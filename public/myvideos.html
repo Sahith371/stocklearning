@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Videos - Market Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #f472b6;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --dark-secondary: #374151;
+            --light: #f9fafb;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            --gradient-soft: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: var(--dark);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.02) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .header {
+            padding: 0.5rem 2.5rem 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+        }
+
+        .header h1 i {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--gray-500);
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .videos-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .videos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .video-card {
+            background: var(--white);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border: 1px solid #000000;
+        }
+
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl), var(--shadow-glow);
+            border-color: var(--primary-light);
+        }
+
+        .video-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-card:hover::after {
+            opacity: 1;
+        }
+
+        .video-thumbnail {
+            width: calc(100% - 12px);
+            height: 185px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 50%, #fce7f3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 3.5rem;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            margin: 6px 6px 0 6px;
+        }
+
+        .video-thumbnail::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .video-thumbnail i {
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 4px 6px rgba(99, 102, 241, 0.3));
+            transition: transform 0.3s ease;
+        }
+
+        .video-card:hover .video-thumbnail i {
+            transform: scale(1.1);
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .video-content {
+            padding: 1.75rem;
+        }
+
+        .video-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.625rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-description {
+            color: var(--gray-500);
+            font-size: 0.925rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .video-price {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--success);
+            background: var(--success-light);
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .video-price i {
+            font-size: 0.75rem;
+        }
+
+        .video-duration {
+            color: var(--gray-400);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .unlocked-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--gradient);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            z-index: 2;
+        }
+
+        .watch-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--gradient);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .watch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .watch-btn:active {
+            transform: translateY(0);
+        }
+
+        .empty-state {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 24px;
+            padding: 5rem 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-100);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .empty-state h3 {
+            color: var(--dark);
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            color: var(--gray-500);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--primary);
+        }
+
+        .loading i {
+            font-size: 3rem;
+            animation: spin 1s linear infinite;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .loading p {
+            color: var(--gray-500);
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 2.25rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .videos-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .video-card {
+                border-radius: 20px;
+            }
+
+            .video-thumbnail {
+                height: 190px;
+                width: calc(100% - 12px);
+                margin: 6px 6px 0 6px;
+                border-radius: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-play-circle"></i> My Videos</h1>
+            <p>Your unlocked video collection</p>
+            <div class="nav-buttons">
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="/mentors" class="btn btn-secondary">
+                    <i class="fas fa-video"></i> Browse Videos
+                </a>
+                <button onclick="refreshVideos()" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Loading your videos...</p>
+        </div>
+
+        <div id="videosContainer" class="videos-grid" style="display: none;">
+            <!-- Videos will be loaded here -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-lock"></i>
+            <h3>No Unlocked Videos Yet</h3>
+            <p>You haven't unlocked any videos yet. Browse our video collection and unlock your first video!</p>
+            <a href="/mentors" class="btn btn-primary">
+                <i class="fas fa-video"></i> Browse Videos
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let unlockedVideos = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUnlockedVideos();
+        });
+
+        // Load unlocked videos
+        async function loadUnlockedVideos() {
+            try {
+                const response = await fetch('/api/user/unlocked-videos', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                console.log('Unlocked videos API response:', data);
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.success && data.videos.length > 0) {
+                    unlockedVideos = data.videos;
+                    console.log('Displaying', data.videos.length, 'videos');
+                    displayVideos(data.videos);
+                } else {
+                    console.log('No videos found or success=false:', data);
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading unlocked videos:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
+
+        // Display videos
+        function displayVideos(videos) {
+            const container = document.getElementById('videosContainer');
+            container.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoCard = createVideoCard(video);
+                container.appendChild(videoCard);
+            });
+            
+            container.style.display = 'grid';
+        }
+
+        // Create video card
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            
+            const videoUrl = video.videoUrl || '#';
+            const thumbnail = video.thumbnail || '';
+            const title = video.title || 'Untitled Video';
+            const topic = video.topic || 'General';
+            const unlockedAt = new Date(video.unlockedAt).toLocaleDateString();
+            
+            card.innerHTML = `
+                <div class="video-thumbnail">
+                    ${thumbnail ? `<img src="${thumbnail}" alt="${title}">` : '<i class="fas fa-play-circle"></i>'}
+                    <div class="unlocked-badge">
+                        <i class="fas fa-unlock"></i> Unlocked
+                    </div>
+                </div>
+                <div class="video-content">
+                    <h3 class="video-title">${title}</h3>
+                    <div class="video-meta">
+                        <span class="video-duration"><i class="fas fa-tag"></i> ${topic}</span>
+                        <span class="video-price"><i class="fas fa-calendar"></i> ${unlockedAt}</span>
+                    </div>
+                    <button class="watch-btn" onclick="watchVideo('${video._id}', '${videoUrl}', '${title}')">
+                        <i class="fas fa-play"></i> Watch Now
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Watch video
+        function watchVideo(videoId, videoUrl, title) {
+            if (videoUrl && videoUrl !== '#') {
+                // Open video in new tab or modal
+                window.open(videoUrl, '_blank');
+            } else {
+                // Show message that video is not available
+                alert(`Video "${title}" is not available for streaming yet. Please contact support.`);
+            }
+        }
+
+        // Refresh videos
+        async function refreshVideos() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('videosContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            
+            await loadUnlockedVideos();
+        }
+    </script>
+</body>
+</html>

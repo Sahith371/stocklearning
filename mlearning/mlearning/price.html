@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Master - Pricing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff4757;
+            --secondary-color: #6c5ce7;
+            --accent-color: #00d2d3;
+            --dark-color: #2d3436;
+            --light-color: #e8e8e8;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 25px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-hero: linear-gradient(135deg, #f0e0e8 0%, #e0e8f0 50%, #f0e8e0 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #e8ebf0;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff6b35;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: -40px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo::before {
+            content: "";
+            width: 55px;
+            height: 55px;
+            background-image: url('https://cdn.vectorstock.com/i/500p/28/22/bull-and-bear-stock-market-logo-vector-4962822.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            animation: none;
+            position: relative;
+            z-index: 11;
+            border-radius: 12px;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            color: #e55a2b;
+        }
+
+        .logo:hover::before {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0;
+            align-items: center;
+            border: 2px solid #d1d1d1;
+            border-radius: 8px;
+            padding: 6px;
+            background: #f8f8f8;
+            height: 50px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 28px;
+            margin: 0 4px;
+            border-radius: 4px;
+        }
+
+        .nav-links a::after {
+            display: none;
+        }
+
+        .nav-links a:hover {
+            color: var(--dark-color);
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Active state for nav links */
+        .nav-links a.active {
+            color: #000;
+            font-weight: 600;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nav-links a[href="#search"] {
+            background: transparent;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: var(--light-color);
+            color: var(--gray-600);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-100);
+            color: var(--dark-color);
+            border-color: var(--gray-300);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background: var(--dark-color);
+            color: var(--light-color);
+            border: 2px solid var(--dark-color);
+        }
+
+        .btn-primary:hover {
+            background: var(--gray-800);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--dark-color);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #8AB84E;
+            color: #111;
+            text-align: center;
+            padding: 7rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(circle at center, rgba(138, 184, 78, 0.4) 0%, rgba(122, 171, 61, 0) 70%);
+            animation: pulse 8s infinite alternate;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
+            z-index: 0;
+            mix-blend-mode: overlay;
+        }
+
+        .hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0.8; }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #111;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 3rem auto 1rem;
+            max-width: 800px;
+        }
+
+        .hero-feature {
+            background: rgba(255,255,255,0.1);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .hero-feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            transform: translateX(-100%) skewX(-15deg);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .hero-feature:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .hero-feature:hover::before {
+            transform: translateX(100%) skewX(-15deg);
+        }
+
+        .hero-feature span:first-child {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .hero-feature:hover span:first-child {
+            background: #4ade80;
+            color: white;
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 5rem 2rem;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+        }
+
+        .pricing-card.popular {
+            transform: scale(1.05);
+            z-index: 1;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .pricing-card.popular:hover {
+            transform: translateY(-10px) scale(1.07);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .plan-description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin: 2.5rem 0;
+            padding: 0;
+        }
+
+        .plan-features li {
+            padding: 0.8rem 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: rgba(249, 250, 251, 0.7);
+            border-left: 3px solid #e5e7eb;
+        }
+
+        .pricing-card:hover .plan-features li {
+            transform: translateX(5px);
+            background: rgba(249, 250, 251, 0.9);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .pricing-card.popular .plan-features li {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .pricing-card:hover .plan-features li:hover {
+            transform: translateX(10px);
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-left-color: #667eea;
+        }
+
+        .pricing-card.popular:hover .plan-features li:hover {
+            border-left-color: #f5576c;
+        }
+
+        .plan-features li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            background: #d1fae5;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .pricing-card:hover .plan-features li:hover::before {
+            background: #10b981;
+            color: white;
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .pricing-card .plan-features li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .pricing-card.popular .plan-features li::after {
+            background: linear-gradient(90deg, rgba(245, 87, 108, 0.1), transparent);
+        }
+
+        .pricing-card:hover .plan-features li:hover::after {
+            transform: translateX(0);
+        }
+
+        .plan-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-button.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .plan-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .plan-button.secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #e0e7ff;
+            background: #f8f9ff;
+        }
+
+        .plan-button.secondary:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .plan-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Commission Section - Exact Match */
+        .commission-section {
+            background: white;
+            padding: 4rem 0;
+        }
+
+        .commission-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .commission-header h2 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .commission-subtitle {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .commission-cards {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .commission-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            width: 280px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow: hidden;
+            transform: translateY(0);
+            will-change: transform, box-shadow;
+        }
+
+        .commission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        .commission-card:nth-child(2) {
+            margin: 0 -10px;
+            z-index: 2;
+            transform: scale(1.03);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .commission-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .commission-card:nth-child(2):hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.2);
+        }
+
+        .commission-card:hover::before {
+            width: 100%;
+            opacity: 0.05;
+        }
+
+        .commission-card:nth-child(3) {
+            z-index: 1;
+        }
+
+        .commission-percentage {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .commission-card:hover .commission-percentage {
+            transform: translateX(5px);
+        }
+
+        .commission-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .commission-card:nth-child(1) .commission-dot {
+            background: #ff9500;
+        }
+
+        .commission-card:nth-child(2) .commission-dot {
+            background: #8b5cf6;
+        }
+
+        .commission-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            background: linear-gradient(45deg, #1a1a1a, #4a4a4a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .commission-card:hover .commission-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .commission-card:nth-child(2) .commission-number {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .commission-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .commission-description strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .custom-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e5e5e5;
+            width: 280px;
+        }
+
+        .custom-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+
+        .custom-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .custom-subtitle strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .custom-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .contact-sales-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .contact-sales-btn:hover {
+            background: #333;
+        }
+
+        /* Stats Section - Dark Background */
+        .stats-section {
+            background: #1a1a1a;
+            padding: 4rem 0;
+        }
+
+        .stats-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .stats-header h3 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .stats-highlight {
+            color: #4ade80;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+            z-index: 2;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card.pink {
+            background: #fecaca;
+            color: #1a1a1a;
+        }
+
+        .stat-card.purple {
+            background: #ddd6fe;
+            color: #1a1a1a;
+        }
+
+        .stat-card.teal {
+            background: #a7f3d0;
+            color: #1a1a1a;
+        }
+
+        .stat-card.amber {
+            background: #fde68a;
+            color: #1a1a1a;
+        }
+
+        .stat-card.green {
+            background: #4ade80;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            margin: 0 auto 1rem;
+            border-radius: 4px;
+        }
+
+        .stat-card.pink .stat-icon {
+            background: #ef4444;
+        }
+
+        .stat-card.purple .stat-icon {
+            background: #8b5cf6;
+        }
+
+        .stat-card.teal .stat-icon {
+            background: #10b981;
+        }
+
+        .stat-card.amber .stat-icon {
+            background: #f59e0b;
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .stat-card:hover .stat-number {
+            transform: scale(1.1);
+        }
+
+        .stat-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card:hover .stat-description {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-description strong {
+            font-weight: 600;
+        }
+
+        .pricing-tags {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-tag {
+            background: white;
+            color: #1a1a1a;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .faq::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgxMDIsIDEyNiwgMjM0LCAwLjAzKSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .faq .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title p {
+            font-size: 1.2rem;
+            color: #6b7280;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .faq-search {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+
+        .faq-search input {
+            width: 100%;
+            padding: 1.2rem 2rem 1.2rem 3.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-search input:focus {
+            outline: none;
+            border-color: #818cf8;
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
+        }
+
+        .faq-search i {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1.2rem;
+        }
+
+        .faq-categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .category-btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-btn i {
+            font-size: 1rem;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-item-header {
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            border-radius: 12px 12px 0 0;
+            margin-bottom: 0;
+        }
+
+        .faq-item.active .faq-item-header {
+            background: linear-gradient(135deg, #667eea 0%, #8e37d7 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .faq-toggle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.2);
+            color: #4b5563;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            color: #4b5563;
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .faq-answer p {
+            margin-bottom: 1rem;
+        }
+
+        .faq-answer p:last-child {
+            margin-bottom: 0;
+        }
+
+        .faq-footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .faq-contact {
+            font-size: 1.1rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-contact a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .faq-contact a:hover {
+            color: #5a67d8;
+            border-bottom-color: #5a67d8;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            z-index: 100;
+            border: none;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .faq {
+                padding: 4rem 1.5rem;
+            }
+
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .faq-item-header {
+                padding: 1.25rem;
+            }
+
+            .faq-question {
+                font-size: 1rem;
+            }
+
+            .faq-answer {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Animation for FAQ items */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .faq-item {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .faq-item:nth-child(1) { animation-delay: 0.1s; }
+        .faq-item:nth-child(2) { animation-delay: 0.2s; }
+        .faq-item:nth-child(3) { animation-delay: 0.3s; }
+        .faq-item:nth-child(4) { animation-delay: 0.4s; }
+        .faq-item:nth-child(5) { animation-delay: 0.5s; }
+        .faq-item:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">market master</a>
+            
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="#mentors" class="nav-link">Mentors</a></li>
+                <li><a href="price.html" class="nav-link active">Pricing</a></li>
+            </ul>
+            
+            <div class="nav-buttons">
+                <a href="upload.html" class="btn btn-primary" data-open-upload>Start Uploading</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero animate-section">
+        <div class="container">
+            <h1 style="color: black;">Simple, Transparent Pricing</h1>
+            <p>Choose the perfect plan for your needs. Start free and scale as you grow. No hidden fees, no surprises.</p>
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <span>✓</span>
+                    <span>14-day free trial</span>
+                </div>
+                <div class="hero-feature">
+                    <span>✓</span>
+                    <span>Cancel anytime</span>
+                </div>
+                <div class="hero-feature">
+                    <span>✓</span>
+                    <span>24/7 support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing animate-section" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Choose Your Plan</h2>
+                <p>Start free and upgrade as you grow</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">Free</div>
+                    <div class="plan-description">Perfect for getting started</div>
+                    <ul class="plan-features">
+                        <li>Create your profile</li>
+                        <li>Basic booking system</li>
+                        <li>Email support</li>
+                        <li>Mobile app access</li>
+                        <li>Basic analytics</li>
+                    </ul>
+                    <button class="plan-button secondary">Get Started Free</button>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card popular">
+                    <div class="popular-badge">⭐ Most Popular</div>
+                    <div class="plan-name">Professional</div>
+                    <div class="plan-price">$29<span style="font-size: 1rem; color: #666;">/month</span></div>
+                    <div class="plan-description">For growing creators and professionals</div>
+                    <ul class="plan-features">
+                        <li>Everything in Starter</li>
+                        <li>Advanced booking features</li>
+                        <li>Custom branding</li>
+                        <li>Priority support</li>
+                        <li>Advanced analytics</li>
+                        <li>Integration tools</li>
+                    </ul>
+                    <button class="plan-button primary">Start Pro Trial</button>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="pricing-card">
+                    <div class="plan-name">Business</div>
+                    <div class="plan-price">$99<span style="font-size: 1rem; color: #666;">/month</span></div>
+                    <div class="plan-description">For teams and established businesses</div>
+                    <ul class="plan-features">
+                        <li>Everything in Professional</li>
+                        <li>Team collaboration</li>
+                        <li>White-label solution</li>
+                        <li>API access</li>
+                        <li>Custom integrations</li>
+                        <li>Dedicated account manager</li>
+                    </ul>
+                    <button class="plan-button secondary">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Commission Section - Exact Match -->
+    <section class="commission-section animate-section" style="background-color: white;">
+        <div class="container">
+            <!-- We earn only when you earn -->
+            <div class="commission-header">
+                <h2>We earn only when<br>you earn</h2>
+                <p class="commission-subtitle">
+                    We charge a small commission on your earnings.<br>
+                    No CC required. No upfront fees. No recurring<br>
+                    charges.
+                </p>
+            </div>
+
+            <!-- Commission Cards -->
+            <div class="commission-cards">
+                <!-- 10% Card -->
+                <div class="commission-card">
+                    <div class="commission-percentage">
+                        <div class="commission-dot"></div>
+                        <div class="commission-number">10%</div>
+                    </div>
+                    <p class="commission-description">
+                        on every sale made through<br>
+                        your <strong>profile</strong> or link.
+                    </p>
+                </div>
+
+                <!-- 20% Card -->
+                <div class="commission-card">
+                    <div class="commission-percentage">
+                        <div class="commission-dot"></div>
+                        <div class="commission-number">20%</div>
+                    </div>
+                    <p class="commission-description">
+                        Charged per transaction<br>
+                        when new customers buy<br>
+                        from you through our<br>
+                        <strong>marketplace</strong>.
+                    </p>
+                </div>
+
+                <!-- Custom Card -->
+                <div class="custom-card">
+                    <div class="custom-title">Custom</div>
+                    <p class="custom-subtitle">
+                        Making <strong>₹10k / $200+</strong> each<br>
+                        month?
+                    </p>
+                    <p class="custom-description">
+                        Let's create something just<br>
+                        for you.
+                    </p>
+                    <button class="contact-sales-btn">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section animate-section">
+            <div class="container">
+                <div class="stats-header">
+                    <h3>Creators on Market Master earn <span class="stats-highlight">73%</span> more</h3>
+                </div>
+
+                <div class="stats-grid">
+                    <!-- Stat Card 1 -->
+                    <div class="stat-card pink">
+                        <div class="stat-icon"></div>
+                        <div class="stat-number">17%</div>
+                        <p class="stat-description">
+                            Uplift in repeat bookings<br>
+                            with <strong>buy-again suggestions</strong>
+                        </p>
+                    </div>
+
+                    <!-- Stat Card 2 -->
+                    <div class="stat-card purple">
+                        <div class="stat-icon"></div>
+                        <div class="stat-number">40%</div>
+                        <p class="stat-description">
+                            increase in conversion<br>
+                            with <strong>testimonial showcase</strong>
+                        </p>
+                    </div>
+
+                    <!-- Stat Card 3 -->
+                    <div class="stat-card teal">
+                        <div class="stat-icon"></div>
+                        <div class="stat-number">25%</div>
+                        <p class="stat-description">
+                            more earnings with<br>
+                            <strong>pay what you want</strong><br>
+                            easiest way to start earning
+                        </p>
+                    </div>
+
+                    <!-- Stat Card 4 -->
+                    <div class="stat-card amber">
+                        <div class="stat-icon"></div>
+                        <div class="stat-number">13%</div>
+                        <p class="stat-description">
+                            uplift in bookings with<br>
+                            <strong>deadline cart emails</strong>
+                        </p>
+                    </div>
+
+                    <!-- Stat Card 5 - Large -->
+                    <div class="stat-card green">
+                        <div class="pricing-tags">
+                            <div class="pricing-tag">₹400</div>
+                            <div class="pricing-tag">$100</div>
+                        </div>
+                        <div class="stat-number">upto 4X</div>
+                        <p class="stat-description">
+                            your earnings with <strong>country<br>
+                            based pricing</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq animate-section" id="faq">
+        <div class="container">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <p>Find answers to common questions about our pricing, features, and platform</p>
+            </div>
+
+            <div class="faq-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="faqSearch" placeholder="Search questions...">
+            </div>
+
+            <div class="faq-categories">
+                <button class="category-btn active" data-category="all">
+                    <i class="fas fa-th-large"></i> All Categories
+                </button>
+                <button class="category-btn" data-category="pricing">
+                    <i class="fas fa-tag"></i> Pricing
+                </button>
+                <button class="category-btn" data-category="features">
+                    <i class="fas fa-star"></i> Features
+                </button>
+                <button class="category-btn" data-category="billing">
+                    <i class="fas fa-credit-card"></i> Billing
+                </button>
+                <button class="category-btn" data-category="account">
+                    <i class="fas fa-user"></i> Account
+                </button>
+            </div>
+
+            <div class="faq-grid">
+                <div class="faq-item" data-categories="pricing" data-index="0">
+                    <div class="faq-item-header">
+                        <h3 class="faq-question">How does the commission structure work?</h3>
+                        <div class="faq-toggle">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We only charge a small commission when you actually earn money. There are no upfront fees, no monthly charges, and no hidden costs. You only pay when you succeed. Our transparent pricing ensures you always know exactly what you're paying for.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-categories="pricing,features" data-index="1">
+                    <div class="faq-item-header">
+                        <h3 class="faq-question">What's included in the 10% commission plan?</h3>
+                        <div class="faq-toggle">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The 10% plan gives you access to our full suite of creator tools while keeping more of your earnings. You'll get:</p>
+                        <ul>
+                            <li>Customizable profile page</li>
+                            <li>Analytics dashboard</li>
+                            <li>Direct booking calendar</li>
+                            <li>Payment processing</li>
+                            <li>Email support</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-categories="pricing,features" data-index="2">
+                    <div class="faq-item-header">
+                        <h3 class="faq-question">When should I consider the 20% plan?</h3>
+                        <div class="faq-toggle">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The 20% plan is ideal when you want to maximize your visibility and reach more potential clients. With this plan, you'll be featured in our marketplace where thousands of potential clients can discover your services. The increased exposure often leads to significantly more bookings, making the higher commission rate worthwhile.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-categories="pricing,account" data-index="3">
+                    <div class="faq-item-header">
+                        <h3 class="faq-question">How do I qualify for custom pricing?</h3>
+                        <div class="faq-toggle">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Custom pricing is available for high-volume creators who are consistently earning ₹10k / $200+ per month. Our team will work with you to create a tailored plan that fits your specific needs and volume. Contact our sales team through the link below to discuss your options.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-categories="billing" data-index="4">
+                    <div class="faq-item-header">
+                        <h3 class="faq-question">Are there any setup fees or monthly charges?</h3>
+                        <div class="faq-toggle">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No, there are absolutely no setup fees, monthly charges, or hidden costs. We believe in a simple, transparent pricing model where we only succeed when you do. The only fee you'll ever pay is a percentage of your earnings, and you'll always see exactly what that percentage is before confirming any transaction.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-categories="features" data-index="5">
+                    <div class="faq-item-header">
+                        <h3 class="faq-question"><span style="color: #000000;">Creators on Market Master earn</span> 73% more</h3>
+                        <div class="faq-toggle">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Our platform is designed to help you maximize your earnings through several key features:</p>
+                        <ul>
+                            <li>Smart pricing recommendations based on your experience and demand</li>
+                            <li>Automated scheduling to reduce no-shows and last-minute cancellations</li>
+                            <li>Client management tools to build lasting relationships</li>
+                            <li>Performance analytics to help you optimize your offerings</li>
+                            <li>Marketing tools to help you promote your services</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </section>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // FAQ Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            const searchInput = document.getElementById('faqSearch');
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const backToTopBtn = document.getElementById('backToTop');
+
+            // Toggle FAQ items
+            faqItems.forEach(item => {
+                const header = item.querySelector('.faq-item-header');
+                const toggle = item.querySelector('.faq-toggle');
+                
+                const toggleItem = () => {
+                    const isActive = item.classList.contains('active');
+                    // Close all items
+                    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                    // Toggle current item if it wasn't active
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                };
+
+                header.addEventListener('click', toggleItem);
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleItem();
+                });
+            });
+
+            // Search functionality
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                        const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                        
+                        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                            item.style.display = 'block';
+                            // Trigger reflow for animation
+                            void item.offsetWidth;
+                            item.style.animation = 'fadeInUp 0.5s ease-out forwards';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Category filtering
+            if (categoryButtons) {
+                categoryButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const category = button.dataset.category;
+                        
+                        // Update active button
+                        categoryButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        // Filter items
+                        faqItems.forEach(item => {
+                            const categories = item.dataset.categories.split(' ');
+                            
+                            if (category === 'all' || categories.includes(category)) {
+                                item.style.display = 'block';
+                                // Trigger reflow for animation
+                                void item.offsetWidth;
+                                item.style.animation = 'fadeInUp 0.5s ease-out forwards';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Back to top button
+            if (backToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        backToTopBtn.classList.add('visible');
+                    } else {
+                        backToTopBtn.classList.remove('visible');
+                    }
+                });
+
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="https://via.placeholder.com/150x40" alt="MentorMe Logo" class="logo-img">
+                    </div>
+                    <p class="footer-description">Empowering creators to share knowledge and monetize their expertise through 1:1 video calls and mentorship.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Twitter" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" aria-label="LinkedIn" class="social-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" aria-label="Instagram" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" aria-label="YouTube" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Platform</h4>
+                    <ul class="footer-menu">
+                        <li><a href="#" class="footer-link">Features</a></li>
+                        <li><a href="#pricing" class="footer-link">Pricing</a></li>
+                        <li><a href="#" class="footer-link">How it Works</a></li>
+                        <li><a href="#" class="footer-link">Success Stories</a></li>
+                        <li><a href="#" class="footer-link">Testimonials</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Resources</h4>
+                    <ul class="footer-menu">
+                        <li><a href="#" class="footer-link">Blog</a></li>
+                        <li><a href="#" class="footer-link">Help Center</a></li>
+                        <li><a href="#" class="footer-link">Community</a></li>
+                        <li><a href="#" class="footer-link">Webinars</a></li>
+                        <li><a href="#" class="footer-link">Guides</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Company</h4>
+                    <ul class="footer-menu">
+                        <li><a href="#" class="footer-link">About Us</a></li>
+                        <li><a href="#" class="footer-link">Careers</a></li>
+                        <li><a href="#" class="footer-link">Contact Us</a></li>
+                        <li><a href="#" class="footer-link">Press</a></li>
+                        <li><a href="#" class="footer-link">Partners</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-newsletter">
+                    <h4 class="footer-heading">Stay Updated</h4>
+                    <p class="newsletter-text">Subscribe to our newsletter for the latest updates and offers.</p>
+                    <form class="newsletter-form">
+                        <div class="form-group">
+                            <input 
+                                type="email" 
+                                class="form-input" 
+                                placeholder="Your email address" 
+                                required
+                                aria-label="Email address"
+                            >
+                            <button type="submit" class="btn-subscribe" aria-label="Subscribe">
+                                <span class="btn-text">Send</span>
+                            </button>
+                        </div>
+                        <p class="form-note"></p>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; 2024 MentorMe. All rights reserved.
+                </div>
+                <div class="footer-legal">
+                    <a href="#" class="legal-link">Privacy Policy</a>
+                    <span class="divider">|</span>
+                    <a href="#" class="legal-link">Terms of Service</a>
+                    <span class="divider">|</span>
+                    <a href="#" class="legal-link">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+    /* Footer Styles */
+    .footer {
+        background: #0a0a0a;
+        color: #fff;
+        padding: 6rem 0 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .footer .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+        margin-bottom: 4rem;
+    }
+
+    .footer-about {
+        max-width: 300px;
+    }
+
+    .footer-logo {
+        margin-bottom: 1.5rem;
+    }
+
+    .logo-img {
+        height: 40px;
+        width: auto;
+    }
+
+    .footer-description {
+        color: #a0a0a0;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .social-link:hover {
+        background: #667eea;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .footer-heading {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.75rem;
+    }
+
+    .footer-heading::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 40px;
+        height: 2px;
+        background: #667eea;
+    }
+
+    .footer-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-menu li {
+        margin-bottom: 0.8rem;
+    }
+
+    .footer-link {
+        color: #a0a0a0;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+        color: #fff;
+    }
+
+    .footer-legal {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .legal-link {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .legal-link:hover {
+        color: #fff;
+    }
+
+    .divider {
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+        .footer-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+        }
+        
+        .footer-about, .footer-newsletter {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .footer {
+            padding: 4rem 0 2rem;
+        }
+        
+        .footer-bottom {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .footer-legal {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .footer-heading {
+            margin-bottom: 1.25rem;
+        }
+        
+        .footer-menu li {
+            margin-bottom: 0.6rem;
+        }
+    }
+    </style>
+
+    <style>
+    .footer-newsletter {
+        max-width: 320px;
+    }
+
+    .newsletter-text {
+        color: #a0a0a0;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .newsletter-form .form-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .form-input {
+        flex: 1;
+        padding: 0.9rem 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    }
+
+    .form-input::placeholder {
+        color: #666;
+    }
+
+    .btn-subscribe {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 100px;
+        height: 48px;
+        padding: 0 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #8e37d7 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-subscribe .btn-text {
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-subscribe:hover .btn-text {
+        transform: translateX(2px);
+    }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.newsletter-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('input[type="email"]').value.trim();
+                if (email) {
+                    // Add your form submission logic here
+                    console.log('Subscribed with:', email);
+                    this.reset();
+                }
+            });
+        }
+    });
+    </script>
+
+    <!-- Add Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script>
+    // Intersection Observer for scroll animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const animatedSections = document.querySelectorAll('.animate-section');
+        const animatedCards = document.querySelectorAll('.pricing-card, .feature-card, .stat-card, .faq-item');
+        
+        // Add initial animation classes
+        animatedSections.forEach(section => {
+            section.classList.add('animate-section');
+        });
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // For sections
+                    if (entry.target.classList.contains('animate-section')) {
+                        entry.target.classList.add('visible');
+                    }
+                    
+                    // For cards within sections
+                    const cards = entry.target.querySelectorAll('.pricing-card, .feature-card, .stat-card, .faq-item');
+                    cards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.add('visible');
+                        }, index * 100); // Stagger the animations
+                    });
+                    
+                    // Unobserve after animation
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        animatedSections.forEach(section => observer.observe(section));
+        
+        // Initial check for elements already in view
+        function checkInitialView() {
+            animatedSections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.9) {
+                    section.classList.add('visible');
+                    
+                    // Animate cards in already visible sections
+                    const cards = section.querySelectorAll('.pricing-card, .feature-card, .stat-card, .faq-item');
+                    cards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.add('visible');
+                        }, index * 100);
+                    });
+                }
+            });
+        }
+
+        // Run initial check
+        checkInitialView();
+    });
+    </script>
+    <style>
+        .text-white {
+            color: white;
+        }
+    </style>
+</body>
+</html>

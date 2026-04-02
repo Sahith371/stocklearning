@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Exam Camera Access</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin-top: 50px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        video {
+            width: 450px;
+            height: 320px;
+            border: 3px solid #333;
+            border-radius: 10px;
+            margin-top: 20px;
+            background: black;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-content button {
+            width: 100%;
+            background: #28a745;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- intro modal -->
+    <div id="introModal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome</h2>
+            <p>Please enter your details to continue</p>
+            <input type="text" id="userName" placeholder="Enter your name" required />
+            <input type="email" id="userEmail" placeholder="Enter your email" required />
+            <button id="continueBtn">Continue</button>
+        </div>
+    </div>
+
+    <h2>Online Exam - Camera Verification</h2>
+
+    <video id="video" autoplay playsinline></video>
+    <br>
+    <button id="allowBtn" onclick="startCamera()">Start Exam (Allow Camera)</button>
+    <button id="startExamBtn" style="display:none; margin-left:10px;">Start Exam</button>
+
+    <p id="status"></p>
+
+    <script>
+        const video = document.getElementById("video");
+        const statusText = document.getElementById("status");
+        const modal = document.getElementById('introModal');
+        const continueBtn = document.getElementById('continueBtn');
+        const nameInput = document.getElementById('userName');
+        const emailInput = document.getElementById('userEmail');
+
+        continueBtn.addEventListener('click', async () => {
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            if (!name || !email) {
+                alert('Please enter both name and email.');
+                return;
+            }
+            
+            try {
+                // Register user in database
+                const response = await fetch('/api/register-exam-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('User registered successfully:', result.user);
+                    // Store email in localStorage for later use
+                    localStorage.setItem('loggedInUserEmail', email);
+                    localStorage.setItem('loggedInUserName', name);
+                    modal.style.display = 'none';
+                } else {
+                    alert('Registration failed: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error registering user:', error);
+                alert('Registration failed. Please try again.');
+            }
+        });
+
+        const startExamBtnEl = document.getElementById('startExamBtn');
+        startExamBtnEl.addEventListener('click', () => {
+            // request fullscreen on current page (user gesture)
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+            // then navigate to quiz page; fullscreen state should persist
+            window.location.href = 'queries.html?startFullscreen=1';
+        });
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+
+                video.srcObject = stream;
+                statusText.innerText = "Camera Access Granted ✅ You may start the exam.";
+                statusText.style.color = "green";
+                // show start exam button once camera is allowed
+                startExamBtnEl.style.display = 'inline-block';
+                // optionally hide allow button
+                document.getElementById('allowBtn').style.display = 'none';
+            } 
+            catch (error) {
+                statusText.innerText = "Camera Access Denied ❌ Exam Blocked.";
+                statusText.style.color = "red";
+                alert("You must allow camera access to continue the exam.");
+                document.body.innerHTML = "<h2 style='color:red;'>Exam Blocked. Camera permission required.</h2>";
+            }
+        }
+    </script>
+
+</body>
+</html>

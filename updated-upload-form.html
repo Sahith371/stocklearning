@@ -1,0 +1,187 @@
+<!-- UPDATED PAYMENT DETAILS SECTION - REPLACE THE QR CODE SECTION IN upload.html WITH THIS -->
+
+<div class="form-group">
+    <label>Payment Details (For Direct Money Transfer)</label>
+    <div class="payment-details-section">
+        <div class="payment-method-toggle">
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="upi" checked onchange="togglePaymentMethod('upi')">
+                <span class="radio-label">UPI ID (Recommended - Instant Transfer)</span>
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="bank" onchange="togglePaymentMethod('bank')">
+                <span class="radio-label">Bank Account (IMPS Transfer)</span>
+            </label>
+        </div>
+
+        <!-- UPI Details -->
+        <div id="upiDetails" class="payment-details">
+            <div class="form-group">
+                <label for="ownerUpiId">Your UPI ID</label>
+                <input type="text" id="ownerUpiId" name="ownerUpiId" 
+                       placeholder="yourname@ybl" class="form-input" required>
+                <p style="font-size: 0.85rem; color: var(--gray); margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Enter your UPI ID (PhonePe, GPay, Paytm, etc.)
+                </p>
+            </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div id="bankDetails" class="payment-details" style="display: none;">
+            <div class="form-group">
+                <label for="ownerAccountName">Account Holder Name</label>
+                <input type="text" id="ownerAccountName" name="ownerAccountName" 
+                       placeholder="John Doe" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="ownerAccountNumber">Account Number</label>
+                <input type="text" id="ownerAccountNumber" name="ownerAccountNumber" 
+                       placeholder="1234567890123456" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="ownerIfsc">IFSC Code</label>
+                <input type="text" id="ownerIfsc" name="ownerIfsc" 
+                       placeholder="HDFC0001234" class="form-input">
+            </div>
+        </div>
+
+        <div class="platform-fee-info">
+            <div class="info-box">
+                <i class="fas fa-percentage"></i>
+                <div>
+                    <h5>Platform Fee: 5%</h5>
+                    <p>You'll receive 95% of each video sale directly to your account</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD THESE CSS STYLES TO YOUR upload.html CSS SECTION -->
+
+<style>
+.payment-details-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+}
+
+.payment-method-toggle {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.payment-option:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.payment-option input[type="radio"] {
+    accent-color: #667eea;
+}
+
+.payment-option input[type="radio"]:checked + .radio-label {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.payment-option input[type="radio"]:checked ~ .payment-option {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.radio-label {
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.payment-details {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.platform-fee-info {
+    margin-top: 1.5rem;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #e8f5e8;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.info-box i {
+    font-size: 1.5rem;
+    color: #28a745;
+}
+
+.info-box h5 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    color: #155724;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #155724;
+}
+</style>
+
+<!-- ADD THIS JAVASCRIPT TO YOUR upload.html SCRIPT SECTION -->
+
+<script>
+function togglePaymentMethod(method) {
+    const upiDetails = document.getElementById('upiDetails');
+    const bankDetails = document.getElementById('bankDetails');
+    
+    if (method === 'upi') {
+        upiDetails.style.display = 'block';
+        bankDetails.style.display = 'none';
+        document.getElementById('ownerUpiId').setAttribute('required', 'required');
+        document.getElementById('ownerAccountName').removeAttribute('required');
+        document.getElementById('ownerAccountNumber').removeAttribute('required');
+        document.getElementById('ownerIfsc').removeAttribute('required');
+    } else {
+        upiDetails.style.display = 'none';
+        bankDetails.style.display = 'block';
+        document.getElementById('ownerUpiId').removeAttribute('required');
+        document.getElementById('ownerAccountName').setAttribute('required', 'required');
+        document.getElementById('ownerAccountNumber').setAttribute('required', 'required');
+        document.getElementById('ownerIfsc').setAttribute('required', 'required');
+    }
+}
+
+// Update form submission to include payment details
+function updateFormData() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    
+    if (paymentMethod === 'upi') {
+        formData.append('ownerUpiId', document.getElementById('ownerUpiId').value);
+    } else {
+        formData.append('ownerAccountName', document.getElementById('ownerAccountName').value);
+        formData.append('ownerAccountNumber', document.getElementById('ownerAccountNumber').value);
+        formData.append('ownerIfsc', document.getElementById('ownerIfsc').value);
+    }
+}
+</script>

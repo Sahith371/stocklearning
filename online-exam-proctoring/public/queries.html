@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .exam-title { font-size: 20px; font-weight: 600; color: #1a202c; }
+        .timer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 8px 16px; border-radius: 8px;
+            font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px;
+        }
+        .exit-btn {
+            background: #ef4444; color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .exit-btn:hover { background: #dc2626; transform: translateY(-1px); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ── LAYOUT ── */
+        .main-container {
+            flex: 1; display: flex; padding: 30px; gap: 30px;
+            max-width: 1400px; margin: 0 auto; width: 100%;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 300px; background: white; border-radius: 16px;
+            padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            height: fit-content; position: sticky; top: 30px;
+        }
+        .webcam-container {
+            background: #000; border-radius: 12px;
+            overflow: hidden; margin-bottom: 20px; position: relative;
+        }
+        #webcam { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .webcam-label {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.7); color: white;
+            padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+        }
+        .progress-section { margin-top: 4px; }
+        .progress-title { font-size: 14px; font-weight: 600; color: #64748b; margin-bottom: 10px; }
+        .progress-bar { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%; width: 0%; transition: width 0.4s ease;
+        }
+        .dots-title { font-size: 13px; font-weight: 600; color: #64748b; margin: 18px 0 10px; }
+        .question-dots { display: flex; flex-wrap: wrap; gap: 8px; }
+        .q-dot {
+            width: 36px; height: 36px; border-radius: 10px;
+            border: 2px solid #e2e8f0; background: #f8fafc;
+            font-size: 13px; font-weight: 700; color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .q-dot:hover { border-color: #667eea; color: #667eea; transform: scale(1.1); }
+        .q-dot.active { background: linear-gradient(135deg, #667eea, #764ba2); border-color: transparent; color: white; }
+        .q-dot.answered:not(.active) { background: #d1fae5; border-color: #10b981; color: #065f46; }
+        .legend { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #94a3b8; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+        /* ── QUESTION AREA ── */
+        .questions-container {
+            flex: 1; background: white; border-radius: 16px;
+            padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 8px 16px; border-radius: 8px;
+            font-weight: 600; font-size: 14px; display: inline-block; margin-bottom: 18px;
+        }
+        .question-text { font-size: 18px; font-weight: 500; color: #1a202c; line-height: 1.7; margin-bottom: 28px; }
+        .options-container { display: grid; gap: 14px; }
+        .option {
+            background: #f8fafc; border: 2px solid #e2e8f0;
+            border-radius: 12px; padding: 18px 20px;
+            cursor: pointer; transition: all 0.25s ease; position: relative;
+        }
+        .option:hover { background: #f1f5f9; border-color: #667eea; transform: translateY(-2px); }
+        .option.selected { background: #ede9fe; border-color: #667eea; }
+        .option input[type="radio"] { position: absolute; opacity: 0; }
+        .option-label { display: flex; align-items: flex-start; gap: 14px; cursor: pointer; pointer-events: none; }
+        .option-marker {
+            width: 20px; height: 20px; border: 2px solid #cbd5e1;
+            border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+            transition: all 0.25s ease; position: relative;
+        }
+        .option.selected .option-marker { background: #667eea; border-color: #667eea; }
+        .option.selected .option-marker::after {
+            content: ''; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 8px; height: 8px; background: white; border-radius: 50%;
+        }
+        .navigation {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;
+        }
+        .nav-btn { padding: 12px 28px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; font-size: 14px; }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .prev-btn { background: #f3f4f6; color: #64748b; }
+        .prev-btn:hover:not(:disabled) { background: #e2e8f0; }
+        .next-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .next-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.35); }
+        .submit-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16,185,129,0.35) !important; }
+
+        /* ── EXIT MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: white; border-radius: 16px; padding: 30px;
+            max-width: 420px; width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            text-align: center;
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 26px; }
+        .modal-title { font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 10px; }
+        .modal-text { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 25px; }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; }
+        .modal-btn-cancel { background: #f3f4f6; color: #64748b; }
+        .modal-btn-cancel:hover { background: #e2e8f0; }
+        .modal-btn-ok { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .modal-btn-ok:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,0.3); }
+
+        /* ── FULLSCREEN PROMPT ── */
+        #fullscreenPrompt {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.93);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999; backdrop-filter: blur(12px);
+        }
+        .prompt-box {
+            background: white; padding: 50px; border-radius: 24px;
+            text-align: center; max-width: 520px; width: 90%;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+            animation: scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.82); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+        .prompt-box h2 { color: #1a202c; font-size: 26px; margin-bottom: 14px; }
+        .prompt-box p  { color: #64748b; font-size: 15px; line-height: 1.7; margin-bottom: 30px; }
+        #startBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 18px 40px;
+            border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        #startBtn:hover { transform: scale(1.05); box-shadow: 0 10px 28px rgba(102,126,234,0.5); }
+
+        /* ══════════════════════════════════════════════════
+           SCORECARD  —  clean white professional design
+        ══════════════════════════════════════════════════ */
+        #scorecardPage {
+            display: none;
+            position: fixed; inset: 0; z-index: 99990;
+            background: #f0f4ff;
+            overflow-y: auto;
+        }
+        #scorecardPage.show { display: block; }
+
+        /* confetti on top */
+        #confettiCanvas {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 99995;
+        }
+
+        /* top accent bar */
+        .sc-topbar {
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f6d365 100%);
+        }
+
+        /* header strip */
+        .sc-header {
+            background: white;
+            padding: 18px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 0 #e9eef8;
+        }
+        .sc-header-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 17px; font-weight: 700; color: #1a202c;
+        }
+        .sc-header-brand span { font-size: 22px; }
+        .sc-header-meta { font-size: 13px; color: #94a3b8; }
+
+        /* main body */
+        .sc-body {
+            max-width: 860px; margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* hero card */
+        .sc-hero {
+            background: white; border-radius: 24px;
+            padding: 48px 40px 40px;
+            box-shadow: 0 4px 30px rgba(102,126,234,0.1);
+            border: 1px solid #e8edf8;
+            text-align: center;
+            margin-bottom: 24px;
+            animation: slideUp 0.6s cubic-bezier(0.34,1.3,0.64,1) both;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        /* trophy badge */
+        .sc-trophy {
+            width: 88px; height: 88px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 42px; margin: 0 auto 20px;
+            animation: popIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+        }
+        @keyframes popIn {
+            from { transform: scale(0) rotate(-30deg); opacity: 0; }
+            to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+        }
+
+        .sc-result-title {
+            font-size: 28px; font-weight: 900; color: #1a202c;
+            letter-spacing: -0.5px; margin-bottom: 6px;
+            animation: fadeUp 0.5s ease 0.4s both;
+        }
+        .sc-result-sub {
+            font-size: 14px; color: #94a3b8; margin-bottom: 36px;
+            animation: fadeUp 0.5s ease 0.5s both;
+        }
+        @keyframes fadeUp {
+            from { transform: translateY(12px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        /* score ring */
+        .sc-ring-wrap {
+            position: relative; width: 160px; height: 160px;
+            margin: 0 auto 28px;
+            animation: fadeUp 0.5s ease 0.6s both;
+        }
+        .sc-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+        .sc-ring-bg   { fill: none; stroke: #f0f4ff; stroke-width: 14; }
+        .sc-ring-fill {
+            fill: none; stroke-width: 14; stroke-linecap: round;
+            stroke-dasharray: 440; stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1) 0.9s;
+        }
+        .sc-ring-center {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .sc-score-num {
+            font-size: 50px; font-weight: 900; color: #1a202c;
+            line-height: 1; letter-spacing: -3px;
+        }
+        .sc-score-pct { font-size: 15px; color: #94a3b8; font-weight: 600; margin-top: 4px; }
+
+        /* grade pill */
+        .sc-grade-pill {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 9px 24px; border-radius: 50px;
+            font-size: 14px; font-weight: 700;
+            margin-bottom: 0;
+            animation: fadeUp 0.5s ease 0.75s both;
+        }
+
+        /* stats grid */
+        .sc-stats {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 16px; margin-bottom: 24px;
+            animation: slideUp 0.5s cubic-bezier(0.34,1.2,0.64,1) 0.15s both;
+        }
+        .sc-stat {
+            background: white; border-radius: 18px;
+            padding: 24px 16px; text-align: center;
+            box-shadow: 0 2px 16px rgba(102,126,234,0.08);
+            border: 1px solid #e8edf8;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sc-stat:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(102,126,234,0.14); }
+        .sc-stat-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; margin: 0 auto 12px;
+        }
+        .sc-stat-num { font-size: 30px; font-weight: 900; color: #1a202c; line-height: 1; margin-bottom: 6px; }
+        .sc-stat-label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.6px; }
+
+        /* review card */
+        .sc-review-card {
+            background: white; border-radius: 20px;
+            padding: 28px 32px;
+            box-shadow: 0 2px 16px rgba(102,126,234,0.08);
+            border: 1px solid #e8edf8;
+            margin-bottom: 24px;
+            animation: slideUp 0.5s cubic-bezier(0.34,1.2,0.64,1) 0.25s both;
+        }
+        .sc-section-title {
+            font-size: 13px; font-weight: 700; color: #64748b;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+        .sc-review-grid {
+            display: flex; flex-wrap: wrap; gap: 10px;
+        }
+        .sc-r-dot {
+            width: 42px; height: 42px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800;
+            transition: transform 0.2s ease;
+            cursor: default; position: relative;
+        }
+        .sc-r-dot:hover { transform: scale(1.12); }
+        .sc-r-dot.correct  { background: #ecfdf5; color: #065f46; border: 2px solid #6ee7b7; }
+        .sc-r-dot.wrong    { background: #fef2f2; color: #991b1b; border: 2px solid #fca5a5; }
+        .sc-r-dot.skipped  { background: #f8fafc; color: #94a3b8; border: 2px dashed #cbd5e1; }
+
+        /* legend for review */
+        .sc-review-legend {
+            display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap;
+        }
+        .sc-leg-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #64748b; }
+        .sc-leg-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+
+        /* time card */
+        .sc-time-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px; padding: 24px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 24px rgba(102,126,234,0.3);
+            animation: slideUp 0.5s cubic-bezier(0.34,1.2,0.64,1) 0.3s both;
+        }
+        .sc-time-left { display: flex; align-items: center; gap: 14px; }
+        .sc-time-icon { font-size: 32px; }
+        .sc-time-label { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; margin-bottom: 3px; }
+        .sc-time-val { font-size: 22px; font-weight: 800; color: white; }
+        .sc-accuracy-wrap { text-align: right; }
+        .sc-accuracy-label { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
+        .sc-accuracy-val { font-size: 28px; font-weight: 900; color: white; }
+
+        /* finish button */
+        .sc-finish-wrap {
+            text-align: center;
+            animation: fadeUp 0.5s ease 0.4s both;
+        }
+        .sc-finish-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border: none; padding: 16px 56px;
+            border-radius: 14px; font-size: 16px; font-weight: 700;
+            cursor: pointer; letter-spacing: 0.3px;
+            box-shadow: 0 8px 24px rgba(102,126,234,0.4);
+            transition: all 0.25s ease;
+        }
+        .sc-finish-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(102,126,234,0.5); }
+        .sc-finish-hint { font-size: 12px; color: #94a3b8; margin-top: 12px; }
+
+        /* Coupon Section Styles */
+        .sc-coupon-section {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #16a34a;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.1);
+            animation: slideUp 0.5s ease;
+        }
+
+        .sc-section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #166534;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .sc-coupon-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sc-coupon-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .sc-coupon-icon {
+            font-size: 2.5rem;
+            color: #f59e0b;
+        }
+
+        .sc-coupon-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .sc-coupon-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .sc-coupon-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .sc-coupon-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'Courier New', monospace;
+        }
+
+        .sc-copy-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #4b5563;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sc-copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: #1f2937;
+        }
+
+        .sc-coupon-instructions {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .sc-coupon-instructions h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .sc-coupon-instructions ol {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #374151;
+        }
+
+        .sc-coupon-instructions li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .sc-coupon-instructions strong {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; position: relative; top: 0; }
+        }
+        @media (max-width: 640px) {
+            .header { padding: 10px 15px; }
+            .exam-title { font-size: 15px; }
+            .main-container { padding: 15px; }
+            .questions-container { padding: 20px; }
+            .question-text { font-size: 16px; }
+            .navigation { flex-direction: column; gap: 10px; }
+            .nav-btn { width: 100%; }
+            .sc-body { padding: 24px 14px 48px; }
+            .sc-hero { padding: 32px 20px; }
+            .sc-stats { gap: 10px; }
+            .sc-time-card { flex-direction: column; gap: 16px; text-align: center; }
+            .sc-accuracy-wrap { text-align: center; }
+            .sc-header { padding: 14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fullscreen Prompt -->
+    <div id="fullscreenPrompt">
+        <div class="prompt-box">
+            <h2>🖥️ Fullscreen Mode Required</h2>
+            <p>This stock market assessment must be taken in fullscreen mode.<br>
+               Your browser tabs and address bar will be hidden.<br>
+               Click below to begin your 10-question exam.</p>
+            <button id="startBtn" onclick="enterFullscreen()">▶ Start Fullscreen Assessment</button>
+        </div>
+    </div>
+
+    <!-- ══ SCORECARD PAGE ══ -->
+    <div id="scorecardPage">
+        <canvas id="confettiCanvas"></canvas>
+        <div class="sc-topbar"></div>
+        <div class="sc-header">
+            <div class="sc-header-brand"><span>📈</span> Stock Market Assessment</div>
+            <div class="sc-header-meta" id="scDate"></div>
+        </div>
+        <div class="sc-body">
+
+            <!-- Hero -->
+            <div class="sc-hero">
+                <div class="sc-trophy" id="scTrophy">🏆</div>
+                <h1 class="sc-result-title" id="scTitle">Exam Complete!</h1>
+                <p class="sc-result-sub">Stock Market Assessment &nbsp;·&nbsp; 10 Questions</p>
+
+                <div class="sc-ring-wrap">
+                    <svg viewBox="0 0 160 160" width="160" height="160">
+                        <circle class="sc-ring-bg" cx="80" cy="80" r="70"/>
+                        <circle class="sc-ring-fill" id="scRingFill" cx="80" cy="80" r="70"
+                                stroke="url(#scGrad)"/>
+                        <defs>
+                            <linearGradient id="scGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#667eea" id="grad0"/>
+                                <stop offset="100%" stop-color="#764ba2" id="grad1"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="sc-ring-center">
+                        <div class="sc-score-num" id="scScoreNum">0</div>
+                        <div class="sc-score-pct" id="scScorePct">0%</div>
+                    </div>
+                </div>
+
+                <div class="sc-grade-pill" id="scGradePill">—</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="sc-stats">
+                <div class="sc-stat">
+                    <div class="sc-stat-icon" style="background:#ecfdf5;">✅</div>
+                    <div class="sc-stat-num" id="scCorrect" style="color:#059669;">0</div>
+                    <div class="sc-stat-label">Correct</div>
+                </div>
+                <div class="sc-stat">
+                    <div class="sc-stat-icon" style="background:#fef2f2;">❌</div>
+                    <div class="sc-stat-num" id="scWrong" style="color:#dc2626;">0</div>
+                    <div class="sc-stat-label">Wrong</div>
+                </div>
+                <div class="sc-stat">
+                    <div class="sc-stat-icon" style="background:#f8fafc;">⏭️</div>
+                    <div class="sc-stat-num" id="scSkipped" style="color:#64748b;">0</div>
+                    <div class="sc-stat-label">Skipped</div>
+                </div>
+            </div>
+
+            <!-- Time & Accuracy -->
+            <div class="sc-time-card">
+                <div class="sc-time-left">
+                    <div class="sc-time-icon">⏱️</div>
+                    <div>
+                        <div class="sc-time-label">Time Taken</div>
+                        <div class="sc-time-val" id="scTimeTaken">—</div>
+                    </div>
+                </div>
+                <div class="sc-accuracy-wrap">
+                    <div class="sc-accuracy-label">Accuracy</div>
+                    <div class="sc-accuracy-val" id="scAccuracy">0%</div>
+                </div>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="sc-coupon-section" id="scCouponSection" style="display: none;">
+                <div class="sc-section-title">🎉 Discount Earned!</div>
+                <div class="sc-coupon-card">
+                    <div class="sc-coupon-header">
+                        <div class="sc-coupon-icon">🎁</div>
+                        <div class="sc-coupon-title">30% Discount Coupon</div>
+                    </div>
+                    <div class="sc-coupon-code">
+                        <div class="sc-coupon-label">Your Code:</div>
+                        <div class="sc-coupon-value" id="scCouponCode">STOCK30XXXXXX</div>
+                        <button class="sc-copy-btn" onclick="copyCouponCode()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="sc-coupon-instructions">
+                        <h4>How to Use Your Discount:</h4>
+                        <ol>
+                            <li>Go to <strong>mentors page</strong></li>
+                            <li>Click <strong>"Pay Now"</strong> on any paid video</li>
+                            <li>Enter your coupon code in the discount field</li>
+                            <li>Click <strong>"Apply"</strong> to get 30% off</li>
+                            <li>Complete payment at discounted price</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Review -->
+            <div class="sc-review-card">
+                <div class="sc-section-title">Question-by-Question Review</div>
+                <div class="sc-review-grid" id="scReviewGrid"></div>
+                <div class="sc-review-legend">
+                    <div class="sc-leg-item">
+                        <div class="sc-leg-dot" style="background:#6ee7b7;border:1px solid #10b981;"></div> Correct
+                    </div>
+                    <div class="sc-leg-item">
+                        <div class="sc-leg-dot" style="background:#fca5a5;border:1px solid #ef4444;"></div> Wrong
+                    </div>
+                    <div class="sc-leg-item">
+                        <div class="sc-leg-dot" style="background:#f8fafc;border:1px dashed #cbd5e1;"></div> Skipped
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finish -->
+            <div class="sc-finish-wrap">
+                <button class="sc-finish-btn" onclick="finishExam()">✓ &nbsp; Finish &amp; Close</button>
+                <p class="sc-finish-hint">Thank you for completing the assessment.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="exam-title">📈 Stock Market Assessment</h1>
+            <div class="timer">⏱️ <span id="timer">25:00</span></div>
+        </div>
+        <button class="exit-btn" onclick="showExitModal()">Exit Exam</button>
+    </header>
+
+    <!-- Main -->
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="webcam-container">
+                <video id="webcam" autoplay playsinline muted></video>
+                <div class="webcam-label">📹 Live</div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-title">Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="dots-title">Questions</div>
+            <div class="question-dots" id="questionDots"></div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:linear-gradient(135deg,#667eea,#764ba2);"></div> Current
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#d1fae5;border:1px solid #10b981;"></div> Answered
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#f8fafc;border:1px solid #e2e8f0;"></div> Not answered
+                </div>
+            </div>
+        </aside>
+
+        <main class="questions-container">
+            <div class="question-number" id="questionNumber">Question 1 of 10</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="navigation">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="previousQuestion()">← Previous</button>
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Exit Modal -->
+    <div class="modal-overlay" id="exitModal">
+        <div class="modal">
+            <div class="modal-icon">⚠️</div>
+            <h2 class="modal-title">Exit Exam?</h2>
+            <p class="modal-text">Are you sure you want to exit the exam? Your progress will be lost and the exam will be canceled.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeExitModal()">Continue Exam</button>
+                <button class="modal-btn modal-btn-ok" onclick="confirmExit()">Exit Exam</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ── QUESTIONS DATA ── */
+        const questions = [
+            {
+                text: "What does 'Bull Market' mean in stock market terminology?",
+                options: [
+                    "A market where stock prices are falling consistently",
+                    "A market where stock prices are rising consistently",
+                    "A market with very low trading volume",
+                    "A market controlled by large institutional investors"
+                ],
+                correct: 1
+            },
+            {
+                text: "What is a 'Dividend' in the context of stocks?",
+                options: [
+                    "A fee charged by brokers for executing trades",
+                    "The difference between the buying and selling price of a stock",
+                    "A portion of a company's profit distributed to its shareholders",
+                    "The total market value of a company's outstanding shares"
+                ],
+                correct: 2
+            },
+            {
+                text: "What does 'P/E Ratio' stand for in stock market analysis?",
+                options: [
+                    "Profit and Earnings Ratio",
+                    "Price-to-Earnings Ratio",
+                    "Portfolio Evaluation Ratio",
+                    "Potential Equity Ratio"
+                ],
+                correct: 1
+            },
+            {
+                text: "Which of the following best describes a 'Bear Market'?",
+                options: [
+                    "A market experiencing a rise of more than 20% from recent lows",
+                    "A highly volatile market with unpredictable price swings",
+                    "A market decline of 20% or more from recent highs over a sustained period",
+                    "A market dominated entirely by small-cap stocks"
+                ],
+                correct: 2
+            },
+            {
+                text: "What is 'Market Capitalization'?",
+                options: [
+                    "The total value of all trades executed on an exchange in a single day",
+                    "The annual revenue generated by a publicly listed company",
+                    "The total market value of a company's outstanding shares",
+                    "The maximum stock price a company has ever achieved"
+                ],
+                correct: 2
+            },
+            {
+                text: "What is an 'IPO' in the stock market?",
+                options: [
+                    "International Portfolio Offering — a fund investing across global markets",
+                    "Initial Public Offering — when a private company first sells shares to the public",
+                    "Indexed Price Operation — a method used for tracking major stock indices",
+                    "Institutional Purchase Order — a bulk buy placed by large investment funds"
+                ],
+                correct: 1
+            },
+            {
+                text: "What does 'Short Selling' mean in stock trading?",
+                options: [
+                    "Buying stocks at a discounted price during a market dip",
+                    "Selling stocks within 24 hours of purchasing them for a quick gain",
+                    "Borrowing shares and selling them, hoping to buy them back at a lower price",
+                    "Selling only a small portion of your total stock holdings"
+                ],
+                correct: 2
+            },
+            {
+                text: "What is a 'Stock Index' such as the S&P 500 or NIFTY 50?",
+                options: [
+                    "A government-regulated maximum price ceiling for listed stocks",
+                    "A statistical measure tracking the performance of a selected group of stocks",
+                    "A government list of companies banned from stock exchange trading",
+                    "A fixed interest rate benchmark offered alongside stock market bonds"
+                ],
+                correct: 1
+            },
+            {
+                text: "What does 'Volatility' refer to in financial markets?",
+                options: [
+                    "The liquidity level of a stock, indicating how easily it can be bought or sold",
+                    "The degree of price fluctuation of a stock or market over a given period",
+                    "The total number of shares traded on an exchange in one trading day",
+                    "The difference between a company's book value and its current market value"
+                ],
+                correct: 1
+            },
+            {
+                text: "What is 'Diversification' as an investment strategy?",
+                options: [
+                    "Concentrating all capital into a single high-performing stock for maximum returns",
+                    "Rapidly buying and selling stocks to profit from short-term price movements",
+                    "Spreading investments across different asset classes and sectors to reduce risk",
+                    "Investing exclusively in international stocks to hedge against local market downturns"
+                ],
+                correct: 2
+            }
+        ];
+
+        /* ── STATE ── */
+        let currentIndex = 0;
+        const totalQuestions = questions.length;
+        let timeRemaining = 1500;
+        let timerInterval = null;
+        let answers = new Array(totalQuestions).fill(null);
+        let examStarted = false;
+        let webcamStream = null;
+
+        /* ── RENDER ── */
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('questionNumber').textContent = `Question ${currentIndex + 1} of ${totalQuestions}`;
+            document.getElementById('questionText').textContent = q.text;
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option' + (answers[currentIndex] === i ? ' selected' : '');
+                div.onclick = () => selectOption(i);
+                div.innerHTML = `
+                    <input type="radio" name="answer" ${answers[currentIndex] === i ? 'checked' : ''}>
+                    <label class="option-label">
+                        <span class="option-marker"></span>
+                        <span>${opt}</span>
+                    </label>`;
+                container.appendChild(div);
+            });
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            const nb = document.getElementById('nextBtn');
+            if (currentIndex === totalQuestions - 1) { nb.textContent = 'Submit Exam'; nb.className = 'nav-btn next-btn submit-btn'; }
+            else { nb.textContent = 'Next →'; nb.className = 'nav-btn next-btn'; }
+            updateProgress(); renderDots();
+        }
+
+        function selectOption(i) { answers[currentIndex] = i; renderQuestion(); }
+        function nextQuestion() {
+            if (currentIndex < totalQuestions - 1) { currentIndex++; renderQuestion(); }
+            else submitExam();
+        }
+        function previousQuestion() { if (currentIndex > 0) { currentIndex--; renderQuestion(); } }
+        function goToQuestion(i) { currentIndex = i; renderQuestion(); }
+
+        function updateProgress() {
+            const done = answers.filter(a => a !== null).length;
+            document.getElementById('progressFill').style.width = `${(done / totalQuestions) * 100}%`;
+        }
+        function renderDots() {
+            const c = document.getElementById('questionDots'); c.innerHTML = '';
+            questions.forEach((_, i) => {
+                const d = document.createElement('div');
+                let cls = 'q-dot';
+                if (i === currentIndex) cls += ' active';
+                else if (answers[i] !== null) cls += ' answered';
+                d.className = cls; d.textContent = i + 1;
+                d.onclick = () => goToQuestion(i);
+                c.appendChild(d);
+            });
+        }
+
+        /* ── FULLSCREEN ── */
+        function requestFS() {
+            const el = document.documentElement;
+            const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+            if (fn) fn.call(el).catch(() => {});
+        }
+        function exitFS() {
+            try {
+                const fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+                if (fn) fn.call(document).catch(() => {});
+            } catch(e) {}
+        }
+        function enterFullscreen() {
+            document.getElementById('fullscreenPrompt').style.display = 'none';
+            examStarted = true; requestFS(); initWebcam(); startTimer(); renderQuestion();
+        }
+        function onFSChange() {
+            const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+            if (!isFS && examStarted) showExitModal();
+        }
+        document.addEventListener('fullscreenchange',       onFSChange);
+        document.addEventListener('webkitfullscreenchange', onFSChange);
+        document.addEventListener('mozfullscreenchange',    onFSChange);
+        document.addEventListener('MSFullscreenChange',     onFSChange);
+
+        /* ── WEBCAM ── */
+        async function initWebcam() {
+            try {
+                webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                document.getElementById('webcam').srcObject = webcamStream;
+            } catch(e) { console.warn('Webcam unavailable:', e); }
+        }
+        function stopWebcam() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(t => t.stop());
+                webcamStream = null;
+                document.getElementById('webcam').srcObject = null;
+            }
+        }
+
+        /* ── TIMER ── */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60).toString().padStart(2,'0');
+                const s = (timeRemaining % 60).toString().padStart(2,'0');
+                document.getElementById('timer').textContent = `${m}:${s}`;
+                if (timeRemaining <= 0) { clearInterval(timerInterval); submitExam(); }
+            }, 1000);
+        }
+
+        /* ── EXIT MODAL ── */
+        function showExitModal() { document.getElementById('exitModal').classList.add('active'); }
+        function closeExitModal() { document.getElementById('exitModal').classList.remove('active'); requestFS(); }
+        function confirmExit() { stopWebcam(); window.location.href = 'http://localhost:4000/index.html'; }
+
+        /* ══════════════════════════════════════════
+           SUBMIT EXAM
+        ══════════════════════════════════════════ */
+        function submitExam() {
+            clearInterval(timerInterval);
+            examStarted = false;
+
+            /* 1. Exit fullscreen */
+            exitFS();
+
+            /* 2. Stop camera */
+            stopWebcam();
+
+            /* 3. Calculate */
+            let correct = 0, wrong = 0, skipped = 0;
+            answers.forEach((ans, i) => {
+                if (ans === null) skipped++;
+                else if (ans === questions[i].correct) correct++;
+                else wrong++;
+            });
+            const pct = Math.round((correct / totalQuestions) * 100);
+            const taken = 1500 - timeRemaining;
+            const mm = Math.floor(taken / 60), ss = taken % 60;
+            const timeStr = `${mm}m ${ss.toString().padStart(2,'0')}s`;
+            const accuracy = answers.filter(a => a !== null).length === 0 ? 0
+                : Math.round((correct / answers.filter(a => a !== null).length) * 100);
+
+            // Debug logging
+            console.log('=== SCORE DEBUG ===');
+            console.log('Total questions:', totalQuestions);
+            console.log('Correct answers:', correct);
+            console.log('Wrong answers:', wrong);
+            console.log('Skipped answers:', skipped);
+            console.log('Non-null answers:', answers.filter(a => a !== null).length);
+            console.log('Calculated percentage:', pct);
+
+            /* 4. Grade */
+            let grade, trophy, title, c0, c1;
+            if (pct >= 90)      { grade='🥇 Excellent'; trophy='🏆'; title='Outstanding Performance!'; c0='#f6d365'; c1='#fda085'; }
+            else if (pct >= 70) { grade='🥈 Good';      trophy='🎖️'; title='Great Job!';              c0='#667eea'; c1='#764ba2'; }
+            else if (pct >= 50) { grade='🥉 Average';   trophy='👍'; title='Good Effort!';            c0='#10b981'; c1='#059669'; }
+            else                { grade='📚 Needs Work'; trophy='📖'; title='Keep Practicing!';        c0='#f97316'; c1='#ef4444'; }
+
+            /* 5. Populate */
+            document.getElementById('scDate').textContent =
+                new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+            document.getElementById('scTrophy').textContent = trophy;
+            document.getElementById('scTitle').textContent  = title;
+            document.getElementById('scScoreNum').textContent = correct;
+            document.getElementById('scScorePct').textContent = pct + '%';
+            document.getElementById('scCorrect').textContent  = correct;
+            document.getElementById('scWrong').textContent    = wrong;
+            document.getElementById('scSkipped').textContent  = skipped;
+            document.getElementById('scTimeTaken').textContent = timeStr;
+            document.getElementById('scAccuracy').textContent  = accuracy + '%';
+
+            // Get logged-in user email from localStorage
+            function getLoggedInUserEmail() {
+                return localStorage.getItem('loggedInUserEmail') || 'anonymous';
+            }
+
+            // Show results and generate coupon if score >= 70%
+            if (pct >= 70) {
+                console.log('=== GENERATING COUPON ===');
+                console.log('Score percentage:', pct);
+                console.log('Score condition met: pct >= 70');
+                
+                // Generate coupon via server API
+                fetch('/api/generate-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        score: pct,
+                        userEmail: getLoggedInUserEmail() // Send user email to find name from examusers
+                    })
+                })
+                .then(response => {
+                    console.log('API Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response data:', data);
+                    if (data.success) {
+                        console.log('Coupon generated:', data.coupon);
+                        
+                        // Store coupon in localStorage for easy access
+                        localStorage.setItem('discountCoupon', data.coupon);
+                        localStorage.setItem('couponGenerated', Date.now().toString());
+                        localStorage.setItem('couponExpires', data.expiresAt);
+                        
+                        // Show coupon section and populate with actual code
+                        const couponSection = document.getElementById('scCouponSection');
+                        const couponCodeElement = document.getElementById('scCouponCode');
+                        
+                        if (couponSection && couponCodeElement) {
+                            couponSection.style.display = 'block';
+                            couponCodeElement.textContent = data.coupon;
+                        }
+                    } else {
+                        console.error('Failed to generate coupon:', data.error);
+                        alert('Failed to generate coupon: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating coupon:', error);
+                    console.log('Using fallback local generation...');
+                    
+                    // Fallback to local generation if server fails
+                    const couponCode = 'STOCK30' + Math.random().toString(36).substr(2, 8).toUpperCase();
+                    localStorage.setItem('discountCoupon', couponCode);
+                    localStorage.setItem('couponGenerated', Date.now().toString());
+                    
+                    const couponSection = document.getElementById('scCouponSection');
+                    const couponCodeElement = document.getElementById('scCouponCode');
+                    
+                    if (couponSection && couponCodeElement) {
+                        couponSection.style.display = 'block';
+                        couponCodeElement.textContent = couponCode;
+                    }
+                });
+            } else {
+                console.log('=== NO COUPON GENERATED ===');
+                console.log('Score percentage:', pct);
+                console.log('Score condition not met: pct < 70');
+                
+                // Hide coupon section if no coupon earned
+                const couponSection = document.getElementById('scCouponSection');
+                if (couponSection) {
+                    couponSection.style.display = 'none';
+                }
+            }
+
+            const pill = document.getElementById('scGradePill');
+            pill.textContent = grade;
+            // grade pill colours (light bg versions)
+            const pillColors = { '🥇 Excellent':'#fef9e7,#d97706','🥈 Good':'#ede9fe,#7c3aed','🥉 Average':'#ecfdf5,#059669','📚 Needs Work':'#fef2f2,#dc2626' };
+            const [bg, fg] = (pillColors[grade] || '#f1f5f9,#475569').split(',');
+            pill.style.background = bg; pill.style.color = fg; pill.style.border = `1.5px solid ${fg}40`;
+
+            // Ring gradient
+            document.getElementById('grad0').setAttribute('stop-color', c0);
+            document.getElementById('grad1').setAttribute('stop-color', c1);
+            const circ = 2 * Math.PI * 70;
+            const ring = document.getElementById('scRingFill');
+            ring.setAttribute('stroke-dasharray', circ);
+            ring.setAttribute('stroke-dashoffset', circ);
+            setTimeout(() => { ring.style.strokeDashoffset = circ * (1 - pct / 100); }, 500);
+
+            // Trophy bg
+            const trophyEl = document.getElementById('scTrophy');
+            const trophyBg = { '🏆':'linear-gradient(135deg,#f6d365,#fda085)', '🎖️':'linear-gradient(135deg,#667eea,#764ba2)', '👍':'linear-gradient(135deg,#10b981,#059669)', '📖':'linear-gradient(135deg,#f97316,#ef4444)' };
+            trophyEl.style.background = trophyBg[trophy] || 'linear-gradient(135deg,#667eea,#764ba2)';
+
+            // Review dots
+            const grid = document.getElementById('scReviewGrid'); grid.innerHTML = '';
+            answers.forEach((ans, i) => {
+                const dot = document.createElement('div');
+                let cls = 'sc-r-dot ';
+                if (ans === null) cls += 'skipped';
+                else if (ans === questions[i].correct) cls += 'correct';
+                else cls += 'wrong';
+                dot.className = cls; dot.textContent = i + 1;
+                dot.title = `Q${i+1}: ${ans===null?'Skipped':ans===questions[i].correct?'Correct ✓':'Wrong ✗'}`;
+                grid.appendChild(dot);
+            });
+
+            /* 6. Show scorecard */
+            document.getElementById('scorecardPage').classList.add('show');
+            document.getElementById('scorecardPage').scrollTop = 0;
+
+            /* 7. Confetti */
+            if (pct > 0) launchConfetti(pct);
+        }
+
+        /* ── CONFETTI ── */
+        function launchConfetti(pct) {
+            const canvas = document.getElementById('confettiCanvas');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+            const colors = ['#667eea','#764ba2','#f6d365','#10b981','#f97316','#ef4444','#3b82f6','#ec4899'];
+            const count = pct >= 70 ? 200 : 80;
+            const pieces = Array.from({length: count}, () => ({
+                x: Math.random() * canvas.width,
+                y: -20 - Math.random() * canvas.height * 0.5,
+                w: Math.random() * 10 + 5, h: Math.random() * 7 + 3,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rot: Math.random() * 360, rotV: (Math.random()-0.5)*8,
+                vx: (Math.random()-0.5)*3, vy: Math.random()*3+2,
+                opacity: Math.random()*0.6+0.4,
+                shape: Math.random()>0.6?'circle':'rect'
+            }));
+
+            let frame = 0; const maxF = 300;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    ctx.save();
+                    ctx.globalAlpha = p.opacity * Math.max(0, 1 - frame/maxF);
+                    ctx.translate(p.x + p.w/2, p.y + p.h/2);
+                    ctx.rotate(p.rot * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    if (p.shape === 'circle') { ctx.beginPath(); ctx.arc(0,0,p.w/2,0,Math.PI*2); ctx.fill(); }
+                    else ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                    ctx.restore();
+                    p.y += p.vy; p.x += p.vx; p.rot += p.rotV; p.vy += 0.06;
+                });
+                frame++;
+                if (frame < maxF) requestAnimationFrame(draw);
+                else ctx.clearRect(0,0,canvas.width,canvas.height);
+            }
+            draw();
+            if (pct >= 70) {
+                setTimeout(() => {
+                    frame = 0;
+                    pieces.forEach(p => { p.x = Math.random()*canvas.width; p.y = -20; p.vy = Math.random()*3+1; p.opacity = Math.random()*0.7+0.3; });
+                    draw();
+                }, 1800);
+            }
+        }
+
+        // Global copy coupon function
+        function copyCouponCode() {
+            const couponCodeElement = document.getElementById('scCouponCode');
+            const couponCode = couponCodeElement.textContent;
+            
+            if (!couponCode || couponCode === 'STOCK30XXXXXX') {
+                alert('No coupon code to copy!');
+                return;
+            }
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(couponCode).then(() => {
+                // Show success feedback
+                const copyBtn = document.querySelector('.sc-copy-btn');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.style.background = '#10b981';
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy coupon:', err);
+                alert('Failed to copy coupon code. Please try again.');
+            });
+        }
+
+        function finishExam() { window.location.href = 'http://localhost:4000/index.html'; }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F11') { e.preventDefault(); requestFS(); }
+        });
+        window.addEventListener('resize', () => {
+            const c = document.getElementById('confettiCanvas');
+            if (c) { c.width = window.innerWidth; c.height = window.innerHeight; }
+        });
+    </script>
+</body>
+</html>

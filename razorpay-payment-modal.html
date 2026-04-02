@@ -1,0 +1,139 @@
+<!-- RAZORPAY PAYMENT MODAL - REPLACE THE EXISTING PAYMENT MODAL BODY WITH THIS -->
+
+<div class="payment-modal-body">
+    <div class="razorpay-section">
+        <div class="payment-summary">
+            <h3 id="paymentVideoTitle">Video Title</h3>
+            <p class="price" id="paymentAmount">$0.00</p>
+        </div>
+        
+        <div class="razorpay-info">
+            <div class="info-box">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    <h5>Secure Payment</h5>
+                    <p>Your payment is secured with Razorpay</p>
+                </div>
+            </div>
+            <div class="info-box">
+                <i class="fas fa-credit-card"></i>
+                <div>
+                    <h5>Multiple Payment Options</h5>
+                    <p>Credit Card, Debit Card, UPI, NetBanking</p>
+                </div>
+            </div>
+            <div class="info-box">
+                <i class="fas fa-instant"></i>
+                <div>
+                    <h5>Instant Access</h5>
+                    <p>Get instant access after successful payment</p>
+                </div>
+            </div>
+        </div>
+        
+        <button class="razorpay-pay-btn" onclick="confirmPayment()">
+            <i class="fas fa-lock"></i>
+            Pay Now - Secure Payment
+        </button>
+    </div>
+</div>
+
+<!-- ADD THESE CSS STYLES TO YOUR EXISTING CSS SECTION -->
+
+<style>
+.razorpay-section {
+    text-align: center;
+    padding: 2rem;
+}
+
+.payment-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.payment-summary h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.payment-summary .price {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.razorpay-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.info-box:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+}
+
+.info-box i {
+    font-size: 2rem;
+    color: #667eea;
+    width: 50px;
+    text-align: center;
+}
+
+.info-box h5 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3436;
+}
+
+.info-box p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.razorpay-pay-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 1.25rem 3rem;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+.razorpay-pay-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
+}
+
+.razorpay-pay-btn i {
+    font-size: 1.1rem;
+}
+</style>

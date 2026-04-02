@@ -1,0 +1,8 @@
+uploads/
+*.mp4
+*.mov
+*.webm
+node_modules/
+.env
+.git
+.github/

@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Content - Market Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --secondary: #00b894;
+            --dark: #2d3436;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --danger: #e17055;
+            --success: #00b894;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .upload-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 600px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .upload-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #a55eea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 3rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+            background-color: white;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+            background-color: white;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+            align-items: center;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--border-radius);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-light);
+            background-color: rgba(108, 92, 231, 0.05);
+        }
+
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .file-upload h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload p {
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, #a55eea 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cost-input {
+            display: none;
+            margin-top: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .currency-amount-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .currency-selector {
+            flex: 0 0 auto;
+            min-width: 120px;
+        }
+
+        .currency-select {
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .currency-select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+            background-color: white;
+        }
+
+        .amount-input {
+            flex: 1;
+        }
+
+        .amount-input .input-with-icon {
+            position: relative;
+        }
+
+        .amount-input .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .amount-input .form-control {
+            padding-left: 3rem;
+        }
+
+        @media (max-width: 576px) {
+            .currency-amount-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .currency-selector {
+                min-width: auto;
+            }
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f0f5ff;
+            border-radius: var(--border-radius);
+            color: var(--primary);
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInDown 0.5s ease-out;
+            box-shadow: 0 5px 20px rgba(0, 184, 148, 0.3);
+        }
+
+        .success-message i {
+            font-size: 1.25rem;
+        }
+
+        .success-message p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        @keyframes slideInDown {
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .qr-upload-section {
+            margin-top: 1rem;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        .file-upload-label i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .file-text {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .qr-preview {
+            position: relative;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .qr-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+        }
+
+        .remove-qr {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+        }
+
+        .remove-qr:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Payment Details Styles */
+        .payment-details-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 1rem;
+        }
+
+        .payment-method-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary-light);
+            background: linear-gradient(135deg, #f8f9ff 0%, #e9ecef 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.15);
+        }
+
+        .payment-option input[type="radio"] {
+            accent-color: var(--primary);
+            transform: scale(1.2);
+        }
+
+        .payment-option input[type="radio"]:checked + .radio-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .payment-option input[type="radio"]:checked ~ .payment-option {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .radio-label {
+            font-size: 0.95rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .payment-details {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            margin-top: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .payment-details .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-details .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .platform-fee-info {
+            margin-top: 2rem;
+        }
+
+        .info-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border-radius: 12px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+        }
+
+        .info-box i {
+            font-size: 2rem;
+            color: #28a745;
+            flex-shrink: 0;
+        }
+
+        .info-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+            color: #155724;
+            font-weight: 600;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #155724;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 576px) {
+            .upload-container {
+                padding: 1.5rem;
+            }
+
+            .upload-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .qr-preview img {
+                max-width: 150px;
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <div class="upload-header">
+            <h1>Upload Your Content</h1>
+            <p>Share your knowledge with the world</p>
+        </div>
+
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="topic">Topic</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-tag"></i>
+                    <input type="text" id="topic" class="form-control" placeholder="What's your content about?" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Pricing</label>
+                <div class="cost-input" id="costInput" style="display: block;">
+                    <div class="currency-amount-group">
+                        <div class="currency-selector">
+                            <select id="currency" class="form-control currency-select">
+                                <option value="USD" selected>$ USD</option>
+                                <option value="INR">₹ INR</option>
+                                <option value="EUR">€ EUR</option>
+                                <option value="GBP">£ GBP</option>
+                                <option value="JPY">¥ JPY</option>
+                                <option value="AUD">$ AUD</option>
+                                <option value="CAD">$ CAD</option>
+                            </select>
+                        </div>
+                        <div class="amount-input">
+                            <div class="input-with-icon">
+                                <i class="fas fa-dollar-sign" id="currencyIcon"></i>
+                                <input type="number" id="cost" class="form-control" placeholder="Enter amount" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-with-icon" style="margin-top: 1rem;">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="paymentEmail" class="form-control" placeholder="Your email" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" id="paymentDetails" style="display: block;">
+                <label>Payment Details (For Direct Money Transfer)</label>
+                <div class="payment-details-section">
+                    <div class="payment-method-toggle">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="upi" checked onchange="togglePaymentMethod('upi')">
+                            <span class="radio-label">UPI ID (Recommended - Instant Transfer)</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="bank" onchange="togglePaymentMethod('bank')">
+                            <span class="radio-label">Bank Account (IMPS Transfer)</span>
+                        </label>
+                    </div>
+
+                    <!-- UPI Details -->
+                    <div id="upiDetails" class="payment-details">
+                        <div class="form-group">
+                            <label for="ownerUpiId">Your UPI ID</label>
+                            <input type="text" id="ownerUpiId" name="ownerUpiId" 
+                                   placeholder="yourname@ybl" class="form-input" required>
+                            <p style="font-size: 0.85rem; color: var(--gray); margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> Enter your UPI ID (PhonePe, GPay, Paytm, etc.)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bank Details -->
+                    <div id="bankDetails" class="payment-details" style="display: none;">
+                        <div class="form-group">
+                            <label for="ownerAccountName">Account Holder Name</label>
+                            <input type="text" id="ownerAccountName" name="ownerAccountName" 
+                                   placeholder="John Doe" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="ownerAccountNumber">Account Number</label>
+                            <input type="text" id="ownerAccountNumber" name="ownerAccountNumber" 
+                                   placeholder="1234567890123456" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="ownerIfsc">IFSC Code</label>
+                            <input type="text" id="ownerIfsc" name="ownerIfsc" 
+                                   placeholder="HDFC0001234" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="platform-fee-info">
+                        <div class="info-box">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <h5>Platform Fee: 5%</h5>
+                                <p>You'll receive 95% of each video sale directly to your account</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Video</label>
+                <div class="file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Drag & drop your video here</h3>
+                    <p>or</p>
+                    <button type="button" class="btn btn-outline" style="max-width: 200px; margin: 0 auto;">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                    <p style="font-size: 0.85rem; margin-top: 1rem; color: var(--gray);">
+                        MP4, WebM or MOV. Max 1GB
+                    </p>
+                    <input type="file" id="videoFile" accept="video/*" style="display: none;">
+                </div>
+                <div class="file-info" id="fileInfo"></div>
+                <p style="color: #e74c3c; font-weight: 600; margin-top: 0.5rem; font-size: 0.95rem;">
+                    <i class="fas fa-info-circle"></i> You have to pay ₹100 for a video upload
+                </p>
+            </div>
+
+            <button type="submit" class="btn">
+                <i class="fas fa-upload"></i> Upload Video
+            </button>
+        </form>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        // Toggle payment method function
+        function togglePaymentMethod(method) {
+            const upiDetails = document.getElementById('upiDetails');
+            const bankDetails = document.getElementById('bankDetails');
+            
+            if (method === 'upi') {
+                upiDetails.style.display = 'block';
+                bankDetails.style.display = 'none';
+                document.getElementById('ownerUpiId').setAttribute('required', 'required');
+                document.getElementById('ownerAccountName').removeAttribute('required');
+                document.getElementById('ownerAccountNumber').removeAttribute('required');
+                document.getElementById('ownerIfsc').removeAttribute('required');
+            } else {
+                upiDetails.style.display = 'none';
+                bankDetails.style.display = 'block';
+                document.getElementById('ownerUpiId').removeAttribute('required');
+                document.getElementById('ownerAccountName').setAttribute('required', 'required');
+                document.getElementById('ownerAccountNumber').setAttribute('required', 'required');
+                document.getElementById('ownerIfsc').setAttribute('required', 'required');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('uploadForm');
+            const costInput = document.getElementById('costInput');
+            const fileInput = document.getElementById('videoFile');
+            const fileInfo = document.getElementById('fileInfo');
+            const browseBtn = document.querySelector('.btn-outline');
+            const fileUploadLabel = document.querySelector('.file-upload-label');
+            const fileName = document.querySelector('.file-name');
+
+            // File upload functionality
+            browseBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileInfo.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success);">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        </div>
+                    `;
+                }
+            });
+
+            // Handle currency change
+            const currencySelect = document.getElementById('currency');
+            const currencyIcon = document.getElementById('currencyIcon');
+            
+            const currencyIcons = {
+                'USD': 'fas fa-dollar-sign',
+                'INR': 'fas fa-rupee-sign',
+                'EUR': 'fas fa-euro-sign',
+                'GBP': 'fas fa-pound-sign',
+                'JPY': 'fas fa-yen-sign',
+                'AUD': 'fas fa-dollar-sign',
+                'CAD': 'fas fa-dollar-sign'
+            };
+
+            currencySelect.addEventListener('change', function() {
+                const selectedCurrency = this.value;
+                const iconClass = currencyIcons[selectedCurrency] || 'fas fa-dollar-sign';
+                currencyIcon.className = iconClass;
+            });
+
+            // Set initial required attributes for payment fields
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            if (paymentMethod === 'upi') {
+                document.getElementById('ownerUpiId').setAttribute('required', '');
+            } else {
+                document.getElementById('ownerAccountName').setAttribute('required', '');
+                document.getElementById('ownerAccountNumber').setAttribute('required', '');
+                document.getElementById('ownerIfsc').setAttribute('required', '');
+            }
+
+            // File input click handler
+            browseBtn.addEventListener('click', () => fileInput.click());
+
+            let checkedFileHash = null;
+
+            // Handle file selection
+            fileInput.addEventListener('change', async function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
+                    
+                    // Check file type
+                    const validTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+                    if (!validTypes.includes(file.type)) {
+                        showFileError('Please upload a valid video file (MP4, WebM, or MOV)');
+                        return;
+                    }
+
+                    // Check file size (max 1GB)
+                    if (file.size > 1024 * 1024 * 1024) {
+                        showFileError('File is too large. Maximum size is 1GB.');
+                        return;
+                    }
+
+                    // Show file info and check for duplicates
+                    fileInfo.textContent = `Selected: ${file.name} (${fileSize} MB) - Checking for duplicates...`;
+                    fileInfo.style.display = 'block';
+                    fileInfo.style.color = '#f39c12';
+                    fileInfo.style.backgroundColor = '#fff3cd';
+
+                    try {
+                        // Check for duplicate before payment
+                        const checkForm = new FormData();
+                        checkForm.append('video', file);
+                        
+                        const response = await fetch('/api/check-duplicate-video', {
+                            method: 'POST',
+                            body: checkForm,
+                            credentials: 'include'
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            showFileError(result.error || 'Failed to check for duplicates');
+                            return;
+                        }
+
+                        // Store the file hash for upload
+                        checkedFileHash = result.fileHash;
+                        
+                        // Show success
+                        fileInfo.textContent = `Selected: ${file.name} (${fileSize} MB) - Ready to upload`;
+                        fileInfo.style.color = '#28a745';
+                        fileInfo.style.backgroundColor = '#e8f5e9';
+                    } catch (error) {
+                        console.error('Duplicate check error:', error);
+                        showFileError('Failed to verify video. Please try again.');
+                    }
+                }
+            });
+
+            function showFileError(message) {
+                fileInfo.textContent = message;
+                fileInfo.style.display = 'block';
+                fileInfo.style.color = '#dc3545';
+                fileInfo.style.backgroundColor = '#ffebee';
+                fileInput.value = '';
+            }
+
+            // Form submission - First process Razorpay payment, then upload
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Validate form fields
+                if (fileInput.files.length === 0) {
+                    showFileError('Please select a video file');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // Check if duplicate verification is complete
+                if (!checkedFileHash) {
+                    showFileError('Please wait for duplicate check to complete or select a video file');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    return;
+                }
+                
+                try {
+                    // Step 1: Create Razorpay order for ₹100
+                    const orderResponse = await fetch('/api/create-upload-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+                    
+                    const orderData = await orderResponse.json();
+                    
+                    if (!orderResponse.ok) {
+                        throw new Error(orderData.error || 'Failed to create payment order');
+                    }
+                    
+                    // Step 2: Open Razorpay checkout
+                    const options = {
+                        key: orderData.key,
+                        amount: orderData.amount,
+                        currency: orderData.currency,
+                        name: 'Market Master',
+                        description: 'Video Upload Fee (₹100)',
+                        order_id: orderData.orderId,
+                        handler: async function(response) {
+                            // Payment successful - now upload the video
+                            await uploadVideo(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+                        },
+                        prefill: {
+                            email: document.getElementById('paymentEmail').value || ''
+                        },
+                        theme: {
+                            color: '#3498db'
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                                showFileError('Payment cancelled. Please complete payment to upload video.');
+                            }
+                        }
+                    };
+                    
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                    
+                } catch (error) {
+                    console.error('Payment initialization error:', error);
+                    showFileError(error.message || 'Failed to initialize payment');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+            
+            // Function to upload video after successful payment
+            async function uploadVideo(paymentId, orderId, signature) {
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                
+                const formData = new FormData();
+                formData.append('name', document.getElementById('name').value.trim());
+                formData.append('topic', document.getElementById('topic').value.trim());
+                formData.append('isPaid', 'true');
+                
+                const cost = parseFloat(document.getElementById('cost').value) || 0;
+                const currency = document.getElementById('currency').value;
+                formData.append('cost', cost.toString());
+                formData.append('currency', currency);
+                formData.append('paymentEmail', document.getElementById('paymentEmail').value.trim());
+                
+                // Add Razorpay payment details
+                formData.append('uploadPaymentId', paymentId);
+                formData.append('uploadOrderId', orderId);
+                formData.append('uploadSignature', signature);
+                
+                // Add file hash for duplicate verification
+                if (checkedFileHash) {
+                    formData.append('fileHash', checkedFileHash);
+                }
+                    
+                // Add payment method details
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+                if (paymentMethod === 'upi') {
+                    const upiId = document.getElementById('ownerUpiId').value.trim();
+                    if (!upiId) {
+                        showFileError('Please enter your UPI ID for paid videos');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                        return;
+                    }
+                    formData.append('ownerUpiId', upiId);
+                } else {
+                    const accountName = document.getElementById('ownerAccountName').value.trim();
+                    const accountNumber = document.getElementById('ownerAccountNumber').value.trim();
+                    const ifsc = document.getElementById('ownerIfsc').value.trim();
+                    
+                    if (!accountName || !accountNumber || !ifsc) {
+                        showFileError('Please fill in all bank account details for paid videos');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                        return;
+                    }
+                    
+                    formData.append('ownerAccountName', accountName);
+                    formData.append('ownerAccountNumber', accountNumber);
+                    formData.append('ownerIfsc', ifsc);
+                }
+                
+                if (fileInput.files.length > 0) {
+                    formData.append('video', fileInput.files[0]);
+                } else {
+                    showFileError('Please select a video file');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/videos', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Upload failed');
+                    }
+
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'success-message';
+                    successMessage.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <p>Video uploaded successfully! Redirecting to videos page...</p>
+                    `;
+                    form.prepend(successMessage);
+                    
+                    // Reset form
+                    form.reset();
+                    fileInfo.style.display = 'none';
+                    costInput.style.display = 'none';
+                    document.getElementById('paymentDetails').style.display = 'none';
+                    
+                    // Remove success message after 5 seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 5000);
+                    
+                    // Redirect to mentors page after successful upload
+                    setTimeout(() => {
+                        window.location.href = 'mentors.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showFileError(error.message || 'Failed to upload video. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                }
+            }
+
+            // Add animation on load
+            document.querySelector('.upload-container').style.animation = 'fadeIn 0.5s ease-out';
+        });
+    </script>
+</body>
+</html>
