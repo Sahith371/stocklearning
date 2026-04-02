@@ -1716,8 +1716,6 @@ app.delete('/api/admin/coupons/clean-used', adminAuth, async (req, res) => {
     console.error('Error cleaning used coupons:', error);
     res.status(500).json({ error: 'Failed to clean used coupons' });
   }
-});
-
 
 // Only start server if running locally (not on Vercel)
 if (process.env.VERCEL !== '1') {
