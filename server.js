@@ -28,7 +28,7 @@ const couponSchema = new mongoose.Schema({
   finalPrice: { type: Number } // Final price after discount
 });
 
-const Coupon = mongoose.model('Coupon', couponSchema);
+const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -50,76 +50,54 @@ if (!GROQ_API_KEY) {
 
 const groq = GROQ_API_KEY ? new Groq({ apiKey: GROQ_API_KEY }) : null;
 
-const userSchema = new mongoose.Schema(
-  {
-    email: { type: String, required: true, unique: true },
-    username: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
-    userType: { 
-      type: String, 
-      required: true, 
-      enum: ['learner', 'mentor'], 
-      default: 'learner',
-      validate: {
-        validator: function(v) {
-          return ['learner', 'mentor'].includes(v);
-        },
-        message: 'User type must be either learner or mentor'
-      }
-    },
-  },
-  { timestamps: true }
-);
-
-const User = mongoose.model('User', userSchema);
-
-// Video Schema
-const videoSchema = new mongoose.Schema(
-  {
-    title: { type: String, required: true },
-    topic: { type: String, required: true },
-    uploader: { type: String, required: true },
-    uploaderEmail: { type: String, required: true },
-    isPaid: { type: Boolean, required: true, default: false },
-    price: { type: Number, required: true, default: 0 },
-    currency: { type: String, required: true, default: 'USD' },
-    formattedAmount: { type: String, required: true, default: '$0.00' },
-    videoUrl: { type: String, required: true },
-    thumbnail: { type: String },
-    qrCodeUrl: { type: String },
-    fileName: { type: String, required: true },
-    fileSize: { type: Number, required: true },
-    mimeType: { type: String, required: true },
-    fileHash: { type: String, unique: true, sparse: true },
-    paymentEmail: { type: String },
-    paymentUpi: { type: String },
-    // Bank account details for direct transfers
-    ownerAccountNumber: { type: String },
-    ownerIfsc: { type: String },
-    ownerAccountName: { type: String },
-    ownerUpiId: { type: String },
-    platformFee: { type: Number, default: 5 }, // 5% platform fee
-    // Upload payment tracking
-    uploadPaid: { type: Boolean, default: false },
-    uploadPaidAt: { type: Date },
-    uploadPaymentId: { type: String },
-    uploadOrderId: { type: String }
-  },
-  { timestamps: true }
-);
-
-const Video = mongoose.model('Video', videoSchema);
-
-// Video Access Schema
-const videoAccessSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  videoId: { type: String, required: true },
-  unlockedAt: { type: Date, default: Date.now },
-  paymentId: { type: String },
-  amount: { type: Number }
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  passwordHash: { type: String, required: true },
+  userType: { type: String, enum: ['user', 'mentor', 'admin'], default: 'user' },
+  createdAt: { type: Date, default: Date.now }
 });
 
-const VideoAccess = mongoose.model('VideoAccess', videoAccessSchema);
+const videoSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String },
+  videoUrl: { type: String, required: true },
+  thumbnailUrl: { type: String },
+  topic: { type: String, required: true },
+  uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  isPaid: { type: Boolean, default: false },
+  price: { type: Number, default: 0 },
+  currency: { type: String, default: 'USD' },
+  uploadPaid: { type: Boolean, default: false },
+  uploadPaymentId: { type: String },
+  uploadOrderId: { type: String },
+  fileName: { type: String, required: true },
+  fileSize: { type: Number, required: true },
+  mimeType: { type: String, required: true },
+  fileHash: { type: String, unique: true, sparse: true },
+  paymentEmail: { type: String },
+  paymentUpi: { type: String },
+  ownerUpiId: { type: String },
+  ownerAccountName: { type: String },
+  ownerAccountNumber: { type: String },
+  ownerIfsc: { type: String },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const videoAccessSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  videoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Video', required: true },
+  unlockedAt: { type: Date, default: Date.now },
+  paymentId: { type: String },
+  amount: { type: Number },
+  couponUsed: { type: String }
+});
+
+// Create models (check if already exists for serverless)
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Video = mongoose.models.Video || mongoose.model('Video', videoSchema);
+const VideoAccess = mongoose.models.VideoAccess || mongoose.model('VideoAccess', videoAccessSchema);
 
 // ====== File Upload Configuration ======
 // Ensure uploads directory exists
@@ -1715,48 +1693,6 @@ app.delete('/api/admin/coupons/clean-used', adminAuth, async (req, res) => {
   } catch (error) {
     console.error('Error cleaning used coupons:', error);
     res.status(500).json({ error: 'Failed to clean used coupons' });
-  }
-});
-
-// Test balance payment endpoint (for development/testing)
-app.post('/api/test-balance-payment', requireAuth, async (req, res) => {
-  try {
-    const { videoId, amount } = req.body;
-    
-    // Get user info
-    const user = await User.findById(req.session.userId);
-    if (!user) {
-      return res.status(401).json({ error: 'User not found' });
-    }
-    
-    // Get video info
-    const video = await Video.findById(videoId);
-    if (!video) {
-      return res.status(404).json({ error: 'Video not found' });
-    }
-    
-    // Create access record
-    const accessRecord = new VideoAccess({
-      userId: req.session.userId,
-      videoId: videoId,
-      paymentId: 'test_balance_' + Date.now(),
-      amount: parseFloat(amount),
-      currency: video.currency || 'USD',
-      paymentMethod: 'test_balance',
-      unlockedAt: new Date()
-    });
-    
-    await accessRecord.save();
-    
-    res.json({ 
-      success: true, 
-      message: 'Test balance payment successful',
-      accessId: accessRecord._id
-    });
-    
-  } catch (error) {
-    console.error('Test balance payment error:', error);
-    res.status(500).json({ error: 'Test balance payment failed' });
   }
 });
 
