@@ -1718,6 +1718,48 @@ app.delete('/api/admin/coupons/clean-used', adminAuth, async (req, res) => {
   }
 });
 
+// Test balance payment endpoint (for development/testing)
+app.post('/api/test-balance-payment', requireAuth, async (req, res) => {
+  try {
+    const { videoId, amount } = req.body;
+    
+    // Get user info
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+    
+    // Get video info
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    
+    // Create access record
+    const accessRecord = new VideoAccess({
+      userId: req.session.userId,
+      videoId: videoId,
+      paymentId: 'test_balance_' + Date.now(),
+      amount: parseFloat(amount),
+      currency: video.currency || 'USD',
+      paymentMethod: 'test_balance',
+      unlockedAt: new Date()
+    });
+    
+    await accessRecord.save();
+    
+    res.json({ 
+      success: true, 
+      message: 'Test balance payment successful',
+      accessId: accessRecord._id
+    });
+    
+  } catch (error) {
+    console.error('Test balance payment error:', error);
+    res.status(500).json({ error: 'Test balance payment failed' });
+  }
+});
+
 // Only start server if running locally (not on Vercel)
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
