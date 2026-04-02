@@ -34,10 +34,15 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ====== Razorpay configuration ======
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+let razorpay = null;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+  });
+} else {
+  console.warn('[WARN] Razorpay credentials not configured. Payment features will be disabled.');
+}
 
 // ====== Groq configuration ======
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -516,6 +521,12 @@ app.post('/api/create-upload-order', requireAuth, async (req, res) => {
   try {
     console.log('=== CREATE UPLOAD ORDER REQUEST ===');
     
+    // Check if Razorpay is configured
+    if (!razorpay) {
+      console.error('Razorpay not configured');
+      return res.status(500).json({ error: 'Payment service not available' });
+    }
+    
     const amount = 100; // ₹100 INR ($1.20)
     const currency = 'INR';
     
@@ -607,6 +618,12 @@ app.post('/api/create-order', async (req, res) => {
     console.log('=== CREATE ORDER REQUEST ===');
     console.log('Request body:', req.body);
     console.log('Request headers:', req.headers);
+    
+    // Check if Razorpay is configured
+    if (!razorpay) {
+      console.error('Razorpay not configured');
+      return res.status(500).json({ error: 'Payment service not available' });
+    }
     
     const { amount, videoId, videoTitle } = req.body;
     
