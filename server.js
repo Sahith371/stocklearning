@@ -224,29 +224,35 @@ mongoose
   });
 
 // ====== Middleware ======
-// CORS: allow local dev ports AND opening HTML via file:// (origin "null")
+// CORS: allow local dev ports, mobile, and production
 const allowedOrigins = [
   'http://localhost:4000',
   'http://localhost:3000',
   'http://127.0.0.1:4000',
   'http://127.0.0.1:3000',
   'null', // For file:// access
-  'file://' // For file:// access
+  'file://', // For file:// access
+  'https://stocklearning.vercel.app', // Production URL
+  'https://stocklearning-npfp7qxlz-sahithguttikondaai-6745s-projects.vercel.app',
+  'https://stocklearning-g00s7y24t-sahithguttikondaai-6745s-projects.vercel.app',
+  'https://stocklearning-p8lc9ugoo-sahithguttikondaai-6745s-projects.vercel.app',
+  'https://stocklearning-eg33g00b3-sahithguttikondaai-6745s-projects.vercel.app'
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // No origin (e.g. curl, Postman) – allow
+      // No origin (e.g. mobile apps, curl, Postman) – allow
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      // For development, allow all origins
-      if (process.env.NODE_ENV !== 'production') {
+      // For production, allow all origins to support mobile devices
+      if (process.env.NODE_ENV === 'production') {
         return callback(null, true);
       }
-      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+      // For development, allow all origins
+      return callback(null, true);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
