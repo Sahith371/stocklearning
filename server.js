@@ -262,7 +262,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: false, // Set to false for development (HTTP)
+      secure: process.env.NODE_ENV === 'production', // Secure in production
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
   })
