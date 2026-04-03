@@ -28,21 +28,16 @@ const couponSchema = new mongoose.Schema({
   finalPrice: { type: Number } // Final price after discount
 });
 
-const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
+const Coupon = mongoose.model('Coupon', couponSchema);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ====== Razorpay configuration ======
-let razorpay = null;
-if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-  razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-  });
-} else {
-  console.warn('[WARN] Razorpay credentials not configured. Payment features will be disabled.');
-}
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 // ====== Groq configuration ======
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -55,54 +50,77 @@ if (!GROQ_API_KEY) {
 
 const groq = GROQ_API_KEY ? new Groq({ apiKey: GROQ_API_KEY }) : null;
 
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  username: { type: String, required: true, unique: true },
-  passwordHash: { type: String, required: true },
-  userType: { type: String, enum: ['user', 'mentor', 'admin'], default: 'user' },
-  createdAt: { type: Date, default: Date.now }
-});
+const userSchema = new mongoose.Schema(
+  {
+    email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
+    passwordHash: { type: String, required: true },
+    userType: { 
+      type: String, 
+      required: true, 
+      enum: ['learner', 'mentor'], 
+      default: 'learner',
+      validate: {
+        validator: function(v) {
+          return ['learner', 'mentor'].includes(v);
+        },
+        message: 'User type must be either learner or mentor'
+      }
+    },
+  },
+  { timestamps: true }
+);
 
-const videoSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String },
-  videoUrl: { type: String, required: true },
-  thumbnailUrl: { type: String },
-  topic: { type: String, required: true },
-  uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  isPaid: { type: Boolean, default: false },
-  price: { type: Number, default: 0 },
-  currency: { type: String, default: 'USD' },
-  uploadPaid: { type: Boolean, default: false },
-  uploadPaymentId: { type: String },
-  uploadOrderId: { type: String },
-  fileName: { type: String, required: true },
-  fileSize: { type: Number, required: true },
-  mimeType: { type: String, required: true },
-  fileHash: { type: String, unique: true, sparse: true },
-  paymentEmail: { type: String },
-  paymentUpi: { type: String },
-  ownerUpiId: { type: String },
-  ownerAccountName: { type: String },
-  ownerAccountNumber: { type: String },
-  ownerIfsc: { type: String },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
+const User = mongoose.model('User', userSchema);
 
+// Video Schema
+const videoSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    topic: { type: String, required: true },
+    uploader: { type: String, required: true },
+    uploaderEmail: { type: String, required: true },
+    isPaid: { type: Boolean, required: true, default: false },
+    price: { type: Number, required: true, default: 0 },
+    currency: { type: String, required: true, default: 'USD' },
+    formattedAmount: { type: String, required: true, default: '$0.00' },
+    videoUrl: { type: String, required: true },
+    thumbnail: { type: String },
+    thumbnailUrl: { type: String },
+    qrCodeUrl: { type: String },
+    fileName: { type: String, required: true },
+    fileSize: { type: Number, required: true },
+    mimeType: { type: String, required: true },
+    fileHash: { type: String, unique: true, sparse: true },
+    paymentEmail: { type: String },
+    paymentUpi: { type: String },
+    // Bank account details for direct transfers
+    ownerAccountNumber: { type: String },
+    ownerIfsc: { type: String },
+    ownerAccountName: { type: String },
+    ownerUpiId: { type: String },
+    platformFee: { type: Number, default: 5 }, // 5% platform fee
+    // Upload payment tracking
+    uploadPaid: { type: Boolean, default: false },
+    uploadPaidAt: { type: Date },
+    uploadPaymentId: { type: String },
+    uploadOrderId: { type: String }
+  },
+  { timestamps: true }
+);
+
+const Video = mongoose.model('Video', videoSchema);
+
+// Video Access Schema
 const videoAccessSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  videoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Video', required: true },
+  userId: { type: String, required: true },
+  videoId: { type: String, required: true },
   unlockedAt: { type: Date, default: Date.now },
   paymentId: { type: String },
-  amount: { type: Number },
-  couponUsed: { type: String }
+  amount: { type: Number }
 });
 
-// Create models (check if already exists for serverless)
-const User = mongoose.models.User || mongoose.model('User', userSchema);
-const Video = mongoose.models.Video || mongoose.model('Video', videoSchema);
-const VideoAccess = mongoose.models.VideoAccess || mongoose.model('VideoAccess', videoAccessSchema);
+const VideoAccess = mongoose.model('VideoAccess', videoAccessSchema);
 
 // ====== File Upload Configuration ======
 // Ensure uploads directory exists
@@ -432,6 +450,7 @@ app.post('/api/videos', requireAuth, upload.fields([
       formattedAmount: formattedAmount,
       videoUrl: `/uploads/${videoFile.filename}`,
       thumbnail: thumbnailUrl,
+      thumbnailUrl: thumbnailUrl,
       qrCodeUrl: qrCodeUrl,
       fileName: videoFile.filename,
       fileSize: videoFile.size,
@@ -490,6 +509,7 @@ app.post('/api/videos', requireAuth, upload.fields([
         price: video.price,
         videoUrl: video.videoUrl,
         thumbnail: video.thumbnail,
+        thumbnailUrl: video.thumbnailUrl,
         createdAt: video.createdAt
       }
     });
@@ -520,12 +540,6 @@ app.post('/api/videos', requireAuth, upload.fields([
 app.post('/api/create-upload-order', requireAuth, async (req, res) => {
   try {
     console.log('=== CREATE UPLOAD ORDER REQUEST ===');
-    
-    // Check if Razorpay is configured
-    if (!razorpay) {
-      console.error('Razorpay not configured');
-      return res.status(500).json({ error: 'Payment service not available' });
-    }
     
     const amount = 100; // ₹100 INR ($1.20)
     const currency = 'INR';
@@ -618,12 +632,6 @@ app.post('/api/create-order', async (req, res) => {
     console.log('=== CREATE ORDER REQUEST ===');
     console.log('Request body:', req.body);
     console.log('Request headers:', req.headers);
-    
-    // Check if Razorpay is configured
-    if (!razorpay) {
-      console.error('Razorpay not configured');
-      return res.status(500).json({ error: 'Payment service not available' });
-    }
     
     const { amount, videoId, videoTitle } = req.body;
     
@@ -881,7 +889,7 @@ app.get('/api/videos', async (req, res) => {
     
     const videos = await Video.find()
       .sort({ createdAt: -1 }) // Most recent first
-      .select('title topic uploader uploaderEmail isPaid price currency formattedAmount videoUrl thumbnail createdAt paymentEmail paymentUpi qrCodeUrl uploadPaid');
+      .select('title topic uploader uploaderEmail isPaid price currency formattedAmount videoUrl thumbnail thumbnailUrl createdAt paymentEmail paymentUpi qrCodeUrl uploadPaid');
 
     console.log(`Found ${videos.length} videos`);
     
@@ -904,6 +912,7 @@ app.get('/api/videos', async (req, res) => {
       formattedAmount: video.formattedAmount || '$0.00',
       videoUrl: video.videoUrl,
       thumbnail: video.thumbnail,
+      thumbnailUrl: video.thumbnailUrl,
       qrCodeUrl: video.qrCodeUrl,
       paymentEmail: video.paymentEmail,
       paymentUpi: video.paymentUpi,
@@ -1712,6 +1721,7 @@ app.delete('/api/admin/coupons/clean-used', adminAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to clean used coupons' });
   }
 });
+
 
 // Only start server if running locally (not on Vercel)
 if (process.env.VERCEL !== '1') {
