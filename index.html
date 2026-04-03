@@ -1,3417 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CreativeHub - Premium Creator Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Market Master – Master Stock Market Trading</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0a0f0b;
+      --ink-2:     #1c2b20;
+      --ink-3:     #3a5242;
+      --mist:      #edf3ee;
+      --mist-2:    #f5f8f5;
+      --accent:    #1a7a3c;
+      --accent-l:  #2ea858;
+      --accent-xl: #e8f5ec;
+      --gold:      #c8972a;
+      --red:       #c0392b;
+      --rule:      rgba(26,122,60,.12);
+      --mono:      'JetBrains Mono', monospace;
+    }
+
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; overflow-x: hidden; background: var(--mist-2); color: var(--ink); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 52px; height: 68px;
+      background: rgba(245,248,245,0.88);
+      backdrop-filter: blur(24px) saturate(1.6);
+      border-bottom: 1px solid var(--rule);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--ink);
+      font-family: 'DM Serif Display', serif; font-size: 1.1rem; letter-spacing: -.01em;
+    }
+    .nav-logo-mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--ink-2); display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-mark svg { width: 18px; height: 18px; }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 2px; list-style: none;
+      background: rgba(26,122,60,.06);
+      border: 1px solid rgba(26,122,60,.13);
+      border-radius: 999px; padding: 7px 8px;
+    }
+    .nav-links a {
+      color: var(--ink-3); text-decoration: none; font-size: .82rem;
+      font-weight: 500; padding: 6px 20px; border-radius: 999px;
+      transition: color .18s, background .18s; letter-spacing: .01em; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--ink); background: rgba(26,122,60,.09); }
+    .nav-links a.active {
+      color: var(--accent); font-weight: 600;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(26,122,60,.12);
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost {
+      background: none; border: 1px solid var(--rule); color: var(--ink-3);
+      font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 500;
+      padding: 8px 18px; border-radius: 8px; cursor: pointer;
+      transition: border-color .18s, color .18s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary {
+      background: var(--ink-2); color: #fff; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+      padding: 9px 20px; border-radius: 8px; cursor: pointer; letter-spacing: .01em;
+      transition: background .18s, transform .12s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+
+    /* User Profile */
+    #userProfile { display: none; margin: 0 15px; position: relative; }
+    #userAvatar {
+      width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+      border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    #userAvatar:hover { transform: scale(1.05); }
+    .profile-dropdown {
+      display: none; position: absolute; top: 50px; right: 0;
+      background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      min-width: 200px; z-index: 1000;
+    }
+    .profile-dropdown a {
+      display: block; padding: 12px 16px; color: #333; text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .profile-dropdown a:hover { background: #f8f9fa; }
+    .profile-dropdown a:first-child { border-radius: 8px 8px 0 0; }
+    .profile-dropdown a:last-child { border-radius: 0 0 8px 8px; border-top: 1px solid #eee; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 10; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 120px 24px 100px;
+    }
+
+    /* Subtle grid background */
+    .hero::before {
+      content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(var(--rule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 75%);
+    }
+    /* Soft radial glow */
+    .hero::after {
+      content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      background: radial-gradient(ellipse 70% 55% at 50% 35%, rgba(26,122,60,.07) 0%, transparent 70%);
+    }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 1px solid var(--rule); border-radius: 99px;
+      padding: 5px 14px 5px 10px; margin-bottom: 28px;
+      background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      animation: fadeDown .5s ease both;
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-l); box-shadow: 0 0 6px rgba(46,168,88,.6);
+      animation: pulse 2.4s ease infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .status-text { font-size: .74rem; font-weight: 500; color: var(--ink-3); letter-spacing: .02em; }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5.2vw, 4rem);
+      font-weight: 400; line-height: 1.1; letter-spacing: -.02em;
+      color: var(--ink); max-width: 680px; margin-bottom: 20px;
+      animation: fadeUp .6s ease .12s both;
+    }
+    h1 em { color: var(--accent); font-style: italic; }
+
+    .hero-sub {
+      font-size: .93rem; font-weight: 400; color: var(--ink-3);
+      line-height: 1.7; max-width: 420px; margin-bottom: 36px;
+      animation: fadeUp .6s ease .24s both;
+    }
+
+    .hero-actions {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 72px;
+      animation: fadeUp .6s ease .34s both;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-cta {
+      background: var(--ink-2); color: #fff; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
+      padding: 14px 30px; border-radius: 10px; cursor: pointer; letter-spacing: .01em;
+      box-shadow: 0 4px 20px rgba(10,15,11,.18);
+      transition: background .18s, transform .12s, box-shadow .18s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-cta:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,122,60,.3); }
+    .btn-text {
+      background: none; border: none; color: var(--ink-3);
+      font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: color .18s;
+      text-decoration: none;
+    }
+    .btn-text:hover { color: var(--accent); }
+    .btn-text svg { width: 14px; height: 14px; transition: transform .18s; }
+    .btn-text:hover svg { transform: translateX(3px); }
+
+    .hero-features {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .hero-feature {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-feature-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--accent-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .72rem;
+    }
+    .hero-feature-text {
+      font-size: .75rem;
+      color: var(--ink-3);
+      font-weight: 500;
+    }
+    .hero-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--rule);
+    }
+
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
 
-        :root {
-            --primary-color: #ff4757;
-            --secondary-color: #6c5ce7;
-            --accent-color: #00d2d3;
-            --dark-color: #2d3436;
-            --light-color: #e8e8e8;
-            --gray-100: #f8f9fa;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-600: #6c757d;
-            --gray-800: #343a40;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 25px rgba(0,0,0,0.12);
-            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --gradient-hero: linear-gradient(135deg, #f0e0e8 0%, #e0e8f0 50%, #f0e8e0 100%);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--dark-color);
-            background-color: #e8ebf0;
-            overflow-x: hidden;
-        }
-
-        /* Login Popup Styles */
-        .login-popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .login-popup {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease;
-            position: relative;
-        }
-
-        .login-popup-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 36px;
-            color: white;
-        }
-
-        .login-popup h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--dark-color);
-        }
-
-        .login-popup p {
-            font-size: 16px;
-            color: var(--gray-600);
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-
-        .login-popup-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .login-popup-btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .login-popup-btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .login-popup-btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .login-popup-btn-secondary {
-            background: var(--gray-200);
-            color: var(--gray-800);
-        }
-
-        .login-popup-btn-secondary:hover {
-            background: var(--gray-300);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Mentor-only Popup Styles */
-        .mentor-popup-overlay {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 320px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 10001;
-            animation: slideInRight 0.4s ease;
-            border: 1px solid #e2e8f0;
-        }
-
-        .mentor-popup {
-            padding: 24px;
-            text-align: center;
-        }
-
-        .mentor-popup-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 16px;
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            color: white;
-        }
-
-        .mentor-popup h4 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--dark-color);
-        }
-
-        .mentor-popup p {
-            font-size: 14px;
-            color: var(--gray-600);
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .mentor-popup-close {
-            background: var(--gray-200);
-            color: var(--gray-800);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 13px;
-        }
-
-        .mentor-popup-close:hover {
-            background: var(--gray-300);
-            transform: translateY(-1px);
-        }
-
-        @keyframes slideInRight {
-            from { 
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Hidden class for robust element hiding */
-        .hidden {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-        /* User Profile Styles */
-        .user-profile {
-            margin-left: auto;
-            margin-right: 20px;
-            position: relative;
-        }
-
-        .user-avatar-container {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary-color);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .user-avatar:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-
-        .user-dropdown {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
-            width: 250px;
-            z-index: 1000;
-            overflow: hidden;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        .user-dropdown.show {
-            display: block;
-        }
-
-        .user-info {
-            padding: 16px;
-            border-bottom: 1px solid var(--gray-200);
-            background: var(--gray-100);
-        }
-
-        .user-name {
-            display: block;
-            font-weight: 600;
-            color: var(--dark-color);
-            margin-bottom: 4px;
-        }
-
-        .user-email {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--gray-600);
-        }
-
-        .dropdown-item {
-            display: block;
-            padding: 12px 16px;
-            color: var(--dark-color);
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background: var(--gray-100);
-            color: var(--primary-color);
-            padding-left: 20px;
-        }
-
-        .dropdown-item:active {
-            background: var(--gray-200);
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 12px;
-            margin-left: auto;
-            margin-right: 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: var(--shadow-lg);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ff6b35;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-left: -40px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 10;
-        }
-
-        .logo::before {
-            content: "";
-            width: 55px;
-            height: 55px;
-            background-image: url('https://cdn.vectorstock.com/i/500p/28/22/bull-and-bear-stock-market-logo-vector-4962822.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            animation: none;
-            position: relative;
-            z-index: 11;
-            border-radius: 12px;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-            color: #e55a2b;
-        }
-
-        .logo:hover::before {
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .hero-image-section {
-            padding: 40px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .hero-image-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 20px;
-        }
-
-        .hero-image {
-            width: 100%;
-            max-width: 900px;
-            height: auto;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            object-fit: cover;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
-        .hero-image:hover {
-            transform: scale(1.02);
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 0;
-            align-items: center;
-            border: 2px solid #d1d1d1; /* Increased border width */
-            border-radius: 8px;
-            padding: 6px; /* Increased padding for taller appearance */
-            background: #f8f8f8;
-            height: 50px; /* Fixed height for consistency */
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--gray-600);
-            font-weight: 500;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 8px 28px; /* Increased horizontal padding */
-            margin: 0 4px; /* Added margin between links */
-            border-radius: 4px;
-        }
-
-        .nav-links a::after {
-            display: none;
-        }
-
-        .nav-links a:hover {
-            color: var(--dark-color);
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* Active state for nav links */
-        .nav-links a[href="#search"] {
-            background: transparent; /* Removed white background */
-            color: var(--dark-color);
-            font-weight: 600; /* Make text slightly bolder */
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        /* Profile icon button in header */
-        .profile-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            text-decoration: none;
-            box-shadow: var(--shadow-md);
-            border: 2px solid rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .profile-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 15px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-secondary {
-            background: var(--light-color);
-            color: var(--gray-600);
-            border: 2px solid var(--gray-200);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-100);
-            color: var(--dark-color);
-            border-color: var(--gray-300);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary {
-            background: #000000;
-            color: white;
-            border: 2px solid #000000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary:hover {
-            background: #333333;
-            border-color: #333333;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Enhanced Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #f0e0e8 0%, #e0e8f0 50%, #f0e8e0 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding-top: 80px;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.02"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.02"/><circle cx="50" cy="10" r="1" fill="%23000" opacity="0.02"/><circle cx="10" cy="90" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-       .hero-container {
-        max-width: 1400px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 1;
-        }
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 71, 87, 0.2);
-            animation: slideInUp 0.8s ease-out;
-        }
-
-        .hero-badge::before {
-            content: "✨";
-            font-size: 16px;
-        }
-
-        .hero-title {
-            font-size: 64px;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            color: var(--dark-color);
-            letter-spacing: -0.02em;
-            animation: slideInUp 0.8s ease-out 0.2s both;
-        }
-
-        .hero-title .highlight {
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-
-        .hero-subtitle {
-            font-size: 22px;
-            color: var(--gray-600);
-            margin-bottom: 40px;
-            line-height: 1.6;
-            font-weight: 400;
-            animation: slideInUp 0.8s ease-out 0.4s both;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 48px;
-            align-items: center;
-            animation: slideInUp 0.8s ease-out 0.6s both;
-        }
-        .hero-side {
-    flex: 0 0 500px;   /* fixed width for marquee */
-    display: flex;
-    justify-content: flex-end;
-}
-
-        .btn-large {
-            padding: 18px 36px;
-            font-size: 18px;
-            border-radius: 16px;
-            font-weight: 700;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-hero {
-            background: var(--gradient-primary);
-            color: var(--light-color);
-            border: none;
-            box-shadow: var(--shadow-lg);
-            height: 68px;
-            font-size: 21px;
-            padding: 0 45px;
-            border-radius: 16px;
-            font-weight: 600;
-        }
-
-        .btn-hero:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .btn-demo {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--dark-color);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-demo:hover {
-            background: var(--light-color);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 48px;
-            align-items: center;
-            animation: slideInUp 0.8s ease-out 0.8s both;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--gray-600);
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .stat-number {
-            font-weight: 800;
-            color: var(--dark-color);
-            font-size: 18px;
-        }
-
-        .stars {
-            color: #ffa500;
-            font-size: 16px;
-            filter: drop-shadow(0 1px 2px rgba(255, 165, 0, 0.3));
-        }
-
-        /* Enhanced Interactive Counter */
-        .counter-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 24px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            margin-top: 32px;
-            display: inline-flex;
-            align-items: center;
-            gap: 20px;
-            animation: slideInUp 0.8s ease-out 1s both;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .counter-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-        }
-
-        .counter-label {
-            font-size: 15px;
-            color: var(--gray-600);
-            font-weight: 600;
-        }
-
-        .counter-display {
-            font-size: 32px;
-            font-weight: 900;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            min-width: 50px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .counter-btn {
-            background: var(--gradient-primary);
-            color: var(--light-color);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .counter-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.3s ease;
-        }
-
-        .counter-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .counter-btn:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .counter-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Enhanced Profile Cards */
-        .profile-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 500px;
-            animation: slideInRight 0.8s ease-out 0.4s both;
-        }
-
-        .profile-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--gradient-primary);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .profile-card:hover::before {
-            opacity: 0.05;
-        }
-
-        .profile-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .profile-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--light-color);
-            font-weight: 800;
-            font-size: 20px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-        }
-
-        .profile-card:nth-child(1) .profile-avatar {
-            background: var(--gradient-accent);
-        }
-
-        .profile-card:nth-child(2) .profile-avatar {
-            background: var(--gradient-secondary);
-        }
-
-        .profile-card:nth-child(3) .profile-avatar {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            color: var(--dark-color);
-        }
-
-        .profile-card:nth-child(4) .profile-avatar {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            color: var(--dark-color);
-        }
-
-        .profile-card:hover .profile-avatar {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .profile-info h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark-color);
-            margin-bottom: 4px;
-        }
-
-        .profile-info p {
-            font-size: 14px;
-            color: var(--gray-600);
-            font-weight: 500;
-        }
-
-        .profile-tag {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--gray-600);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            z-index: 1;
-        }
-
-        /* Enhanced Features Section */
-        .features {
-            padding: 120px 0;
-            background: var(--light-color);
-            position: relative;
-        }
-
-        .features::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gray-200), transparent);
-        }
-
-        .features-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            text-align: center;
-        }
-
-        .features-title {
-            font-size: 56px;
-            font-weight: 900;
-            color: var(--dark-color);
-            margin-bottom: 20px;
-            letter-spacing: -0.02em;
-        }
-
-        .features-subtitle {
-            font-size: 22px;
-            color: var(--gray-600);
-            margin-bottom: 80px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
-        }
-
-        .feature-item {
-            background: var(--light-color);
-            padding: 48px 40px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--gray-200);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-item:hover::before {
-            transform: scaleX(1);
-        }
-
-        .feature-item:hover {
-            transform: translateY(-12px);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--gray-300);
-        }
-
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            margin-bottom: 32px;
-            background: var(--gradient-primary);
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s ease;
-        }
-
-        .feature-item:nth-child(1) .feature-icon {
-            background: var(--gradient-accent);
-        }
-
-        .feature-item:nth-child(2) .feature-icon {
-            background: var(--gradient-secondary);
-        }
-
-        .feature-item:nth-child(3) .feature-icon {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .feature-item:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .feature-item h3 {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--dark-color);
-            margin-bottom: 16px;
-            line-height: 1.2;
-        }
-
-        .feature-item p {
-            font-size: 18px;
-            color: var(--gray-600);
-            line-height: 1.6;
-            font-weight: 400;
-        }
-
-        /* Enhanced Animations */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--light-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Enhanced Responsive Design */
-        @media (max-width: 1024px) {
-            .hero-container {
-                gap: 60px;
-            }
-            
-            .hero-title {
-                font-size: 52px;
-            }
-            
-            .nav-container {
-                padding: 0 24px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero-container {
-                grid-template-columns: 1fr;
-                gap: 48px;
-                text-align: center;
-            }
-
-            .hero-title {
-                font-size: 44px;
-            }
-
-            .hero-subtitle {
-                font-size: 20px;
-            }
-
-            .hero-actions {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .hero-stats {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 32px;
-            }
-
-            .profile-cards {
-                grid-template-columns: 1fr;
-                max-width: 350px;
-                margin: 0 auto;
-            }
-
-            .features-title {
-                font-size: 40px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-container {
-                padding: 0 20px;
-            }
-
-            .hero-container,
-            .features-container {
-                padding: 0 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 36px;
-            }
-
-            .btn-large {
-                padding: 16px 28px;
-                font-size: 16px;
-            }
-
-            .counter-section {
-                flex-direction: column;
-                text-align: center;
-                gap: 16px;
-            }
-        }
-
-        /* Success notification styles */
-        .success-notification {
-            position: fixed;
-            top: 120px;
-            right: 32px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: var(--light-color);
-            padding: 20px 28px;
-            border-radius: 16px;
-            font-weight: 600;
-            box-shadow: var(--shadow-xl);
-            z-index: 1001;
-            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
- .marquee-container {
-  display: flex;
-  gap: 28px; /* space between columns */
-  height: 600px; 
-  width: 500px; /* overall container height */
-}
-
-.marquee-column {
-  width: 240px;  /* column width */
-  overflow: hidden;
-  border-radius: 10px;
-  position: relative;
-  height: 600px;
-}
-
-.marquee-content {
-  display: flex;
-  flex-direction: column;
-  animation: scrollDown 7s linear infinite;
-  gap: 10px ;
-}
-
-/* Downward scrolling */
-.marquee-column.down .marquee-content {
-  animation: scrollDown 13s linear infinite;
-}
-
-/* Upward scrolling */
-.marquee-column.up .marquee-content {
-  animation: scrollUp 13s linear infinite;
-}
-
-@keyframes scrollDown {
-  0% { transform: translateY(-50%); }
-  100% { transform: translateY(0%); }
-}
-
-@keyframes scrollUp {
-  0% { transform: translateY(0%); }
-  100% { transform: translateY(-50%); }
-}
-
-    /* ========== Review Cards ========== */
-    .review-card {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-    }
-
-    .review-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #ff6b81, #ff9a8b);
-    }
-
-    .review-card:nth-child(3n+1)::before {
-        background: linear-gradient(90deg, #667eea, #764ba2);
-    }
-
-    .review-card:nth-child(3n+2)::before {
-        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
-    }
-
-    .review-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    }
-
-    .review-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 16px;
-    }
-
-    .review-header img {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 12px;
-        border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .review-card:hover .review-header img {
-        transform: scale(1.1);
-    }
-
-    .review-author {
-        font-weight: 700;
-        color: #2d3436;
-        font-size: 16px;
-        margin-bottom: 2px;
-        background: linear-gradient(90deg, #2d3436, #636e72);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .review-username {
-        color: #636e72;
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .review-body {
-        color: #2d3436;
-        font-size: 15px;
-        line-height: 1.6;
-        position: relative;
-        padding-left: 16px;
-        font-style: italic;
-    }
-
-    .review-body::before {
-        content: '"';
-        position: absolute;
-        left: -8px;
-        top: -12px;
-        font-size: 48px;
-        font-family: Georgia, serif;
-        color: rgba(99, 110, 114, 0.1);
-        line-height: 1;
-    }
-
-    /* Button Hover Effects */
-    .btn {
-        position: relative;
-        overflow: hidden;
-        z-index: 1;
-    }
-
-    .btn::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-        transform: translateX(-100%);
-        transition: transform 0.6s ease;
-        z-index: -1;
-    }
-
-    .btn:hover::after {
-        transform: translateX(100%);
-    }
-    /* Responsive styles */
-    @media (max-width: 1024px) {
-        .nav-links {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100vh;
-            background: #fff;
-            flex-direction: column;
-            padding: 80px 30px;
-            transition: 0.5s;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-        }
-    }
-
-    /* Learn More Section Styles */
-    .learn-more-section {
-        padding: 100px 20px;
-        background: linear-gradient(135deg, #f8faff 0%, #eef2ff 25%, #f0f4ff 50%, #e8f0ff 75%, #f5f7ff 100%);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .learn-more-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-            radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.03) 0%, transparent 50%);
-        opacity: 1;
-    }
-
-    .learn-more-section::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="%23e8eefb" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-        opacity: 0.4;
-    }
-
-    .learn-more-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 1;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-
-    .section-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 8px 20px;
-        border-radius: 50px;
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        animation: slideInUp 0.8s ease-out;
-    }
-
-    .title-highlight {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .feature-number {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 48px;
-        font-weight: 900;
-        color: rgba(102, 126, 234, 0.1);
-        transition: all 0.5s ease;
-    }
-
-    .feature-box:hover .feature-number {
-        color: rgba(102, 126, 234, 0.2);
-        transform: scale(1.1);
-    }
-
-    .feature-features {
-        display: flex;
-        gap: 8px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-    }
-
-    .feature-tag {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .feature-box:hover .feature-tag {
-        background: rgba(102, 126, 234, 0.2);
-        transform: translateY(-2px);
-    }
-
-    /* Feature Box specific tag colors */
-    .feature-box-1 .feature-tag {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-    }
-
-    .feature-box-2 .feature-tag {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
-    }
-
-    .feature-box-3 .feature-tag {
-        background: rgba(251, 146, 60, 0.1);
-        color: #fb923c;
-    }
-
-    .feature-box-4 .feature-tag {
-        background: rgba(236, 72, 153, 0.1);
-        color: #ec4899;
-    }
-
-    .features-cta {
-        margin-top: 80px;
-        text-align: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 24px;
-        padding: 60px 40px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
-    }
-
-    .features-cta::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="cta-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23cta-grid)"/></svg>');
-        opacity: 0.5;
-    }
-
-    .cta-content {
-        position: relative;
-        z-index: 1;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .features-cta h3 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: white;
-        margin-bottom: 20px;
-        letter-spacing: -0.02em;
-    }
-
-    .features-cta p {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 32px;
-        line-height: 1.6;
-    }
-
-    .cta-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        background: white;
-        color: #667eea;
-        padding: 18px 36px;
-        border-radius: 16px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 18px;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .cta-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        background: #f8f9ff;
-    }
-
-    .cta-button svg {
-        transition: transform 0.3s ease;
-    }
-
-    .cta-button:hover svg {
-        transform: translateX(4px);
-    }
-
-    .section-title {
-        font-size: 3rem;
-        font-weight: 800;
-        color: var(--dark-color);
-        margin-bottom: 20px;
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        line-height: 1.2;
-    }
-
-    .section-subtitle {
-        font-size: 1.25rem;
-        color: var(--gray-600);
-        max-width: 600px;
-        margin: 0 auto;
-        line-height: 1.7;
-    }
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 35px;
-        margin-top: 60px;
-    }
-
-    .feature-box {
-        background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
-        border-radius: 24px;
-        padding: 45px 35px;
-        text-align: center;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-    }
-
-    .feature-box::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        transform: scaleX(0);
-        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: left;
-    }
-
-    .feature-box::after {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        pointer-events: none;
-    }
-
-    .feature-box:hover {
-        transform: translateY(-20px) scale(1.02);
-        box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%);
-    }
-
-    .feature-box:hover::before {
-        transform: scaleX(1);
-    }
-
-    .feature-box:hover::after {
-        opacity: 1;
-    }
-
-    .feature-icon {
-        width: 90px;
-        height: 90px;
-        margin: 0 auto 30px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-
-    .feature-icon::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        border-radius: 24px;
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-    }
-
-    .feature-box:hover .feature-icon {
-        transform: scale(1.15) rotate(8deg);
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
-    }
-
-    .feature-box:hover .feature-icon::before {
-        opacity: 1;
-    }
-
-    .feature-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #2d3436;
-        margin-bottom: 18px;
-        transition: all 0.3s ease;
-        position: relative;
-        letter-spacing: -0.5px;
-    }
-
-    .feature-box:hover .feature-title {
-        color: #667eea;
-        transform: translateY(-2px);
-    }
-
-    .feature-description {
-        font-size: 1.05rem;
-        color: #636e72;
-        line-height: 1.8;
-        margin-bottom: 0;
-        min-height: 88px;
-        font-weight: 400;
-        letter-spacing: 0.2px;
-    }
-
-    /* Colorful Feature Box Styles */
-    
-    /* Feature Box 1 - Expert Courses - Blue/Purple Theme */
-    .feature-box-1 {
-        background: linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%);
-        border-color: rgba(102, 126, 234, 0.2);
-    }
-    
-    .feature-box-1:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #e8efff 100%);
-        box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-1::before {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .feature-box-1::after {
-        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-1 {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-    
-    .feature-icon-1::before {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    }
-    
-    .feature-box-1:hover .feature-icon-1 {
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
-    }
-
-    /* Feature Box 2 - Real-Time Analytics - Green/Teal Theme */
-    .feature-box-2 {
-        background: linear-gradient(145deg, #ffffff 0%, #f0fff4 100%);
-        border-color: rgba(16, 185, 129, 0.2);
-    }
-    
-    .feature-box-2:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #e8fff5 100%);
-        box-shadow: 0 25px 60px rgba(16, 185, 129, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-2::before {
-        background: linear-gradient(90deg, #10b981 0%, #14b8a6 100%);
-    }
-    
-    .feature-box-2::after {
-        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-2 {
-        background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-    }
-    
-    .feature-icon-2::before {
-        background: linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #06b6d4 100%);
-    }
-    
-    .feature-box-2:hover .feature-icon-2 {
-        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4);
-    }
-
-    /* Feature Box 3 - Live Trading - Orange/Red Theme */
-    .feature-box-3 {
-        background: linear-gradient(145deg, #ffffff 0%, #fff7ed 100%);
-        border-color: rgba(251, 146, 60, 0.2);
-    }
-    
-    .feature-box-3:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #ffedd5 100%);
-        box-shadow: 0 25px 60px rgba(251, 146, 60, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-3::before {
-        background: linear-gradient(90deg, #fb923c 0%, #ef4444 100%);
-    }
-    
-    .feature-box-3::after {
-        background: radial-gradient(circle, rgba(251, 146, 60, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-3 {
-        background: linear-gradient(135deg, #fb923c 0%, #ef4444 100%);
-        box-shadow: 0 8px 25px rgba(251, 146, 60, 0.3);
-    }
-    
-    .feature-icon-3::before {
-        background: linear-gradient(135deg, #fb923c 0%, #ef4444 50%, #dc2626 100%);
-    }
-    
-    .feature-box-3:hover .feature-icon-3 {
-        box-shadow: 0 20px 40px rgba(251, 146, 60, 0.4);
-    }
-
-    /* Feature Box 4 - Community - Pink/Purple Theme */
-    .feature-box-4 {
-        background: linear-gradient(145deg, #ffffff 0%, #fdf4ff 100%);
-        border-color: rgba(236, 72, 153, 0.2);
-    }
-    
-    .feature-box-4:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #fae8ff 100%);
-        box-shadow: 0 25px 60px rgba(236, 72, 153, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-4::before {
-        background: linear-gradient(90deg, #ec4899 0%, #a855f7 100%);
-    }
-    
-    .feature-box-4::after {
-        background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-4 {
-        background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
-        box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
-    }
-    
-    .feature-icon-4::before {
-        background: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #9333ea 100%);
-    }
-    
-    .feature-box-4:hover .feature-icon-4 {
-        box-shadow: 0 20px 40px rgba(236, 72, 153, 0.4);
-    }
-
-    /* Responsive Design */
     @media (max-width: 768px) {
-        .learn-more-section {
-            padding: 60px 20px;
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-        }
-
-        .section-subtitle {
-            font-size: 1.1rem;
-        }
-
-        .features-grid {
-            grid-template-columns: 1fr;
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .feature-box {
-            padding: 35px 25px;
-        }
-
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 25px;
-        }
-
-        .feature-title {
-            font-size: 1.4rem;
-        }
-
-        .feature-description {
-            font-size: 1rem;
-            min-height: 80px;
-        }
+      nav { padding: 0 18px; }
+      .nav-links { display: none; }
+      h1 { font-size: 2.1rem; }
+      .hero-actions { flex-direction: column; }
     }
-
-    @media (max-width: 480px) {
-        .section-title {
-            font-size: 1.9rem;
-        }
-
-        .feature-box {
-            padding: 30px 20px;
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
-        }
-
-        .feature-title {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-        }
-
-        .feature-description {
-            font-size: 0.95rem;
-            min-height: 72px;
-            margin-bottom: 22px;
-        }
-    }
-
-    /* Animation for feature boxes on scroll */
-    .feature-box {
-        opacity: 0;
-        transform: translateY(50px);
-        animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    .feature-box:nth-child(1) { animation-delay: 0.1s; }
-    .feature-box:nth-child(2) { animation-delay: 0.2s; }
-    .feature-box:nth-child(3) { animation-delay: 0.3s; }
-    .feature-box:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    </style>
+  </style>
 </head>
 <body>
-    <!-- Enhanced Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">Market Master</a>
-            
-            <!-- User Profile Dropdown (initially hidden) -->
-            <div class="user-profile" id="userProfile" style="display: none;">
-                <div class="user-avatar-container">
-                    <img src="" alt="User Avatar" id="userAvatar" class="user-avatar">
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="user-info">
-                            <span id="userName" class="user-name"></span>
-                            <span id="userEmail" class="user-email"></span>
-                        </div>
-                        <a href="profile.html" class="dropdown-item">My Profile</a>
-                        <a href="#" id="logoutBtn" class="dropdown-item">Logout</a>
-                    </div>
-                </div>
-            </div>
-            
-            
-            <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="mentors.html">Mentors</a></li>
-                <li><a href="price.html">Pricing</a></li>
-            </ul>
-            
-            <!-- Profile Icon (between links and buttons) -->
-            <div id="userProfile" style="display: none; margin: 0 15px; position: relative;">
-                <img id="userAvatar" src="https://www.gravatar.com/avatar/00000000000000000000000000000?d=mp&f=y" 
-                     alt="Profile" 
-                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">
-                <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 200px; z-index: 1000;">
-                    <a href="profile.html" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s ease;">
-                        <i class="fas fa-user-circle" style="margin-right: 8px;"></i> My Profile
-                    </a>
-                    <a href="#" onclick="logout()" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-top: 1px solid #eee; transition: background 0.2s ease;">
-                        <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> Logout
-                    </a>
-                </div>
-            </div>
-            
-            <div class="nav-buttons" id="navButtons">
-                <a href="upload.html" class="btn btn-primary">Start Uploading</a>
-            </div>
-        </div>
-    </nav>
 
-    
-    <!-- Enhanced Hero Section -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                
-                
-                <h1 class="hero-title">
-                    Master <span class="highlight">Stock Market</span> Trading
-                </h1>
-                
-                <p class="hero-subtitle">
-                    Learn professional trading strategies. Analyze market trends, build wealth, and achieve financial independence — all from one comprehensive platform.
-                </p>
-                
-                <div class="hero-actions">
-                    <a href="page.html" class="btn btn-hero btn-large" id="start-btn">
-                        <span>Start  My  Page</span>
-                        <span style="margin-left: 12px;">→</span>
-                    </a>
-                    <a href="#learn-more" class="btn btn-hero btn-large" id="learn-more-btn">
-                        <span>Learn More</span>
-                        <span style="margin-left: 12px;">→</span>
-                    </a>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number"></span>
-                        <span class="stars"></span>
-                        <span></span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number"></span>
-                        <span></span>
-                    </div>
-
-                </div>
-            </div>
-            <div class="hero-image-container">
-                <img src="https://plus.unsplash.com/premium_photo-1681487769650-a0c3fbaed85a?q=80&w=1255&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Market Master Professional Trading Platform" class="hero-image">
-            </div>
-        </div>
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="index.html">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="12" width="3" height="5" rx=".8" fill="rgba(255,255,255,.35)"/>
+          <rect x="8.5" y="8" width="3" height="9" rx=".8" fill="rgba(255,255,255,.6)"/>
+          <rect x="14" y="4.5" width="3" height="12.5" rx=".8" fill="#fff"/>
+          <path d="M4.5 11L9.5 7.2l5.5-4.5" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="15" cy="2.7" r="1.4" fill="#4ade80"/>
+        </svg>
       </div>
-    </section>
+      Market Master
+    </a>
 
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="mlearning/mlearning/mentors.html">Mentors</a></li>
+      <li><a href="mlearning/mlearning/price.html">Pricing</a></li>
+    </ul>
+
+    <div class="nav-right" id="navButtons">
+      <button class="btn-primary" onclick="window.location.href='mlearning/mlearning/upload.html'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Start Uploading
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      <span class="status-text">Live market data • 50K+ traders</span>
+    </div>
+
+    <h1>Master <em>Stock Market</em><br>Trading</h1>
+
+    <p class="hero-sub">Learn professional trading strategies. Analyze market trends, build wealth, and achieve financial independence — all from one comprehensive platform.</p>
+
+    <div class="hero-actions">
+      <a href="mlearning/mlearning/page.html" class="btn-cta" id="start-btn">
+        <span>Start My Page</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+      <a href="#learn-more" class="btn-text">
+        See how it works
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7h8M8 4l3 3-3 3"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="hero-features">
+      <div class="hero-feature">
+        <span class="hero-feature-icon">🔒</span>
+        <span class="hero-feature-text">Bank-grade security</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-feature">
+        <span class="hero-feature-icon">⚡</span>
+        <span class="hero-feature-text">Real-time data</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-feature">
+        <span class="hero-feature-icon">📊</span>
+        <span class="hero-feature-text">Zero commission</span>
+      </div>
+    </div>
+
+  </section>
+
+  <script>
+    // Auth state management
+    const navButtons = document.getElementById('navButtons');
     
-    <script>
+    async function renderHeaderFromSession() {
+      if (!navButtons) return;
+      try {
+        const res = await fetch('http://localhost:4000/api/me', { credentials: 'include' });
+        if (!res.ok) throw new Error('No session');
+        const me = await res.json();
         
-        // Enhanced navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-        
-        // Enhanced start button interaction
-        document.getElementById('start-btn').addEventListener('click', function() {
-            const btn = this;
-            const originalHTML = btn.innerHTML;
-            
-            btn.innerHTML = '<span class="loading"></span> <span>Creating Your Page...</span>';
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.8';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalHTML;
-                btn.style.pointerEvents = 'auto';
-                btn.style.opacity = '1';
-                
-                // Enhanced success notification
-                const successMsg = document.createElement('div');
-                successMsg.className = 'success-notification';
-                successMsg.innerHTML = '🎉 Welcome to CreativeHub Premium!';
-                document.body.appendChild(successMsg);
-                
-                setTimeout(() => {
-                    successMsg.style.animation = 'slideInRight 0.4s reverse';
-                    setTimeout(() => successMsg.remove(), 400);
-                }, 4000);
-            }, 2500);
-        });
-        
-        // Enhanced smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-        
-        // Enhanced profile card interactions
-        const profileCards = document.querySelectorAll('.profile-card');
-        profileCards.forEach((card, index) => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-12px) scale(1.03) rotate(1deg)';
-                card.style.zIndex = '10';
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0) scale(1) rotate(0deg)';
-                card.style.zIndex = '1';
-            });
-            
-            // Staggered animation on load
-            card.style.animationDelay = `${0.6 + index * 0.1}s`;
-        });
-        
-        // Enhanced intersection observer
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0) scale(1)';
-                }
-            });
-        }, observerOptions);
-        
-        // Observe elements for enhanced animations
-        document.querySelectorAll('.feature-item').forEach((el, index) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(60px) scale(0.9)';
-            el.style.transition = `all 0.8s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.2}s`;
-            observer.observe(el);
-        });
-        
-        // Enhanced page load animation
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '1';
-            
-            // Add floating animation to hero elements
-            const floatingElements = document.querySelectorAll('.profile-card');
-            floatingElements.forEach((el, index) => {
-                el.style.animation = `float 6s ease-in-out infinite ${index * 0.5}s`;
-            });
-        });
-        
-        // Add floating keyframes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes float {
-                0%, 100% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-10px) rotate(1deg); }
-            }
+        navButtons.innerHTML = `
+          <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
+            <img id="userAvatar" src="https://www.gravatar.com/avatar/${me.email ? me.email.toLowerCase().trim() : ''}?d=mp&f=y" 
+                 alt="Profile" 
+                 onclick="toggleDropdown()"
+                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">
+            <div class="profile-dropdown" id="profileDropdown">
+              <a href="profile.html">My Profile</a>
+              <a href="#" onclick="logout(); return false;">Logout</a>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="window.location.href='mlearning/mlearning/upload.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Start Uploading
+          </button>
         `;
-        document.head.appendChild(style);
         
-        // Enhanced demo button interaction
-        document.querySelector('.btn-demo').addEventListener('click', function() {
-            const btn = this;
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                btn.style.transform = 'scale(1)';
-            }, 150);
-            
-            // Demo modal simulation
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.8);
-                backdrop-filter: blur(10px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 2000;
-                animation: fadeInScale 0.3s ease-out;
-            `;
-            
-            const content = document.createElement('div');
-            content.style.cssText = `
-                background: white;
-                padding: 40px;
-                border-radius: 20px;
-                text-align: center;
-                max-width: 400px;
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            `;
-            content.innerHTML = `
-                <h3 style="margin-bottom: 16px; font-size: 24px; font-weight: 700;">🎬 Demo Coming Soon!</h3>
-                <p style="color: #666; margin-bottom: 24px;">We're preparing an amazing demo experience for you.</p>
-                <button onclick="this.closest('.modal').remove()" style="background: var(--gradient-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Close</button>
-            `;
-            
-            modal.className = 'modal';
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
-            });
-        });
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) startBtn.style.display = 'none';
+      } catch (error) {
+        // User not logged in - show default state
+        navButtons.innerHTML = `
+          <button class="btn-ghost" onclick="window.location.href='signin.html'">Sign In</button>
+          <button class="btn-primary" onclick="window.location.href='mlearning/mlearning/upload.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Start Uploading
+          </button>
+        `;
         
-        // Render auth state in header using localStorage 'userProfile'
-        // Fetch session user from API and render header
-        const navButtons = document.getElementById('navButtons');
-        async function renderHeaderFromSession() {
-            if (!navButtons) return;
-            try {
-                // Always call API on backend origin so cookies/sessions work,
-                // even if this page is opened from file:// or another port.
-                const res = await fetch('http://localhost:4000/api/me', { credentials: 'include' });
-                if (!res.ok) throw new Error('No session');
-                const me = await res.json();
-                const first = String(me.username || '').charAt(0).toUpperCase() || 'U';
-                
-                // Update header buttons for logged-in user
-                navButtons.innerHTML = `
-                    <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
-                        <img id="userAvatar" src="https://www.gravatar.com/avatar/${md5(me.email)}?d=mp&f=y" 
-                             alt="Profile" 
-                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">
-                        <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 200px; z-index: 1000;">
-                            <a href="profile.html" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s ease;">
-                                <i class="fas fa-user-circle" style="margin-right: 8px;"></i> My Profile
-                            </a>
-                            <a href="#" onclick="logout()" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-top: 1px solid #eee; transition: background 0.2s ease;">
-                                <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> Logout
-                            </a>
-                        </div>
-                    </div>
-                    <a href="upload.html" class="btn btn-primary">Start Uploading</a>
-                `;
-                
-                // Hide "Start My Page" button from hero section
-                const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                console.log('Start My Page button found:', startMyPageBtn); // Debug log
-                if (startMyPageBtn) {
-                    console.log('Hiding Start My Page button'); // Debug log
-                    startMyPageBtn.style.display = 'none';
-                    // Also try adding a class for more robust hiding
-                    startMyPageBtn.classList.add('hidden');
-                } else {
-                    console.log('Start My Page button not found'); // Debug log
-                    // Try again after a short delay
-                    setTimeout(() => {
-                        const delayedBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                        console.log('Delayed search - Start My Page button found:', delayedBtn);
-                        if (delayedBtn) {
-                            delayedBtn.style.display = 'none';
-                            delayedBtn.classList.add('hidden');
-                        }
-                    }, 100);
-                }
-            } catch (error) {
-                // Check if user is actually logged in via localStorage before showing login popup
-                const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
-                if (userProfile) {
-                    // User has local profile data, use it instead of showing login popup
-                    const user = JSON.parse(userProfile);
-                    const userData = user.user || user; // Handle both formats
-                    const first = String(userData.username || '').charAt(0).toUpperCase() || 'U';
-                    
-                    navButtons.innerHTML = `
-                        <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
-                            <img id="userAvatar" src="https://www.gravatar.com/avatar/${md5(userData.email)}?d=mp&f=y" 
-                                 alt="Profile" 
-                                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">
-                            <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 200px; z-index: 1000;">
-                                <a href="profile.html" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s ease;">
-                                    <i class="fas fa-user-circle" style="margin-right: 8px;"></i> My Profile
-                                </a>
-                                <a href="#" onclick="logout()" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-top: 1px solid #eee; transition: background 0.2s ease;">
-                                    <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> Logout
-                                </a>
-                            </div>
-                        </div>
-                        <a href="upload.html" class="btn btn-primary">Start Uploading</a>
-                    `;
-                    
-                    // Hide "Start My Page" button
-                    const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                    if (startMyPageBtn) {
-                        startMyPageBtn.style.display = 'none';
-                        startMyPageBtn.classList.add('hidden');
-                    }
-                } else {
-                    // Show default buttons for logged-out user
-                    navButtons.innerHTML = `
-                        <a href="signin.html" class="btn btn-secondary" style="border: 0.5px solid #000;">Sign In</a>
-                        <a href="upload.html" class="btn btn-primary">Start Uploading</a>
-                    `;
-                    
-                    // Show "Start My Page" button for logged-out user
-                    const startMyPageBtn = document.getElementById('start-btn');
-                    console.log('Logged out - Start My Page button found:', startMyPageBtn); // Debug log
-                    if (startMyPageBtn) {
-                        console.log('Showing Start My Page button'); // Debug log
-                        startMyPageBtn.style.display = 'inline-flex';
-                    } else {
-                        console.log('Logged out - Start My Page button not found'); // Debug log
-                    }
-                }
-            }
-        }
-        
-        // Wait for DOM to be ready before rendering
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, calling renderHeaderFromSession'); // Debug log
-            renderHeaderFromSession();
-        });
-    </script>
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) startBtn.style.display = 'inline-flex';
+      }
+    }
     
-    <!-- Enhanced Floating Chat with Professional Label -->
-    <div class="floating-chat" id="floatingChat">
-        <div class="chat-container">
-            <div class="ai-assistant-label">
-                <span>AI Assistant</span>
-                <div class="label-arrow"></div>
-            </div>
-            <div class="chat-bubble">
-                <img src="https://www.shutterstock.com/image-vector/robot-head-speech-bubble-red-600nw-2483741073.jpg" alt="AI Assistant" class="robot-avatar">
-            </div>
-        </div>
-    </div>
-
-    <style>
-        /* Enhanced Floating Chat Button Styles */
-        .floating-chat {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            z-index: 1000;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
-
-        .floating-chat:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-        }
-
-        .floating-chat:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .chat-icon {
-            position: relative;
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-bubble {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            z-index: 2;
-            overflow: hidden;
-            padding: 0;
-            border: 2px solid #000000;
-            box-sizing: border-box;
-        }
-
-        .chat-bubble:hover {
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
-        }
-
-        .chat-bubble:active {
-            transform: translateY(-2px) scale(0.98);
-        }
-
-        /* Tooltip styles */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-        }
-
-        .ai-assistant-label {
-            background: #6c5ce7;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeIn 0.5s ease-out;
-            white-space: nowrap;
-            position: relative;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            font-family: 'Inter', sans-serif;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .label-arrow {
-            position: absolute;
-            bottom: -8px;
-            right: 20px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid #6c5ce7;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .chat-bubble {
-            position: relative;
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-            background: #a29bfe;
-            padding: 4px;
-            /* Rainbow border effect */
-            background: linear-gradient(45deg, 
-                #ff0000, #ff7f00, #ffff00, #00ff00, 
-                #0000ff, #4b0082, #8b00ff) border-box;
-            border: 3px solid transparent;
-            background-size: 200% 200%;
-            animation: rainbow 3s ease infinite;
-        }
-        
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .chat-bubble .tooltip {
-            visibility: hidden;
-            width: 100px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-            font-weight: 500;
-            pointer-events: none;
-        }
-
-        .chat-bubble .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-        }
-
-        .chat-bubble:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .robot-avatar {
-            width: 120%;
-            height: 120%;
-            object-fit: contain;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-            transform: scale(1.4);
-            background: #a29bfe;
-            padding: 2px;
-            margin: -10%;
-        }
-
-        .chat-bubble:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .chat-bubble:active {
-            transform: translateY(-1px);
-        }
-
-        .chat-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background: #ff4757;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
-            z-index: 3;
-            animation: bounce 2s infinite;
-            border: 2px solid white;
-        }
-
-        .pulse-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 72px;
-            height: 72px;
-            background: rgba(102, 126, 234, 0.3);
-            border-radius: 50%;
-            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0.8);
-                opacity: 0.5;
-            }
-            70% {
-                transform: translate(-50%, -50%) scale(1.4);
-                opacity: 0;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* Add smooth hover effect on the icon */
-        .floating-chat:hover .chat-bubble svg {
-            transform: rotate(10deg);
-        }
-
-        /* Add a subtle floating animation */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .floating-chat {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        /* Animation for first load */
-        @keyframes floatUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .floating-chat {
-            animation: floatUp 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28) 1s both;
-        }
-    </style>
-
+    function toggleDropdown() {
+      const dropdown = document.getElementById('profileDropdown');
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      }
+    }
     
+    function logout() {
+      fetch('http://localhost:4000/api/logout', { 
+        method: 'POST', 
+        credentials: 'include' 
+      }).then(() => {
+        localStorage.removeItem('userProfile');
+        localStorage.removeItem('userAuth');
+        window.location.reload();
+      }).catch(() => window.location.reload());
+    }
     
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="cta-container">
-            <div class="cta-content">
-                <h2>Ready to Discover Your True Potential?</h2>
-                <p>Take our comprehensive assessment to uncover your strengths, find your ideal career path, and get personalized recommendations for your professional growth journey.</p>
-                <div class="cta-buttons">
-                    <a href="http://localhost:3000" class="btn btn-primary" id="startAssessmentBtn" target="_blank">Start Assessment</a>
-                </div>
-            </div>
-            <div class="cta-image">
-                <img src="https://img.freepik.com/premium-vector/professional-online-exam-test-quiz-3d-vector-graphic-writing-concept_1326094-5710.jpg" alt="Assessment" loading="lazy">
-            </div>
-        </div>
-    </section>
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const profile = document.getElementById('userProfile');
+      const dropdown = document.getElementById('profileDropdown');
+      if (profile && dropdown && !profile.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', renderHeaderFromSession);
+  </script>
 
-    <!-- Learn More Section -->
-    <section class="learn-more-section" id="learn-more">
-        <div class="learn-more-container">
-            <div class="section-header">
-                <div class="section-badge">
-                    <span>✨</span>
-                    <span>Why Choose Us</span>
-                </div>
-                <h2 class="section-title">Why Choose <span class="title-highlight">Market Master</span>?</h2>
-                <p class="section-subtitle">Discover the features that make us the leading platform for stock market education and trading success</p>
-            </div>
-            
-            <div class="features-grid">
-                <!-- Feature Box 1 - Expert Courses - Blue/Purple -->
-                <div class="feature-box feature-box-1">
-                    <div class="feature-number">01</div>
-                    <div class="feature-icon feature-icon-1">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                            <path d="M12 7v14"></path>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Expert-Led Courses</h3>
-                    <p class="feature-description">Learn from seasoned traders and market experts with comprehensive courses covering everything from basics to advanced strategies.</p>
-                    <div class="feature-features">
-                        <span class="feature-tag">Professional Traders</span>
-                        <span class="feature-tag">Live Sessions</span>
-                    </div>
-                </div>
-
-                <!-- Feature Box 2 - Real-Time Analytics - Green/Teal -->
-                <div class="feature-box feature-box-2">
-                    <div class="feature-number">02</div>
-                    <div class="feature-icon feature-icon-2">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 3v18h18"></path>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Real-Time Analytics</h3>
-                    <p class="feature-description">Access live market data, advanced charting tools, and predictive analytics to make informed trading decisions in real-time.</p>
-                    <div class="feature-features">
-                        <span class="feature-tag">Live Data</span>
-                        <span class="feature-tag">AI Insights</span>
-                    </div>
-                </div>
-
-                <!-- Feature Box 3 - Live Trading - Orange/Red -->
-                <div class="feature-box feature-box-3">
-                    <div class="feature-number">03</div>
-                    <div class="feature-icon feature-icon-3">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M12 6v6l4 2"></path>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Live Trading Sessions</h3>
-                    <p class="feature-description">Participate in live trading sessions where experts demonstrate strategies, answer questions, and share market insights in real-time.</p>
-                    <div class="feature-features">
-                        <span class="feature-tag">Interactive</span>
-                        <span class="feature-tag">Q&A Sessions</span>
-                    </div>
-                </div>
-
-                <!-- Feature Box 4 - Community - Pink/Purple -->
-                <div class="feature-box feature-box-4">
-                    <div class="feature-number">04</div>
-                    <div class="feature-icon feature-icon-4">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Community Support</h3>
-                    <p class="feature-description">Join a thriving community of traders, share experiences, get feedback, and grow together with like-minded individuals on the same journey.</p>
-                    <div class="feature-features">
-                        <span class="feature-tag">24/7 Support</span>
-                        <span class="feature-tag">Network</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Bottom CTA Section -->
-            <div class="features-cta">
-                <div class="cta-content">
-                    <h3>Ready to Start Your Trading Journey?</h3>
-                    <p>Join thousands of successful traders who have transformed their careers with Market Master</p>
-                    <a href="page.html" class="cta-button">
-                        <span>Get Started Today</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14"></path>
-                            <path d="m12 5 7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <a href="#" class="footer-logo">Market Master</a>
-                <p class="footer-tagline">Empowering creators to turn their passion into a profession.</p>
-                <div class="social-links">
-                    <a href="#" aria-label="Twitter">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="Instagram">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="LinkedIn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                            <rect x="2" y="9" width="4" height="12"></rect>
-                            <circle cx="4" cy="4" r="2"></circle>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="footer-links">
-                <div class="footer-links-group">
-                    <h4>Product</h4>
-                    <a href="#">Features</a>
-                    <a href="#">Pricing</a>
-                    <a href="#">Templates</a>
-                    <a href="#">Integrations</a>
-                </div>
-                
-                <div class="footer-links-group">
-                    <h4>Resources</h4>
-                    <a href="#">Blog</a>
-                    <a href="#">Help Center</a>
-                    <a href="#">Tutorials</a>
-                    <a href="#">Community</a>
-                </div>
-                
-                <div class="footer-links-group">
-                    <h4>Company</h4>
-                    <a href="#">About Us</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Contact</a>
-                    <a href="#">Press</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-legal">
-                <span>© 2024 Market Master. All rights reserved.</span>
-                <div class="legal-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Cookie Policy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <style>
-        
-        /* CTA Section Styles */
-        .cta-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 120px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-content {
-            max-width: 600px;
-        }
-
-        .cta-content h2 {
-            font-size: 40px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .cta-content p {
-            font-size: 18px;
-            margin-bottom: 32px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 16px;
-        }
-
-        .cta-image {
-            width: 450px;
-            height: 350px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .cta-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 20px;
-            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        /* Footer Styles */
-        .main-footer {
-            background: #111827;
-            color: #9ca3af;
-            padding: 80px 0 0;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: grid;
-            grid-template-columns: 1.5fr 2fr;
-            gap: 60px;
-            margin-bottom: 60px;
-        }
-
-        .footer-brand {
-            max-width: 350px;
-        }
-
-        .footer-logo {
-            font-size: 28px;
-            font-weight: 900;
-            color: white;
-            text-decoration: none;
-            margin-bottom: 16px;
-            display: inline-block;
-        }
-
-        .footer-tagline {
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            background: #667eea;
-            transform: translateY(-3px);
-        }
-
-        .footer-links {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-        }
-
-        .footer-links-group h4 {
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .footer-links-group a {
-            display: block;
-            color: #9ca3af;
-            margin-bottom: 12px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .footer-links-group a:hover {
-            color: white;
-            transform: translateX(4px);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 24px 0;
-        }
-
-        .footer-legal {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .legal-links {
-            display: flex;
-            gap: 24px;
-        }
-
-        .legal-links a {
-            color: #9ca3af;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-
-        .legal-links a:hover {
-            color: white;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 1024px) {
-            .cta-container {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .cta-content {
-                margin-bottom: 48px;
-            }
-
-            .footer-container {
-                grid-template-columns: 1fr;
-                gap: 48px;
-            }
-
-            .footer-brand {
-                max-width: 100%;
-                text-align: center;
-                margin: 0 auto;
-            }
-
-            .social-links {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .footer-links {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            .footer-legal {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .legal-links {
-                margin-top: 8px;
-            }
-
-            .cta-content h2 {
-                font-size: 32px;
-            }
-
-            .cta-image {
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .section-title {
-                font-size: 32px;
-            }
-
-            .section-subtitle {
-                font-size: 16px;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .cta-buttons .btn {
-                width: 100%;
-                text-align: center;
-            }
-        }
-    </style>
-
-    <!-- User Authentication Script -->
-    <script>
-        const API_BASE_URL = 'http://localhost:4000';
-
-        // Check authentication status and update UI
-        async function checkAuthStatus() {
-            try {
-                // First check localStorage as fallback
-                const localAuth = localStorage.getItem('userAuth');
-                if (localAuth) {
-                    try {
-                        const authData = JSON.parse(localAuth);
-                        if (authData.isAuthenticated && authData.user) {
-                            console.log('User authenticated via localStorage');
-                            updateUIForLoggedInUser(authData.user);
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('Invalid localStorage auth data:', e);
-                    }
-                }
-
-                console.log('Checking auth status from:', `${API_BASE_URL}/api/check-auth`);
-                const response = await fetch(`${API_BASE_URL}/api/check-auth`, {
-                    method: 'GET',
-                    credentials: 'include', // Important for sending cookies
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                console.log('Auth check response status:', response.status);
-                
-                const data = await response.json();
-                console.log('Auth check response data:', data);
-                
-                if (data.isAuthenticated && data.user) {
-                    console.log('User is authenticated, updating UI for:', data.user);
-                    // Store in localStorage as backup
-                    localStorage.setItem('userAuth', JSON.stringify({
-                        isAuthenticated: true,
-                        user: data.user,
-                        timestamp: Date.now()
-                    }));
-                    updateUIForLoggedInUser(data.user);
-                } else {
-                    console.log('User is not authenticated');
-                    // Clear localStorage
-                    localStorage.removeItem('userAuth');
-                    updateUIForLoggedOutUser();
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                // Try localStorage fallback
-                const localAuth = localStorage.getItem('userAuth');
-                if (localAuth) {
-                    try {
-                        const authData = JSON.parse(localAuth);
-                        if (authData.isAuthenticated && authData.user) {
-                            updateUIForLoggedInUser(authData.user);
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('LocalStorage fallback failed:', e);
-                    }
-                }
-                updateUIForLoggedOutUser();
-            }
-        }
-
-        // Update UI for logged in user
-        function updateUIForLoggedInUser(user) {
-            const userProfile = document.getElementById('userProfile');
-            const userAvatar = document.getElementById('userAvatar');
-            const userName = document.getElementById('userName');
-            const userEmail = document.getElementById('userEmail');
-            
-            if (userProfile && userAvatar && userName && userEmail) {
-                // Update user info - use correct field names from API response
-                userAvatar.src = user.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000?d=mp&f=y';
-                userName.textContent = user.username || user.name || 'User'; // API returns username, not name
-                userEmail.textContent = user.email || '';
-                
-                // Show user profile
-                userProfile.style.display = 'block';
-                
-                // Hide "Start Trading" button when user is logged in
-                const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                if (startMyPageBtn) {
-                    startMyPageBtn.style.display = 'none';
-                    startMyPageBtn.classList.add('hidden');
-                }
-                
-                // Show "Learn More" button when user is logged in
-                const learnMoreBtn = document.getElementById('learn-more-btn');
-                if (learnMoreBtn) {
-                    learnMoreBtn.style.display = 'inline-flex';
-                    learnMoreBtn.classList.remove('hidden');
-                }
-                
-                // Remove existing event listeners to prevent duplicates
-                const newAvatar = userAvatar.cloneNode(true);
-                userAvatar.parentNode.replaceChild(newAvatar, userAvatar);
-                
-                // Add click event for dropdown toggle
-                newAvatar.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const dropdown = document.getElementById('userDropdown');
-                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                });
-            }
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                const dropdown = document.getElementById('userDropdown');
-                if (userProfile && !userProfile.contains(e.target) && dropdown) {
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
-
-        // Update UI for logged out user
-        function updateUIForLoggedOutUser() {
-            const userProfile = document.getElementById('userProfile');
-            if (userProfile) {
-                userProfile.style.display = 'none';
-            }
-            
-            // Show "Start Trading" button when user is logged out
-            const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-            if (startMyPageBtn) {
-                startMyPageBtn.style.display = 'inline-flex';
-                startMyPageBtn.classList.remove('hidden');
-            }
-            
-            // Hide "Learn More" button when user is logged out
-            const learnMoreBtn = document.getElementById('learn-more-btn');
-            if (learnMoreBtn) {
-                learnMoreBtn.style.display = 'none';
-                learnMoreBtn.classList.add('hidden');
-            }
-        }
-
-        // Handle logout
-        document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/logout`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                // Clear localStorage on logout
-                localStorage.removeItem('userAuth');
-                
-                if (response.ok) {
-                    window.location.href = 'index.html';
-                }
-            } catch (error) {
-                console.error('Logout failed:', error);
-                // Still clear localStorage even if logout fails
-                localStorage.removeItem('userAuth');
-            }
-        });
-
-        // Check auth status when page loads
-        document.addEventListener('DOMContentLoaded', checkAuthStatus);
-
-        // Start Assessment button with login check
-        const startAssessmentBtn = document.getElementById('startAssessmentBtn');
-        if (startAssessmentBtn) {
-            startAssessmentBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                checkAuthenticationAndRedirect('http://localhost:3000');
-            });
-        }
-
-        // Chat button functionality (open in same tab to avoid popup blockers)
-        const floatingChat = document.getElementById('floatingChat');
-        if (floatingChat) {
-            floatingChat.addEventListener('click', function () {
-                checkAuthenticationAndRedirect('http://localhost:4000/ai.html');
-            });
-        }
-
-        // Login popup functions
-        function showLoginPopup() {
-            const popup = document.getElementById('loginPopupOverlay');
-            popup.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLoginPopup() {
-            const popup = document.getElementById('loginPopupOverlay');
-            popup.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Mentor popup functions
-        function showMentorPopup() {
-            const popup = document.getElementById('mentorPopupOverlay');
-            popup.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                closeMentorPopup();
-            }, 5000);
-        }
-
-        function closeMentorPopup() {
-            const popup = document.getElementById('mentorPopupOverlay');
-            popup.style.display = 'none';
-        }
-
-        // Check user type and handle upload access
-        async function checkUserTypeAndRedirect(redirectUrl) {
-            try {
-                // Always fetch fresh data from API to avoid localStorage issues
-                console.log('=== DEBUG: Fetching fresh user data from API ===');
-                
-                const response = await fetch(`${API_BASE_URL}/api/me`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Not authenticated');
-                }
-
-                const user = await response.json();
-                console.log('=== DEBUG: Fresh API response ===');
-                console.log(user);
-                
-                // TEMPORARY FIX: Force set userType for your user
-                if (user.email === 'bhanuprakashtungala@gmail.com' && !user.userType) {
-                    user.userType = 'mentor';
-                    console.log('=== TEMPORARY FIX: Set userType to mentor ===');
-                }
-                
-                // Update localStorage with fresh data
-                localStorage.setItem('userAuth', JSON.stringify({
-                    isAuthenticated: true,
-                    user: user,
-                    timestamp: Date.now()
-                }));
-                
-                if (user.userType === 'mentor') {
-                    // User is a mentor, allow access
-                    console.log('✅ User is mentor, allowing access to:', redirectUrl);
-                    window.location.href = redirectUrl;
-                } else {
-                    // User is a learner, show mentor-only popup
-                    console.log('❌ User is learner, showing mentor popup');
-                    showMentorPopup();
-                }
-            } catch (error) {
-                console.error('Error checking user type:', error);
-                // Check localStorage as fallback
-                const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
-                if (userProfile) {
-                    const user = JSON.parse(userProfile);
-                    const userData = user.user || user; // Handle both formats
-                    
-                    // TEMPORARY FIX: Force set userType for your user
-                    if (userData.email === 'bhanuprakashtungala@gmail.com' && !userData.userType) {
-                        userData.userType = 'mentor';
-                        console.log('=== TEMPORARY FIX: Set userType to mentor in fallback ===');
-                    }
-                    
-                    if (userData.userType === 'mentor') {
-                        console.log('Fallback: User is mentor, allowing access');
-                        window.location.href = redirectUrl;
-                    } else {
-                        console.log('Fallback: User is learner, showing mentor popup');
-                        showMentorPopup();
-                    }
-                } else {
-                    showLoginPopup();
-                }
-            }
-        }
-        async function checkAuthenticationAndRedirect(redirectUrl) {
-            try {
-                // First check if user has local profile data
-                const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
-                if (userProfile) {
-                    // User has local profile data, redirect directly
-                    window.location.href = redirectUrl;
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE_URL}/api/check-auth`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                
-                if (data.isAuthenticated && data.user) {
-                    // User is logged in, redirect to the requested page
-                    window.location.href = redirectUrl;
-                } else {
-                    // User is not logged in, show login popup
-                    showLoginPopup();
-                }
-            } catch (error) {
-                console.error('Error checking authentication:', error);
-                // Check localStorage as fallback
-                const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
-                if (userProfile) {
-                    window.location.href = redirectUrl;
-                } else {
-                    showLoginPopup();
-                }
-            }
-        }
-
-        // Add click handlers for protected links
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle Mentors link
-            const mentorsLink = document.querySelector('a[href="mentors.html"]');
-            if (mentorsLink) {
-                mentorsLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    checkAuthenticationAndRedirect('mentors.html');
-                });
-            }
-
-            // Handle Upload button
-            const uploadLinks = document.querySelectorAll('a[href="upload.html"]');
-            uploadLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    checkUserTypeAndRedirect('upload.html');
-                });
-            });
-
-            // Close popup when clicking overlay
-            const popupOverlay = document.getElementById('loginPopupOverlay');
-            if (popupOverlay) {
-                popupOverlay.addEventListener('click', function(e) {
-                    if (e.target === popupOverlay) {
-                        closeLoginPopup();
-                    }
-                });
-            }
-        });
-    </script>
-
-    <!-- Login Popup -->
-    <div class="login-popup-overlay" id="loginPopupOverlay">
-        <div class="login-popup">
-            <div class="login-popup-icon">
-                🔒
-            </div>
-            <h3>Please Login First</h3>
-            <p>You need to be logged in to access this feature. Login now to continue exploring all our amazing features!</p>
-            <div class="login-popup-buttons">
-                <a href="page.html" class="login-popup-btn login-popup-btn-primary">Login Now</a>
-                <button class="login-popup-btn login-popup-btn-secondary" onclick="closeLoginPopup()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mentor-only Popup -->
-    <div class="mentor-popup-overlay" id="mentorPopupOverlay">
-        <div class="mentor-popup">
-            <div class="mentor-popup-icon">
-                🚫
-            </div>
-            <h4>Mentors Only</h4>
-            <p>Only mentors can access the upload feature. If you're a mentor, please make sure you're logged in with a mentor account.</p>
-            <button class="mentor-popup-close" onclick="closeMentorPopup()">Got it</button>
-        </div>
-    </div>
 </body>
 </html>
