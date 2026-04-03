@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "server.js": {
-      "runtime": "nodejs24.x"
-    }
-  },
   "routes": [
     {
       "src": "/(.*)",
