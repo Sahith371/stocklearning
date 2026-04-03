@@ -284,6 +284,11 @@ app.use(express.static('public'));
 // Serve static files from mlearning/mlearning directory
 app.use(express.static('mlearning/mlearning'));
 
+// Serve home page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Serve myvideos page
 app.get('/myvideos', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'myvideos.html'));
