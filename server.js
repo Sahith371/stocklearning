@@ -1165,24 +1165,35 @@ app.post('/api/signup', async (req, res) => {
 // Login (called from signin.html)
 app.post('/api/login', async (req, res) => {
   try {
+    console.log('=== LOGIN ATTEMPT ===');
+    console.log('Request body:', req.body);
+    
     const { username, password } = req.body || {};
 
     if (!username || !password) {
+      console.log('Missing username or password');
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
+    console.log('Looking for user:', username);
     const user = await User.findOne({ username });
     if (!user) {
+      console.log('User not found:', username);
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
+    console.log('User found, checking password');
     const matches = await bcrypt.compare(password, user.passwordHash);
     if (!matches) {
+      console.log('Password mismatch for user:', username);
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
+    console.log('Password correct, creating session');
     req.session.userId = user._id.toString();
     req.session.username = user.username;
+
+    console.log('Session created:', { userId: req.session.userId, username: req.session.username });
 
     res.json({
       success: true,
@@ -1193,8 +1204,8 @@ app.post('/api/login', async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('/api/login error:', err);
-    res.status(500).json({ error: 'Login failed' });
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Login failed. Please try again.' });
   }
 });
 
