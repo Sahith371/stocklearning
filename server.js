@@ -28,7 +28,7 @@ const couponSchema = new mongoose.Schema({
   finalPrice: { type: Number } // Final price after discount
 });
 
-const Coupon = mongoose.model('Coupon', couponSchema);
+const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 // Video Schema
 const videoSchema = new mongoose.Schema(
@@ -86,7 +86,6 @@ const videoSchema = new mongoose.Schema(
     formattedAmount: { type: String, required: true, default: '$0.00' },
     videoUrl: { type: String, required: true },
     thumbnail: { type: String },
-    thumbnailUrl: { type: String },
     qrCodeUrl: { type: String },
     fileName: { type: String, required: true },
     fileSize: { type: Number, required: true },
@@ -109,7 +108,7 @@ const videoSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Video = mongoose.model('Video', videoSchema);
+const Video = mongoose.models.Video || mongoose.model('Video', videoSchema);
 
 // Video Access Schema
 const videoAccessSchema = new mongoose.Schema({
@@ -120,7 +119,7 @@ const videoAccessSchema = new mongoose.Schema({
   amount: { type: Number }
 });
 
-const VideoAccess = mongoose.model('VideoAccess', videoAccessSchema);
+const VideoAccess = mongoose.models.VideoAccess || mongoose.model('VideoAccess', videoAccessSchema);
 
 // ====== File Upload Configuration ======
 // Ensure uploads directory exists
@@ -450,7 +449,6 @@ app.post('/api/videos', requireAuth, upload.fields([
       formattedAmount: formattedAmount,
       videoUrl: `/uploads/${videoFile.filename}`,
       thumbnail: thumbnailUrl,
-      thumbnailUrl: thumbnailUrl,
       qrCodeUrl: qrCodeUrl,
       fileName: videoFile.filename,
       fileSize: videoFile.size,
@@ -509,7 +507,6 @@ app.post('/api/videos', requireAuth, upload.fields([
         price: video.price,
         videoUrl: video.videoUrl,
         thumbnail: video.thumbnail,
-        thumbnailUrl: video.thumbnailUrl,
         createdAt: video.createdAt
       }
     });
@@ -889,7 +886,7 @@ app.get('/api/videos', async (req, res) => {
     
     const videos = await Video.find()
       .sort({ createdAt: -1 }) // Most recent first
-      .select('title topic uploader uploaderEmail isPaid price currency formattedAmount videoUrl thumbnail thumbnailUrl createdAt paymentEmail paymentUpi qrCodeUrl uploadPaid');
+      .select('title topic uploader uploaderEmail isPaid price currency formattedAmount videoUrl thumbnail createdAt paymentEmail paymentUpi qrCodeUrl uploadPaid');
 
     console.log(`Found ${videos.length} videos`);
     
@@ -912,7 +909,6 @@ app.get('/api/videos', async (req, res) => {
       formattedAmount: video.formattedAmount || '$0.00',
       videoUrl: video.videoUrl,
       thumbnail: video.thumbnail,
-      thumbnailUrl: video.thumbnailUrl,
       qrCodeUrl: video.qrCodeUrl,
       paymentEmail: video.paymentEmail,
       paymentUpi: video.paymentUpi,
