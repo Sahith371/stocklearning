@@ -122,9 +122,9 @@ const videoAccessSchema = new mongoose.Schema({
 const VideoAccess = mongoose.models.VideoAccess || mongoose.model('VideoAccess', videoAccessSchema);
 
 // ====== File Upload Configuration ======
-// Ensure uploads directory exists
+// Ensure uploads directory exists (skip in serverless)
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
+if (!fs.existsSync(uploadsDir) && process.env.VERCEL !== '1') {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
