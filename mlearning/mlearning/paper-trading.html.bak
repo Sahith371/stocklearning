@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Trading - StockMaster</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .card-header i {
+            color: #00d4ff;
+        }
+
+        .balance-display {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .balance-amount {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+
+        .balance-label {
+            color: #888;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .stat-value.positive {
+            color: #00ff88;
+        }
+
+        .stat-value.negative {
+            color: #ff4757;
+        }
+
+        .trading-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .trading-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stock-selector {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .stock-selector option {
+            background: #1a1a2e;
+        }
+
+        .stock-info {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stock-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stock-symbol {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .stock-price {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stock-change {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stock-change.positive {
+            color: #00ff88;
+        }
+
+        .stock-change.negative {
+            color: #ff4757;
+        }
+
+        .quantity-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .trade-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            color: #000;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,255,136,0.4);
+        }
+
+        .btn-sell {
+            background: linear-gradient(135deg, #ff4757 0%, #cc3845 100%);
+            color: #fff;
+        }
+
+        .btn-sell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,71,87,0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .holdings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .holdings-table th,
+        .holdings-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .holdings-table th {
+            color: #888;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .holdings-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .pnl-positive {
+            color: #00ff88;
+        }
+
+        .pnl-negative {
+            color: #ff4757;
+        }
+
+        .transactions-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .transaction-type.buy {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+        }
+
+        .transaction-type.sell {
+            background: rgba(255,71,87,0.2);
+            color: #ff4757;
+        }
+
+        .transaction-details {
+            flex: 1;
+            margin: 0 15px;
+        }
+
+        .transaction-stock {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .transaction-date {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-price {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0,255,136,0.1);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #00ff88;
+            margin-bottom: 20px;
+        }
+
+        .live-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .error-message {
+            background: rgba(255,71,87,0.2);
+            color: #ff4757;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #00d4ff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .reset-btn {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,71,87,0.2);
+            border-color: #ff4757;
+        }
+
+        .total-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1><i class="fas fa-chart-line"></i> Paper Trading</h1>
+        <div class="nav-links">
+            <a href="/mlearning/mlearning/index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="#" onclick="resetAccount()" class="reset-btn"><i class="fas fa-redo"></i> Reset Account</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="live-indicator">
+            <span>Live Market Data</span>
+            <span id="lastUpdate">Last updated: Just now</span>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <!-- Dashboard Overview -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-wallet"></i>
+                    <span>Virtual Balance</span>
+                </div>
+                <div class="balance-display">
+                    <div class="balance-label">Available Cash</div>
+                    <div class="balance-amount" id="balanceAmount">₹100,000</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Portfolio Summary</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Investment</div>
+                        <div class="stat-value" id="totalInvestment">₹0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Current Value</div>
+                        <div class="stat-value" id="currentValue">₹0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Total P&L</div>
+                        <div class="stat-value" id="totalPnL">₹0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">P&L %</div>
+                        <div class="stat-value" id="totalPnLPercent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Section -->
+        <div class="trading-section">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Trade Stocks</span>
+                </div>
+                
+                <select class="stock-selector" id="stockSelect" onchange="selectStock()">
+                    <option value="">Select a stock...</option>
+                </select>
+
+                <div class="stock-info" id="stockInfo" style="display: none;">
+                    <div class="stock-name" id="selectedStockName">-</div>
+                    <div class="stock-symbol" id="selectedStockSymbol">-</div>
+                    <div class="stock-price" id="selectedStockPrice">₹0.00</div>
+                    <div class="stock-change" id="selectedStockChange">
+                        <i class="fas fa-caret-up"></i>
+                        <span>0.00 (0.00%)</span>
+                    </div>
+                </div>
+
+                <input type="number" class="quantity-input" id="quantityInput" placeholder="Enter quantity" min="1" value="1">
+
+                <div class="trade-buttons">
+                    <button class="btn btn-buy" id="buyBtn" onclick="executeTrade('BUY')" disabled>
+                        <i class="fas fa-arrow-up"></i> Buy
+                    </button>
+                    <button class="btn btn-sell" id="sellBtn" onclick="executeTrade('SELL')" disabled>
+                        <i class="fas fa-arrow-down"></i> Sell
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Your Holdings</span>
+                </div>
+                <div id="holdingsContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-briefcase"></i>
+                        <p>No holdings yet. Start trading!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-history"></i>
+                <span>Recent Transactions</span>
+            </div>
+            <div class="transactions-list" id="transactionsList">
+                <div class="empty-state">
+                    <i class="fas fa-receipt"></i>
+                    <p>No transactions yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:4000';
+        let stocks = [];
+        let selectedStock = null;
+        let portfolio = null;
+        let priceUpdateInterval = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStocks();
+            loadPortfolio();
+            loadTransactions();
+            
+            // Start real-time price updates
+            priceUpdateInterval = setInterval(updatePrices, 30000); // Update every 30 seconds
+        });
+
+        // Load available stocks
+        async function loadStocks() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/paper-trading/stocks`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    stocks = data.stocks;
+                    const select = document.getElementById('stockSelect');
+                    
+                    data.stocks.forEach(stock => {
+                        const option = document.createElement('option');
+                        option.value = stock.symbol;
+                        option.textContent = `${stock.name} (${stock.symbol})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading stocks:', error);
+                showError('Failed to load stocks');
+            }
+        }
+
+        // Select stock and fetch price
+        async function selectStock() {
+            const symbol = document.getElementById('stockSelect').value;
+            
+            if (!symbol) {
+                document.getElementById('stockInfo').style.display = 'none';
+                selectedStock = null;
+                updateTradeButtons();
+                return;
+            }
+
+            selectedStock = stocks.find(s => s.symbol === symbol);
+            
+            if (selectedStock) {
+                document.getElementById('selectedStockName').textContent = selectedStock.name;
+                document.getElementById('selectedStockSymbol').textContent = selectedStock.symbol;
+                document.getElementById('stockInfo').style.display = 'block';
+                
+                // Fetch real-time price
+                await fetchStockPrice(symbol);
+            }
+        }
+
+        // Fetch stock price
+        async function fetchStockPrice(symbol) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/paper-trading/quote/${symbol}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const quote = data.quote;
+                    selectedStock.price = quote.price;
+                    selectedStock.change = quote.change;
+                    selectedStock.changePercent = quote.changePercent;
+                    
+                    document.getElementById('selectedStockPrice').textContent = `₹${quote.price.toFixed(2)}`;
+                    
+                    const changeEl = document.getElementById('selectedStockChange');
+                    const isPositive = quote.change >= 0;
+                    
+                    changeEl.className = `stock-change ${isPositive ? 'positive' : 'negative'}`;
+                    changeEl.innerHTML = `
+                        <i class="fas fa-caret-${isPositive ? 'up' : 'down'}"></i>
+                        <span>${Math.abs(quote.change).toFixed(2)} (${Math.abs(quote.changePercent).toFixed(2)}%)</span>
+                    `;
+                    
+                    updateTradeButtons();
+                }
+            } catch (error) {
+                console.error('Error fetching price:', error);
+            }
+        }
+
+        // Update prices for all holdings
+        async function updatePrices() {
+            if (portfolio && portfolio.holdings.length > 0) {
+                await loadPortfolio();
+            }
+            
+            if (selectedStock) {
+                await fetchStockPrice(selectedStock.symbol);
+            }
+            
+            document.getElementById('lastUpdate').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // Load portfolio
+        async function loadPortfolio() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/paper-trading/portfolio`, {
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    portfolio = data.portfolio;
+                    updatePortfolioDisplay();
+                }
+            } catch (error) {
+                console.error('Error loading portfolio:', error);
+            }
+        }
+
+        // Update portfolio display
+        function updatePortfolioDisplay() {
+            // Update balance
+            document.getElementById('balanceAmount').textContent = `₹${portfolio.cashBalance.toLocaleString('en-IN')}`;
+            
+            // Update summary
+            document.getElementById('totalInvestment').textContent = `₹${portfolio.summary.totalInvestment.toLocaleString('en-IN')}`;
+            document.getElementById('currentValue').textContent = `₹${portfolio.summary.totalCurrentValue.toLocaleString('en-IN')}`;
+            
+            const totalPnL = portfolio.summary.totalProfitLoss;
+            const pnlEl = document.getElementById('totalPnL');
+            pnlEl.textContent = `${totalPnL >= 0 ? '+' : ''}₹${Math.abs(totalPnL).toLocaleString('en-IN')}`;
+            pnlEl.className = `stat-value ${totalPnL >= 0 ? 'positive' : 'negative'}`;
+            
+            const pnlPercentEl = document.getElementById('totalPnLPercent');
+            pnlPercentEl.textContent = `${portfolio.summary.totalProfitLossPercent >= 0 ? '+' : ''}${portfolio.summary.totalProfitLossPercent.toFixed(2)}%`;
+            pnlPercentEl.className = `stat-value ${portfolio.summary.totalProfitLossPercent >= 0 ? 'positive' : 'negative'}`;
+            
+            // Update holdings table
+            const holdingsContainer = document.getElementById('holdingsContainer');
+            
+            if (portfolio.holdings.length === 0) {
+                holdingsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-briefcase"></i>
+                        <p>No holdings yet. Start trading!</p>
+                    </div>
+                `;
+            } else {
+                let holdingsHTML = `
+                    <table class="holdings-table">
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Qty</th>
+                                <th>Avg Buy</th>
+                                <th>Current</th>
+                                <th>P&L</th>
+                                <th>P&L %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                portfolio.holdings.forEach(holding => {
+                    const pnlClass = holding.profitLoss >= 0 ? 'pnl-positive' : 'pnl-negative';
+                    holdingsHTML += `
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">${holding.companyName}</div>
+                                <div style="font-size: 12px; color: #888;">${holding.symbol}</div>
+                            </td>
+                            <td>${holding.quantity}</td>
+                            <td>₹${holding.avgBuyPrice.toFixed(2)}</td>
+                            <td>₹${holding.currentPrice.toFixed(2)}</td>
+                            <td class="${pnlClass}">${holding.profitLoss >= 0 ? '+' : ''}₹${holding.profitLoss.toFixed(2)}</td>
+                            <td class="${pnlClass}">${holding.profitLossPercent >= 0 ? '+' : ''}${holding.profitLossPercent.toFixed(2)}%</td>
+                        </tr>
+                    `;
+                });
+                
+                holdingsHTML += '</tbody></table>';
+                holdingsContainer.innerHTML = holdingsHTML;
+            }
+            
+            updateTradeButtons();
+        }
+
+        // Load transactions
+        async function loadTransactions() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/paper-trading/transactions`, {
+                    credentials: 'include'
+                });
+                
+                if (response.status === 401) return;
+                
+                const data = await response.json();
+                
+                if (data.success && data.transactions.length > 0) {
+                    const transactionsList = document.getElementById('transactionsList');
+                    
+                    let html = '';
+                    data.transactions.forEach(tx => {
+                        const date = new Date(tx.createdAt);
+                        html += `
+                            <div class="transaction-item">
+                                <span class="transaction-type ${tx.type.toLowerCase()}">${tx.type}</span>
+                                <div class="transaction-details">
+                                    <div class="transaction-stock">${tx.companyName} (${tx.quantity} shares)</div>
+                                    <div class="transaction-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
+                                </div>
+                                <div class="transaction-amount">
+                                    <div>₹${tx.totalAmount.toFixed(2)}</div>
+                                    <div class="transaction-price">@ ₹${tx.price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    transactionsList.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        // Update trade buttons state
+        function updateTradeButtons() {
+            const buyBtn = document.getElementById('buyBtn');
+            const sellBtn = document.getElementById('sellBtn');
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 0;
+            
+            // Buy button - enabled if stock selected and has price
+            buyBtn.disabled = !selectedStock || !selectedStock.price || quantity <= 0;
+            
+            // Sell button - enabled if stock selected, has price, and user has holdings
+            let canSell = false;
+            if (selectedStock && selectedStock.price && quantity > 0 && portfolio) {
+                const holding = portfolio.holdings.find(h => h.symbol === selectedStock.symbol);
+                if (holding && holding.quantity >= quantity) {
+                    canSell = true;
+                }
+            }
+            sellBtn.disabled = !canSell;
+        }
+
+        // Execute trade
+        async function executeTrade(type) {
+            if (!selectedStock || !selectedStock.price) return;
+            
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            
+            if (!quantity || quantity <= 0) {
+                showError('Please enter a valid quantity');
+                return;
+            }
+            
+            const endpoint = type === 'BUY' ? '/api/paper-trading/buy' : '/api/paper-trading/sell';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        symbol: selectedStock.symbol,
+                        companyName: selectedStock.name,
+                        quantity: quantity
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(`${type} order executed successfully! ${quantity} shares of ${selectedStock.symbol} at ₹${data.transaction.price.toFixed(2)}`);
+                    
+                    // Refresh data
+                    await loadPortfolio();
+                    await loadTransactions();
+                    
+                    // Reset quantity
+                    document.getElementById('quantityInput').value = '1';
+                } else {
+                    showError(data.error || 'Failed to execute trade');
+                }
+            } catch (error) {
+                console.error('Error executing trade:', error);
+                showError('Failed to execute trade. Please try again.');
+            }
+        }
+
+        // Reset account
+        async function resetAccount() {
+            if (!confirm('Are you sure you want to reset your paper trading account? This will clear all holdings and reset your balance to ₹100,000.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/paper-trading/reset`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Account reset successfully! Starting balance: ₹100,000');
+                    
+                    // Refresh all data
+                    await loadPortfolio();
+                    await loadTransactions();
+                    
+                    // Reset selection
+                    document.getElementById('stockSelect').value = '';
+                    document.getElementById('stockInfo').style.display = 'none';
+                    selectedStock = null;
+                    updateTradeButtons();
+                } else {
+                    showError(data.error || 'Failed to reset account');
+                }
+            } catch (error) {
+                console.error('Error resetting account:', error);
+                showError('Failed to reset account. Please try again.');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            setTimeout(() => {
+                successEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Listen for quantity changes
+        document.getElementById('quantityInput').addEventListener('input', updateTradeButtons);
+    </script>
+</body>
+</html>

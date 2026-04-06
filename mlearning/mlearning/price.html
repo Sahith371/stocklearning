@@ -41,129 +41,83 @@
             overflow-x: hidden;
         }
 
-        /* Enhanced Navigation */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* ── InvestNow NAV styles ── */
+        :root {
+            --ink:       #ffffff;
+            --ink-2:     #e8f5ec;
+            --ink-3:     #a8c5b5;
+            --mist:      #0d1f12;
+            --mist-2:    #0a1a0f;
+            --accent:    #22c55e;
+            --accent-l:  #4ade80;
+            --accent-xl: #166534;
+            --gold:      #c8972a;
+            --red:       #c0392b;
+            --rule:      rgba(74,222,128,.15);
+            --mono:      'JetBrains Mono', monospace;
         }
 
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: var(--shadow-lg);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        nav.invest-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 52px; height: 76px;
+            background: rgba(13,31,18,0.65);
+            backdrop-filter: blur(40px) saturate(2);
+            border-bottom: 1px solid var(--rule);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--ink);
+            font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 600; letter-spacing: -.01em;
+        }
+        .nav-logo-mark {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--ink-2); display: flex; align-items: center; justify-content: center;
+        }
+        .nav-logo-mark svg { width: 18px; height: 18px; }
+
+        nav.invest-nav .nav-links {
+            display: flex; align-items: center; gap: 2px; list-style: none;
+            background: rgba(74,222,128,.1);
+            border: 1px solid rgba(74,222,128,.2);
+            border-radius: 999px; padding: 7px 8px;
+            height: auto;
+        }
+        nav.invest-nav .nav-links a {
+            color: var(--ink-3); text-decoration: none; font-size: .88rem;
+            font-weight: 500; padding: 6px 20px; border-radius: 999px;
+            transition: color .18s, background .18s; letter-spacing: 0; white-space: nowrap;
+            margin: 0; font-family: 'Poppins', sans-serif;
+        }
+        nav.invest-nav .nav-links a:hover { color: var(--ink); background: rgba(26,122,60,.09); }
+        nav.invest-nav .nav-links a.active {
+            color: var(--accent); font-weight: 600;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(26,122,60,.12);
         }
 
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .btn-ghost {
+            background: none; border: 1px solid var(--rule); color: var(--ink-3);
+            font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 500;
+            padding: 8px 18px; border-radius: 8px; cursor: pointer;
+            transition: border-color .18s, color .18s;
         }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ff6b35;
+        .btn-ghost:hover { border-color: var(--accent-l); color: var(--ink); }
+        .btn-primary-inv {
+            background: #000000; color: #FFFFFF; border: 1px solid #E5E5E5;
+            font-family: 'Inter', sans-serif; font-size: .88rem; font-weight: 600;
+            padding: 11px 24px; border-radius: 10px; cursor: pointer; letter-spacing: 0;
+            transition: background .18s, transform .12s, box-shadow .18s, border-color .18s;
+            display: flex; align-items: center; gap: 7px;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-left: -40px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
-
-        .logo::before {
-            content: "";
-            width: 55px;
-            height: 55px;
-            background-image: url('https://cdn.vectorstock.com/i/500p/28/22/bull-and-bear-stock-market-logo-vector-4962822.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            animation: none;
-            position: relative;
-            z-index: 11;
-            border-radius: 12px;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-            color: #e55a2b;
-        }
-
-        .logo:hover::before {
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 0;
-            align-items: center;
-            border: 2px solid #d1d1d1;
-            border-radius: 8px;
-            padding: 6px;
-            background: #f8f8f8;
-            height: 50px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--gray-600);
-            font-weight: 500;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 8px 28px;
-            margin: 0 4px;
-            border-radius: 4px;
-        }
-
-        .nav-links a::after {
-            display: none;
-        }
-
-        .nav-links a:hover {
-            color: var(--dark-color);
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* Active state for nav links */
-        .nav-links a.active {
-            color: #000;
-            font-weight: 600;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .nav-links a[href="#search"] {
-            background: transparent;
-            color: var(--dark-color);
-            font-weight: 600;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 16px;
-            align-items: center;
+        .btn-primary-inv:hover { 
+            background: #1a1a1a; 
+            border-color: #FFFFFF;
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
         }
 
         .btn {
@@ -1279,20 +1233,34 @@
     </style>
 </head>
 <body>
-    <!-- Enhanced Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">market master</a>
-            
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="#mentors" class="nav-link">Mentors</a></li>
-                <li><a href="price.html" class="nav-link active">Pricing</a></li>
-            </ul>
-            
-            <div class="nav-buttons">
-                <a href="upload.html" class="btn btn-primary" data-open-upload>Start Uploading</a>
+    <!-- ══════════════════════
+         InvestNow NAV (from file 2)
+    ══════════════════════ -->
+    <nav class="invest-nav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-mark">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="12" width="3" height="5" rx=".8" fill="rgba(255,255,255,.35)"/>
+                    <rect x="8.5" y="8" width="3" height="9" rx=".8" fill="rgba(255,255,255,.6)"/>
+                    <rect x="14" y="4.5" width="3" height="12.5" rx=".8" fill="#fff"/>
+                    <path d="M4.5 11L9.5 7.2l5.5-4.5" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="2.7" r="1.4" fill="#4ade80"/>
+                </svg>
             </div>
+            Market Master
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="mentors.html">Mentors</a></li>
+            <li><a href="price.html" class="active">Pricing</a></li>
+        </ul>
+
+        <div class="nav-right" id="navButtons">
+            <a href="upload.html" class="btn-primary-inv">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Start Uploading
+            </a>
         </div>
     </nav>
 
@@ -1498,117 +1466,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="faq animate-section" id="faq">
-        <div class="container">
-            <div class="section-title">
-                <h2>Frequently Asked Questions</h2>
-                <p>Find answers to common questions about our pricing, features, and platform</p>
-            </div>
-
-            <div class="faq-search">
-                <i class="fas fa-search"></i>
-                <input type="text" id="faqSearch" placeholder="Search questions...">
-            </div>
-
-            <div class="faq-categories">
-                <button class="category-btn active" data-category="all">
-                    <i class="fas fa-th-large"></i> All Categories
-                </button>
-                <button class="category-btn" data-category="pricing">
-                    <i class="fas fa-tag"></i> Pricing
-                </button>
-                <button class="category-btn" data-category="features">
-                    <i class="fas fa-star"></i> Features
-                </button>
-                <button class="category-btn" data-category="billing">
-                    <i class="fas fa-credit-card"></i> Billing
-                </button>
-                <button class="category-btn" data-category="account">
-                    <i class="fas fa-user"></i> Account
-                </button>
-            </div>
-
-            <div class="faq-grid">
-                <div class="faq-item" data-categories="pricing" data-index="0">
-                    <div class="faq-item-header">
-                        <h3 class="faq-question">How does the commission structure work?</h3>
-                        <div class="faq-toggle">+</div>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We only charge a small commission when you actually earn money. There are no upfront fees, no monthly charges, and no hidden costs. You only pay when you succeed. Our transparent pricing ensures you always know exactly what you're paying for.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item" data-categories="pricing,features" data-index="1">
-                    <div class="faq-item-header">
-                        <h3 class="faq-question">What's included in the 10% commission plan?</h3>
-                        <div class="faq-toggle">+</div>
-                    </div>
-                    <div class="faq-answer">
-                        <p>The 10% plan gives you access to our full suite of creator tools while keeping more of your earnings. You'll get:</p>
-                        <ul>
-                            <li>Customizable profile page</li>
-                            <li>Analytics dashboard</li>
-                            <li>Direct booking calendar</li>
-                            <li>Payment processing</li>
-                            <li>Email support</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="faq-item" data-categories="pricing,features" data-index="2">
-                    <div class="faq-item-header">
-                        <h3 class="faq-question">When should I consider the 20% plan?</h3>
-                        <div class="faq-toggle">+</div>
-                    </div>
-                    <div class="faq-answer">
-                        <p>The 20% plan is ideal when you want to maximize your visibility and reach more potential clients. With this plan, you'll be featured in our marketplace where thousands of potential clients can discover your services. The increased exposure often leads to significantly more bookings, making the higher commission rate worthwhile.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item" data-categories="pricing,account" data-index="3">
-                    <div class="faq-item-header">
-                        <h3 class="faq-question">How do I qualify for custom pricing?</h3>
-                        <div class="faq-toggle">+</div>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Custom pricing is available for high-volume creators who are consistently earning ₹10k / $200+ per month. Our team will work with you to create a tailored plan that fits your specific needs and volume. Contact our sales team through the link below to discuss your options.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item" data-categories="billing" data-index="4">
-                    <div class="faq-item-header">
-                        <h3 class="faq-question">Are there any setup fees or monthly charges?</h3>
-                        <div class="faq-toggle">+</div>
-                    </div>
-                    <div class="faq-answer">
-                        <p>No, there are absolutely no setup fees, monthly charges, or hidden costs. We believe in a simple, transparent pricing model where we only succeed when you do. The only fee you'll ever pay is a percentage of your earnings, and you'll always see exactly what that percentage is before confirming any transaction.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item" data-categories="features" data-index="5">
-                    <div class="faq-item-header">
-                        <h3 class="faq-question"><span style="color: #000000;">Creators on Market Master earn</span> 73% more</h3>
-                        <div class="faq-toggle">+</div>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Our platform is designed to help you maximize your earnings through several key features:</p>
-                        <ul>
-                            <li>Smart pricing recommendations based on your experience and demand</li>
-                            <li>Automated scheduling to reduce no-shows and last-minute cancellations</li>
-                            <li>Client management tools to build lasting relationships</li>
-                            <li>Performance analytics to help you optimize your offerings</li>
-                            <li>Marketing tools to help you promote your services</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            
         </div>
     </section>
 
@@ -2150,5 +2007,117 @@
             color: white;
         }
     </style>
+
+    <!-- Header Auth Script -->
+    <script>
+        const API_BASE_URL = 'http://localhost:4000';
+        const navButtons = document.getElementById('navButtons');
+        
+        async function renderHeaderFromSession() {
+            if (!navButtons) return;
+            try {
+                const res = await fetch('http://localhost:4000/api/me', { credentials: 'include' });
+                if (!res.ok) throw new Error('No session');
+                const me = await res.json();
+                const first = String(me.username || '').charAt(0).toUpperCase() || 'U';
+                
+                const isMentor = me.userType === 'mentor';
+                const myEarningsLink = isMentor ? `
+                            <a href="myearnings.html" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                My Earnings
+                            </a>
+                            <div style="border-top: 1px solid #eee; margin: 8px 0;"></div>
+                ` : '';
+                
+                navButtons.innerHTML = `
+                    <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
+                        <div id="userAvatar" onclick="toggleProfileDropdown()" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600; text-transform: uppercase; border: 3px solid #FF6F61; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">${first}</div>
+                        <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 55px; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; padding: 16px;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                                <div style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600;">${first}</div>
+                                <div>
+                                    <div style="font-weight: 600; color: #333; font-size: 15px;">${me.username || 'User'}</div>
+                                    <div style="font-size: 13px; color: #666;">${me.email || ''}</div>
+                                </div>
+                            </div>
+                            ${myEarningsLink}
+                            <a href="#" onclick="logout(); return false;" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                    <a href="upload.html" class="btn-primary-inv" style="display:flex;align-items:center;gap:7px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Start Uploading
+                    </a>
+                `;
+            } catch (error) {
+                const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
+                if (userProfile) {
+                    const user = JSON.parse(userProfile);
+                    const userData = user.user || user;
+                    const first = String(userData.username || '').charAt(0).toUpperCase() || 'U';
+                    const isMentor = userData.userType === 'mentor';
+                    const myEarningsLink = isMentor ? `
+                                <a href="myearnings.html" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    My Earnings
+                                </a>
+                                <div style="border-top: 1px solid #eee; margin: 8px 0;"></div>
+                    ` : '';
+                    
+                    navButtons.innerHTML = `
+                        <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
+                            <div id="userAvatar" onclick="toggleProfileDropdown()" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600; text-transform: uppercase; border: 3px solid #FF6F61; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">${first}</div>
+                            <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 55px; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; padding: 16px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                                    <div style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600;">${first}</div>
+                                    <div>
+                                        <div style="font-weight: 600; color: #333; font-size: 15px;">${userData.username || 'User'}</div>
+                                        <div style="font-size: 13px; color: #666;">${userData.email || ''}</div>
+                                    </div>
+                                </div>
+                            ${myEarningsLink}
+                                <a href="#" onclick="logout(); return false;" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                        <a href="upload.html" class="btn-primary-inv" style="display:flex;align-items:center;gap:7px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Start Uploading
+                        </a>
+                    `;
+                }
+            }
+        }
+        
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_BASE_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                localStorage.removeItem('userAuth');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'index.html';
+            } catch (error) {
+                localStorage.removeItem('userAuth');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'index.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderHeaderFromSession();
+        });
+    </script>
 </body>
 </html>

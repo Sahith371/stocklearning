@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CreativeHub - Premium Creator Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <style>
         * {
             margin: 0;
@@ -318,232 +320,353 @@
             margin-right: 20px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* ── InvestNow NAV styles ── */
+        :root {
+            --ink:       #ffffff;
+            --ink-2:     #e8f5ec;
+            --ink-3:     #a8c5b5;
+            --mist:      #0d1f12;
+            --mist-2:    #0a1a0f;
+            --accent:    #22c55e;
+            --accent-l:  #4ade80;
+            --accent-xl: #166534;
+            --gold:      #c8972a;
+            --red:       #c0392b;
+            --rule:      rgba(74,222,128,.15);
+            --mono:      'JetBrains Mono', monospace;
         }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        nav.invest-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 52px; height: 84px;
+            background: rgba(13,31,18,0.65);
+            backdrop-filter: blur(40px) saturate(2);
+            border-bottom: 1px solid var(--rule);
         }
-
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: var(--shadow-lg);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--ink);
+            font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 600; letter-spacing: -.01em;
         }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-            position: relative;
+        .nav-logo-mark {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--ink-2); display: flex; align-items: center; justify-content: center;
         }
+        .nav-logo-mark svg { width: 18px; height: 18px; }
 
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ff6b35;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo::before {
-            content: "";
-            width: 55px;
-            height: 55px;
-            background-image: url('https://cdn.vectorstock.com/i/500p/28/22/bull-and-bear-stock-market-logo-vector-4962822.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            animation: none;
-            position: relative;
-            z-index: 11;
-            border-radius: 12px;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-            color: #e55a2b;
-        }
-
-        .logo:hover::before {
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .hero-image-section {
-            padding: 40px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .hero-image-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 20px;
-        }
-
-        .hero-image {
-            width: 100%;
-            max-width: 900px;
+        nav.invest-nav .nav-links {
+            display: flex; align-items: center; gap: 2px; list-style: none;
+            background: rgba(74,222,128,.1);
+            border: 1px solid rgba(74,222,128,.2);
+            border-radius: 999px; padding: 7px 8px;
             height: auto;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            object-fit: cover;
-            animation: float 6s ease-in-out infinite;
+        }
+        nav.invest-nav .nav-links a {
+            color: var(--ink-3); text-decoration: none; font-size: .88rem;
+            font-weight: 500; padding: 6px 20px; border-radius: 999px;
+            transition: color .18s, background .18s; letter-spacing: 0; white-space: nowrap;
+            margin: 0; font-family: 'Poppins', sans-serif;
+        }
+        nav.invest-nav .nav-links a:hover { color: var(--ink); background: rgba(26,122,60,.09); }
+        nav.invest-nav .nav-links a.active {
+            color: var(--accent); font-weight: 600;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(26,122,60,.12);
         }
 
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .btn-ghost {
+            background: none; border: 1px solid var(--rule); color: var(--ink-3);
+            font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 500;
+            padding: 8px 18px; border-radius: 8px; cursor: pointer;
+            transition: border-color .18s, color .18s;
         }
-
-        .hero-image:hover {
-            transform: scale(1.02);
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
-        }
-
-        .nav-center {
-            display: flex;
-            align-items: center;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .nav-center .nav-links {
-            margin-right: 40px;
-        }
-
-        .nav-center #userProfile {
-            margin: 0;
-        }
-
-        .nav-buttons {
-            position: absolute;
-            right: 32px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        #userProfile {
-            position: static;
-            transform: none;
-            z-index: 1000;
-        }
-
-        #userProfile .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 3px solid #FF6F61;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #008080;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 0;
-            align-items: center;
-            border: 2px solid #d1d1d1; /* Increased border width */
-            border-radius: 8px;
-            padding: 6px; /* Increased padding for taller appearance */
-            background: #f8f8f8;
-            height: 50px; /* Fixed height for consistency */
-        }
-
-        .nav-links a {
+        .btn-ghost:hover { border-color: var(--accent-l); color: var(--ink); }
+        .btn-primary-inv {
+            background: #000000; color: #FFFFFF; border: 1px solid #E5E5E5;
+            font-family: 'Inter', sans-serif; font-size: .88rem; font-weight: 600;
+            padding: 11px 24px; border-radius: 10px; cursor: pointer; letter-spacing: 0;
+            transition: background .18s, transform .12s, box-shadow .18s, border-color .18s;
+            display: flex; align-items: center; gap: 7px;
             text-decoration: none;
-            color: var(--gray-600);
-            font-weight: 500;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .btn-primary-inv:hover { 
+            background: #1a1a1a; 
+            border-color: #FFFFFF;
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+
+        /* ── InvestNow HERO styles ── */
+        .invest-hero {
+            position: relative; z-index: 10; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; text-align: center;
+            padding: 120px 24px 100px;
+            background: linear-gradient(180deg, #0d1f12 0%, #051208 50%, #020804 100%);
+        }
+
+        .invest-hero::before {
+            content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+            background-image:
+                linear-gradient(transparent 1px, transparent 1px),
+                linear-gradient(90deg, transparent 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 75%);
+        }
+        .invest-hero::after {
+            content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+            background: radial-gradient(ellipse 70% 55% at 50% 35%, rgba(34,197,94,.15) 0%, transparent 70%);
+        }
+
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 7px;
+            border: 1px solid var(--rule); border-radius: 99px;
+            padding: 5px 14px 5px 10px; margin-bottom: 28px;
+            background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+            animation: fadeDown .5s ease both;
+        }
+        .status-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent-l); box-shadow: 0 0 6px rgba(46,168,88,.6);
+            animation: statusPulse 2.4s ease infinite;
+        }
+        @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+        .status-text { font-size: .74rem; font-weight: 500; color: var(--ink-3); letter-spacing: .02em; font-family: 'Inter', sans-serif; }
+
+        .invest-hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.2rem, 4.8vw, 3.6rem);
+            font-weight: 600; line-height: 1.15; letter-spacing: -.02em;
+            color: var(--ink); max-width: 680px; margin-bottom: 20px;
+            animation: fadeUp .6s ease .12s both;
+        }
+        .invest-hero h1 em { color: #fff; font-style: normal; font-weight: 600; }
+
+        .hero-sub {
+            font-size: .88rem; font-weight: 400; color: var(--ink-3);
+            line-height: 1.7; max-width: 420px; margin-bottom: 36px;
+            animation: fadeUp .6s ease .24s both;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-actions {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 72px;
+            animation: fadeUp .6s ease .34s both;
+            flex-wrap: wrap; justify-content: center;
+        }
+        .btn-cta {
+            background: #000000; color: #FFFFFF; border: 1px solid #E5E5E5;
+            font-family: 'Poppins', sans-serif; font-size: .9rem; font-weight: 500;
+            padding: 16px 34px; border-radius: 10px; cursor: pointer; letter-spacing: 0;
+            transition: background .18s, transform .12s, box-shadow .18s, border-color .18s;
+            text-decoration: none; display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .btn-cta:hover { 
+            background: #1a1a1a; 
+            border-color: #FFFFFF;
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        .btn-text-inv {
+            background: none; border: none; color: var(--ink-3);
+            font-family: 'Poppins', sans-serif; font-size: .85rem; font-weight: 400;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: color .18s; text-decoration: none;
+        }
+        .btn-text-inv:hover { color: var(--accent-l); }
+        .btn-text-inv svg { width: 14px; height: 14px; transition: transform .18s; }
+        .btn-text-inv:hover svg { transform: translateX(3px); }
+
+        /* Dashboard Card */
+        .dashboard-card {
             position: relative;
-            padding: 8px 28px; /* Increased horizontal padding */
-            margin: 0 4px; /* Added margin between links */
-            border-radius: 4px;
+            width: min(980px, 94vw);
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid rgba(0,0,0,.08);
+            box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 12px 40px rgba(0,0,0,.1), 0 40px 90px rgba(0,0,0,.08);
+            overflow: visible;
+            animation: fadeUp .7s ease .5s both;
         }
 
-        .nav-links a::after {
-            display: none;
+        .db-topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 22px;
+            border-bottom: 1px solid rgba(0,0,0,.08);
+        }
+        .db-topbar-left { display: flex; align-items: center; gap: 20px; }
+        .db-brand { display: flex; align-items: center; gap: 8px; }
+        .db-brand-mark {
+            width: 26px; height: 26px; border-radius: 7px;
+            background: var(--accent); display: flex; align-items: center; justify-content: center;
+        }
+        .db-brand-mark svg { width: 14px; height: 14px; }
+        .db-brand-name { font-family: 'Inter', sans-serif; font-size: .88rem; color: #1a1a1a; }
+        .db-nav { display: flex; gap: 2px; }
+        .db-nav-item {
+            font-size: .72rem; font-weight: 500; color: rgba(0,0,0,.5);
+            padding: 5px 12px; border-radius: 6px; cursor: pointer;
+            transition: color .15s, background .15s;
+        }
+        .db-nav-item:hover { color: rgba(0,0,0,.8); }
+        .db-nav-item.active { color: #1a1a1a; background: rgba(0,0,0,.06); }
+        .db-topbar-right { display: flex; align-items: center; gap: 10px; }
+        .db-search {
+            display: flex; align-items: center; gap: 7px;
+            background: rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.08);
+            border-radius: 7px; padding: 5px 12px;
+        }
+        .db-search svg { width: 11px; height: 11px; opacity: .5; }
+        .db-search input {
+            background: none; border: none; outline: none;
+            font-size: .72rem; color: #1a1a1a; font-family: 'Inter', sans-serif; width: 100px;
+        }
+        .db-search input::placeholder { color: rgba(0,0,0,.4); }
+        .db-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--accent); color: #fff;
+            font-size: .62rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .db-notif {
+            width: 28px; height: 28px; border-radius: 7px;
+            background: rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.08);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
+        }
+        .db-notif svg { width: 13px; height: 13px; opacity: .5; }
+        .db-notif-dot {
+            position: absolute; top: 4px; right: 4px;
+            width: 5px; height: 5px; border-radius: 50%;
+            background: #22c55e; border: 1px solid #fff;
         }
 
-        .nav-links a:hover {
-            color: var(--dark-color);
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .db-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: rgba(0,0,0,.06); }
+        .db-body > * { background: #ffffff; }
+
+        .db-portfolio {
+            padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;
+            border-radius: 0 0 0 18px;
+        }
+        .db-section-label { font-size: .58rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: rgba(0,0,0,.4); margin-bottom: 2px; font-family: 'Inter', sans-serif; }
+        .db-port-val { font-family: 'Inter', sans-serif; font-size: 1.7rem; color: #1a1a1a; line-height: 1; }
+        .db-port-sub { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+        .db-gain { font-size: .7rem; font-weight: 600; color: #16a34a; background: rgba(22,163,74,.1); padding: 2px 8px; border-radius: 99px; font-family: var(--mono); }
+        .db-port-period { font-size: .66rem; color: rgba(0,0,0,.5); font-family: 'Inter', sans-serif; }
+        .db-alloc { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+        .db-alloc-row { display: flex; align-items: center; gap: 8px; }
+        .db-alloc-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .db-alloc-name { font-size: .68rem; color: rgba(0,0,0,.55); flex: 1; font-family: 'Inter', sans-serif; }
+        .db-alloc-pct { font-size: .68rem; font-weight: 600; font-family: var(--mono); }
+        .db-alloc-bar { height: 2px; flex: 1; border-radius: 99px; background: rgba(0,0,0,.08); overflow: hidden; }
+        .db-alloc-fill { height: 100%; border-radius: 99px; }
+
+        .db-chart { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .db-chart-header { display: flex; align-items: flex-start; justify-content: space-between; }
+        .db-chart-sym { font-family: 'Inter', sans-serif; font-size: .88rem; color: #1a1a1a; }
+        .db-chart-sub { font-size: .6rem; color: rgba(0,0,0,.4); margin-top: 1px; font-family: var(--mono); }
+        .db-tabs { display: flex; gap: 2px; }
+        .db-tab {
+            font-size: .6rem; font-weight: 600; padding: 3px 7px;
+            border-radius: 5px; cursor: pointer; border: none; font-family: var(--mono);
+        }
+        .db-tab.active { background: #22c55e; color: #fff; }
+        .db-tab:not(.active) { background: rgba(0,0,0,.04); color: rgba(0,0,0,.5); }
+        .db-price-row { display: flex; align-items: baseline; gap: 8px; }
+        .db-price { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: #1a1a1a; }
+        .db-chg-up { font-size: .67rem; font-weight: 600; color: #16a34a; background: rgba(22,163,74,.1); padding: 2px 7px; border-radius: 5px; font-family: var(--mono); }
+        .db-chg-dn { font-size: .67rem; font-weight: 600; color: #f87171; background: rgba(248,113,113,.1); padding: 2px 7px; border-radius: 5px; font-family: var(--mono); }
+        .db-chart-svg { width: 100%; height: 70px; }
+
+        .db-watchlist { padding: 18px 20px; display: flex; flex-direction: column; gap: 0; border-radius: 0 0 18px 0; }
+        .db-watch-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .db-watch-title { font-family: 'Inter', sans-serif; font-size: .86rem; color: #1a1a1a; }
+        .db-watch-link { font-size: .65rem; color: #22c55e; cursor: pointer; }
+        .db-watch-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.06);
+        }
+        .db-watch-row:last-child { border-bottom: none; }
+        .db-watch-icon {
+            width: 28px; height: 28px; border-radius: 7px;
+            background: rgba(0,0,0,.04); display: flex; align-items: center; justify-content: center;
+            font-size: .72rem; font-weight: 700; color: rgba(0,0,0,.6); flex-shrink: 0; font-family: var(--mono);
+        }
+        .db-watch-sym { font-size: .72rem; font-weight: 600; color: #1a1a1a; font-family: 'Inter', sans-serif; }
+        .db-watch-name { font-size: .6rem; color: rgba(0,0,0,.4); margin-top: 1px; font-family: 'Inter', sans-serif; }
+        .db-watch-right { margin-left: auto; text-align: right; }
+        .db-watch-price { font-size: .72rem; font-weight: 600; color: #1a1a1a; font-family: var(--mono); }
+        .db-watch-chg { font-size: .6rem; font-weight: 600; font-family: var(--mono); margin-top: 1px; }
+        .up { color: #16a34a; } .dn { color: #ef4444; }
+        .db-spark { width: 44px; height: 22px; flex-shrink: 0; }
+
+        .db-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: rgba(0,0,0,.06); border-top: 1px solid rgba(0,0,0,.06); }
+        .db-stat {
+            background: #ffffff; padding: 12px 18px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .db-stat:first-child { border-radius: 0 0 0 18px; }
+        .db-stat:last-child { border-radius: 0 0 18px 0; }
+        .db-stat-icon {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: rgba(0,0,0,.04); display: flex; align-items: center; justify-content: center; font-size: .82rem; flex-shrink: 0;
+        }
+        .db-stat-val { font-family: 'Inter', sans-serif; font-size: .9rem; color: #1a1a1a; }
+        .db-stat-label { font-size: .58rem; color: rgba(0,0,0,.4); margin-top: 1px; letter-spacing: .02em; font-family: 'Inter', sans-serif; }
+
+        .float-alert {
+            position: absolute; bottom: -48px; left: -14px;
+            background: #fff; border-radius: 12px; padding: 12px 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.12); border: 1px solid var(--rule);
+            min-width: 210px; z-index: 20;
+        }
+        .alert-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .alert-icon {
+            width: 26px; height: 26px; border-radius: 7px;
+            background: var(--accent-xl); display: flex; align-items: center; justify-content: center; font-size: .82rem;
+        }
+        .alert-title { font-size: .72rem; font-weight: 600; color: var(--ink); font-family: 'Inter', sans-serif; }
+        .alert-body { font-size: .63rem; color: var(--ink-3); line-height: 1.55; font-family: 'Inter', sans-serif; }
+        .alert-chip {
+            display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
+            font-size: .58rem; font-weight: 600;
+            color: var(--accent); background: var(--accent-xl);
+            padding: 2px 8px; border-radius: 99px; letter-spacing: .02em; font-family: 'Inter', sans-serif;
+        }
+        .alert-chip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-l); }
+
+        .float-portfolio {
+            position: absolute; bottom: -54px; right: -14px;
+            background: #fff; border-radius: 12px; padding: 14px 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.12); border: 1px solid var(--rule);
+            min-width: 182px; z-index: 20;
+        }
+        .port-title { font-size: .62rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; font-family: 'Inter', sans-serif; }
+        .port-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .port-item { display: flex; align-items: center; gap: 7px; }
+        .port-dot { width: 7px; height: 7px; border-radius: 50%; }
+        .port-name { font-size: .7rem; font-weight: 500; color: var(--ink); font-family: 'Inter', sans-serif; }
+        .port-pct { font-size: .68rem; font-weight: 600; font-family: var(--mono); }
+        .port-track { height: 3px; background: rgba(0,0,0,.06); border-radius: 99px; margin-top: 4px; overflow: hidden; }
+        .port-fill { height: 100%; border-radius: 99px; }
+
+        @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
+
+        @media (max-width: 768px) {
+            nav.invest-nav { padding: 0 18px; }
+            nav.invest-nav .nav-links { display: none; }
+            .invest-hero h1 { font-size: 2.1rem; }
+            .float-alert, .float-portfolio { display: none; }
+            .db-body { grid-template-columns: 1fr; }
+            .db-stats { grid-template-columns: repeat(2,1fr); }
         }
 
-        /* Active state for nav links */
-        .nav-links a[href="#search"] {
-            background: transparent; /* Removed white background */
-            color: var(--dark-color);
-            font-weight: 600; /* Make text slightly bolder */
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        /* Profile icon button in header */
-        .profile-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            text-decoration: none;
-            box-shadow: var(--shadow-md);
-            border: 2px solid rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .profile-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
+        /* ── REST OF FILE 1 STYLES ── */
         .btn {
             padding: 14px 28px;
             border: none;
@@ -604,626 +727,6 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
         }
 
-        /* Enhanced Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #f0e0e8 0%, #e0e8f0 50%, #f0e8e0 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding-top: 80px;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.02"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.02"/><circle cx="50" cy="10" r="1" fill="%23000" opacity="0.02"/><circle cx="10" cy="90" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-       .hero-container {
-        max-width: 1400px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 1;
-        }
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 71, 87, 0.2);
-            animation: slideInUp 0.8s ease-out;
-        }
-
-        .hero-badge::before {
-            content: "✨";
-            font-size: 16px;
-        }
-
-        .hero-title {
-            font-size: 64px;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            color: var(--dark-color);
-            letter-spacing: -0.02em;
-            animation: slideInUp 0.8s ease-out 0.2s both;
-        }
-
-        .hero-title .highlight {
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-
-        .hero-subtitle {
-            font-size: 22px;
-            color: var(--gray-600);
-            margin-bottom: 40px;
-            line-height: 1.6;
-            font-weight: 400;
-            animation: slideInUp 0.8s ease-out 0.4s both;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 48px;
-            align-items: center;
-            animation: slideInUp 0.8s ease-out 0.6s both;
-        }
-        .hero-side {
-    flex: 0 0 500px;   /* fixed width for marquee */
-    display: flex;
-    justify-content: flex-end;
-}
-
-        .btn-large {
-            padding: 18px 36px;
-            font-size: 18px;
-            border-radius: 16px;
-            font-weight: 700;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-hero {
-            background: var(--gradient-primary);
-            color: var(--light-color);
-            border: none;
-            box-shadow: var(--shadow-lg);
-            height: 68px;
-            font-size: 21px;
-            padding: 0 45px;
-            border-radius: 16px;
-            font-weight: 600;
-        }
-
-        .btn-hero:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .btn-demo {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--dark-color);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-demo:hover {
-            background: var(--light-color);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 48px;
-            align-items: center;
-            animation: slideInUp 0.8s ease-out 0.8s both;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--gray-600);
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .stat-number {
-            font-weight: 800;
-            color: var(--dark-color);
-            font-size: 18px;
-        }
-
-        .stars {
-            color: #ffa500;
-            font-size: 16px;
-            filter: drop-shadow(0 1px 2px rgba(255, 165, 0, 0.3));
-        }
-
-        /* Enhanced Interactive Counter */
-        .counter-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 24px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            margin-top: 32px;
-            display: inline-flex;
-            align-items: center;
-            gap: 20px;
-            animation: slideInUp 0.8s ease-out 1s both;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .counter-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-        }
-
-        .counter-label {
-            font-size: 15px;
-            color: var(--gray-600);
-            font-weight: 600;
-        }
-
-        .counter-display {
-            font-size: 32px;
-            font-weight: 900;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            min-width: 50px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .counter-btn {
-            background: var(--gradient-primary);
-            color: var(--light-color);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .counter-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.3s ease;
-        }
-
-        .counter-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .counter-btn:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .counter-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Enhanced Profile Cards */
-        .profile-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 500px;
-            animation: slideInRight 0.8s ease-out 0.4s both;
-        }
-
-        .profile-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--gradient-primary);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .profile-card:hover::before {
-            opacity: 0.05;
-        }
-
-        .profile-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .profile-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--light-color);
-            font-weight: 800;
-            font-size: 20px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-        }
-
-        .profile-card:nth-child(1) .profile-avatar {
-            background: var(--gradient-accent);
-        }
-
-        .profile-card:nth-child(2) .profile-avatar {
-            background: var(--gradient-secondary);
-        }
-
-        .profile-card:nth-child(3) .profile-avatar {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            color: var(--dark-color);
-        }
-
-        .profile-card:nth-child(4) .profile-avatar {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            color: var(--dark-color);
-        }
-
-        .profile-card:hover .profile-avatar {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .profile-info h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark-color);
-            margin-bottom: 4px;
-        }
-
-        .profile-info p {
-            font-size: 14px;
-            color: var(--gray-600);
-            font-weight: 500;
-        }
-
-        .profile-tag {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--gray-600);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            z-index: 1;
-        }
-
-        /* Enhanced Features Section */
-        .features {
-            padding: 120px 0;
-            background: var(--light-color);
-            position: relative;
-        }
-
-        .features::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gray-200), transparent);
-        }
-
-        .features-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            text-align: center;
-        }
-
-        .features-title {
-            font-size: 56px;
-            font-weight: 900;
-            color: var(--dark-color);
-            margin-bottom: 20px;
-            letter-spacing: -0.02em;
-        }
-
-        .features-subtitle {
-            font-size: 22px;
-            color: var(--gray-600);
-            margin-bottom: 80px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
-        }
-
-        .feature-item {
-            background: var(--light-color);
-            padding: 48px 40px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--gray-200);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-item:hover::before {
-            transform: scaleX(1);
-        }
-
-        .feature-item:hover {
-            transform: translateY(-12px);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--gray-300);
-        }
-
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            margin-bottom: 32px;
-            background: var(--gradient-primary);
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s ease;
-        }
-
-        .feature-item:nth-child(1) .feature-icon {
-            background: var(--gradient-accent);
-        }
-
-        .feature-item:nth-child(2) .feature-icon {
-            background: var(--gradient-secondary);
-        }
-
-        .feature-item:nth-child(3) .feature-icon {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .feature-item:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .feature-item h3 {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--dark-color);
-            margin-bottom: 16px;
-            line-height: 1.2;
-        }
-
-        .feature-item p {
-            font-size: 18px;
-            color: var(--gray-600);
-            line-height: 1.6;
-            font-weight: 400;
-        }
-
-        /* Enhanced Animations */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--light-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Enhanced Responsive Design */
-        @media (max-width: 1024px) {
-            .hero-container {
-                gap: 60px;
-            }
-            
-            .hero-title {
-                font-size: 52px;
-            }
-            
-            .nav-container {
-                padding: 0 24px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero-container {
-                grid-template-columns: 1fr;
-                gap: 48px;
-                text-align: center;
-            }
-
-            .hero-title {
-                font-size: 44px;
-            }
-
-            .hero-subtitle {
-                font-size: 20px;
-            }
-
-            .hero-actions {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .hero-stats {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 32px;
-            }
-
-            .profile-cards {
-                grid-template-columns: 1fr;
-                max-width: 350px;
-                margin: 0 auto;
-            }
-
-            .features-title {
-                font-size: 40px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-container {
-                padding: 0 20px;
-            }
-
-            .hero-container,
-            .features-container {
-                padding: 0 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 36px;
-            }
-
-            .btn-large {
-                padding: 16px 28px;
-                font-size: 16px;
-            }
-
-            .counter-section {
-                flex-direction: column;
-                text-align: center;
-                gap: 16px;
-            }
-        }
-
         /* Success notification styles */
         .success-notification {
             position: fixed;
@@ -1239,756 +742,1039 @@
             animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
- .marquee-container {
-  display: flex;
-  gap: 28px; /* space between columns */
-  height: 600px; 
-  width: 500px; /* overall container height */
-}
 
-.marquee-column {
-  width: 240px;  /* column width */
-  overflow: hidden;
-  border-radius: 10px;
-  position: relative;
-  height: 600px;
-}
-
-.marquee-content {
-  display: flex;
-  flex-direction: column;
-  animation: scrollDown 7s linear infinite;
-  gap: 10px ;
-}
-
-/* Downward scrolling */
-.marquee-column.down .marquee-content {
-  animation: scrollDown 13s linear infinite;
-}
-
-/* Upward scrolling */
-.marquee-column.up .marquee-content {
-  animation: scrollUp 13s linear infinite;
-}
-
-@keyframes scrollDown {
-  0% { transform: translateY(-50%); }
-  100% { transform: translateY(0%); }
-}
-
-@keyframes scrollUp {
-  0% { transform: translateY(0%); }
-  100% { transform: translateY(-50%); }
-}
-
-    /* ========== Review Cards ========== */
-    .review-card {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-    }
-
-    .review-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #ff6b81, #ff9a8b);
-    }
-
-    .review-card:nth-child(3n+1)::before {
-        background: linear-gradient(90deg, #667eea, #764ba2);
-    }
-
-    .review-card:nth-child(3n+2)::before {
-        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
-    }
-
-    .review-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    }
-
-    .review-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 16px;
-    }
-
-    .review-header img {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 12px;
-        border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .review-card:hover .review-header img {
-        transform: scale(1.1);
-    }
-
-    .review-author {
-        font-weight: 700;
-        color: #2d3436;
-        font-size: 16px;
-        margin-bottom: 2px;
-        background: linear-gradient(90deg, #2d3436, #636e72);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .review-username {
-        color: #636e72;
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .review-body {
-        color: #2d3436;
-        font-size: 15px;
-        line-height: 1.6;
-        position: relative;
-        padding-left: 16px;
-        font-style: italic;
-    }
-
-    .review-body::before {
-        content: '"';
-        position: absolute;
-        left: -8px;
-        top: -12px;
-        font-size: 48px;
-        font-family: Georgia, serif;
-        color: rgba(99, 110, 114, 0.1);
-        line-height: 1;
-    }
-
-    /* Button Hover Effects */
-    .btn {
-        position: relative;
-        overflow: hidden;
-        z-index: 1;
-    }
-
-    .btn::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-        transform: translateX(-100%);
-        transition: transform 0.6s ease;
-        z-index: -1;
-    }
-
-    .btn:hover::after {
-        transform: translateX(100%);
-    }
-    /* Responsive styles */
-    @media (max-width: 1024px) {
-        .nav-links {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100vh;
-            background: #fff;
-            flex-direction: column;
-            padding: 80px 30px;
-            transition: 0.5s;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-        }
-    }
-
-    /* Learn More Section Styles */
-    .learn-more-section {
-        padding: 100px 20px;
-        background: linear-gradient(135deg, #f8faff 0%, #eef2ff 25%, #f0f4ff 50%, #e8f0ff 75%, #f5f7ff 100%);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .learn-more-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-            radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.03) 0%, transparent 50%);
-        opacity: 1;
-    }
-
-    .learn-more-section::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="%23e8eefb" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-        opacity: 0.4;
-    }
-
-    .learn-more-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 1;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-
-    .section-title {
-        font-size: 3rem;
-        font-weight: 800;
-        color: var(--dark-color);
-        margin-bottom: 20px;
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        line-height: 1.2;
-    }
-
-    .section-subtitle {
-        font-size: 1.25rem;
-        color: var(--gray-600);
-        max-width: 600px;
-        margin: 0 auto;
-        line-height: 1.7;
-    }
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 35px;
-        margin-top: 60px;
-    }
-
-    .feature-box {
-        background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
-        border-radius: 24px;
-        padding: 45px 35px;
-        text-align: center;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-    }
-
-    .feature-box::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        transform: scaleX(0);
-        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: left;
-    }
-
-    .feature-box::after {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        pointer-events: none;
-    }
-
-    .feature-box:hover {
-        transform: translateY(-20px) scale(1.02);
-        box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%);
-    }
-
-    .feature-box:hover::before {
-        transform: scaleX(1);
-    }
-
-    .feature-box:hover::after {
-        opacity: 1;
-    }
-
-    .feature-icon {
-        width: 90px;
-        height: 90px;
-        margin: 0 auto 30px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-
-    .feature-icon::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        border-radius: 24px;
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-    }
-
-    .feature-box:hover .feature-icon {
-        transform: scale(1.15) rotate(8deg);
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
-    }
-
-    .feature-box:hover .feature-icon::before {
-        opacity: 1;
-    }
-
-    .feature-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #2d3436;
-        margin-bottom: 18px;
-        transition: all 0.3s ease;
-        position: relative;
-        letter-spacing: -0.5px;
-    }
-
-    .feature-box:hover .feature-title {
-        color: #667eea;
-        transform: translateY(-2px);
-    }
-
-    .feature-description {
-        font-size: 1.05rem;
-        color: #636e72;
-        line-height: 1.8;
-        margin-bottom: 0;
-        min-height: 88px;
-        font-weight: 400;
-        letter-spacing: 0.2px;
-    }
-
-    /* Colorful Feature Box Styles */
-    
-    /* Feature Box 1 - Expert Courses - Blue/Purple Theme */
-    .feature-box-1 {
-        background: linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%);
-        border-color: rgba(102, 126, 234, 0.2);
-    }
-    
-    .feature-box-1:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #e8efff 100%);
-        box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-1::before {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .feature-box-1::after {
-        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-1 {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-    
-    .feature-icon-1::before {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    }
-    
-    .feature-box-1:hover .feature-icon-1 {
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
-    }
-
-    /* Feature Box 2 - Real-Time Analytics - Green/Teal Theme */
-    .feature-box-2 {
-        background: linear-gradient(145deg, #ffffff 0%, #f0fff4 100%);
-        border-color: rgba(16, 185, 129, 0.2);
-    }
-    
-    .feature-box-2:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #e8fff5 100%);
-        box-shadow: 0 25px 60px rgba(16, 185, 129, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-2::before {
-        background: linear-gradient(90deg, #10b981 0%, #14b8a6 100%);
-    }
-    
-    .feature-box-2::after {
-        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-2 {
-        background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-    }
-    
-    .feature-icon-2::before {
-        background: linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #06b6d4 100%);
-    }
-    
-    .feature-box-2:hover .feature-icon-2 {
-        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4);
-    }
-
-    /* Feature Box 3 - Live Trading - Orange/Red Theme */
-    .feature-box-3 {
-        background: linear-gradient(145deg, #ffffff 0%, #fff7ed 100%);
-        border-color: rgba(251, 146, 60, 0.2);
-    }
-    
-    .feature-box-3:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #ffedd5 100%);
-        box-shadow: 0 25px 60px rgba(251, 146, 60, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-3::before {
-        background: linear-gradient(90deg, #fb923c 0%, #ef4444 100%);
-    }
-    
-    .feature-box-3::after {
-        background: radial-gradient(circle, rgba(251, 146, 60, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-3 {
-        background: linear-gradient(135deg, #fb923c 0%, #ef4444 100%);
-        box-shadow: 0 8px 25px rgba(251, 146, 60, 0.3);
-    }
-    
-    .feature-icon-3::before {
-        background: linear-gradient(135deg, #fb923c 0%, #ef4444 50%, #dc2626 100%);
-    }
-    
-    .feature-box-3:hover .feature-icon-3 {
-        box-shadow: 0 20px 40px rgba(251, 146, 60, 0.4);
-    }
-
-    /* Feature Box 4 - Community - Pink/Purple Theme */
-    .feature-box-4 {
-        background: linear-gradient(145deg, #ffffff 0%, #fdf4ff 100%);
-        border-color: rgba(236, 72, 153, 0.2);
-    }
-    
-    .feature-box-4:hover {
-        background: linear-gradient(145deg, #ffffff 0%, #fae8ff 100%);
-        box-shadow: 0 25px 60px rgba(236, 72, 153, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .feature-box-4::before {
-        background: linear-gradient(90deg, #ec4899 0%, #a855f7 100%);
-    }
-    
-    .feature-box-4::after {
-        background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
-    }
-    
-    .feature-icon-4 {
-        background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
-        box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
-    }
-    
-    .feature-icon-4::before {
-        background: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #9333ea 100%);
-    }
-    
-    .feature-box-4:hover .feature-icon-4 {
-        box-shadow: 0 20px 40px rgba(236, 72, 153, 0.4);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
+        /* Learn More Section Styles */
         .learn-more-section {
-            padding: 60px 20px;
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #f8faff 0%, #eef2ff 25%, #f0f4ff 50%, #e8f0ff 75%, #f5f7ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .learn-more-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.03) 0%, transparent 50%);
+        }
+
+        .learn-more-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
         }
 
         .section-title {
-            font-size: 2.2rem;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
         }
 
         .section-subtitle {
-            font-size: 1.1rem;
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
         }
 
         .features-grid {
-            grid-template-columns: 1fr;
-            gap: 30px;
-            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
         }
 
         .feature-box {
-            padding: 35px 25px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 24px;
+            padding: 45px 35px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
+        .feature-box:nth-child(1) { animation-delay: 0.1s; }
+        .feature-box:nth-child(2) { animation-delay: 0.2s; }
+        .feature-box:nth-child(3) { animation-delay: 0.3s; }
+
+        .feature-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            transform: scaleX(0);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left;
+        }
+
+        .feature-box:hover { transform: translateY(-20px) scale(1.02); box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1); }
+        .feature-box:hover::before { transform: scaleX(1); }
+
         .feature-icon {
+            width: 90px; height: 90px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            font-size: 2rem;
+        }
+
+        .feature-box:hover .feature-icon { transform: scale(1.15) rotate(8deg); }
+
+        .feature-title { font-size: 1.6rem; font-weight: 700; color: #2d3436; margin-bottom: 18px; }
+        .feature-box:hover .feature-title { color: #667eea; }
+        .feature-description { font-size: 1.05rem; color: #636e72; line-height: 1.8; }
+
+        .feature-box-1 .feature-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .feature-box-2 .feature-icon { background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); }
+        .feature-box-3 .feature-icon { background: linear-gradient(135deg, #fb923c 0%, #ef4444 100%); }
+
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* My Videos Section - White Theme */
+        .my-videos-section {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 25%, #f1f5f9 50%, #e2e8f0 100%);
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .my-videos-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99,102,241,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139,92,246,0.04) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        
+        .videos-section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.25);
+            color: #818cf8;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+        }
+        
+        .videos-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        
+        .videos-subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Features Grid */
+        .videos-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .video-feature-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        /* Card 1 - Purple Gradient */
+        .video-feature-card:nth-child(1) {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+            border: 2px solid #a78bfa;
+        }
+        .video-feature-card:nth-child(1) .feature-icon-wrap {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(139,92,246,0.4);
+        }
+        .video-feature-card:nth-child(1):hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 20px 40px rgba(139,92,246,0.25);
+        }
+        
+        /* Card 2 - Blue Gradient */
+        .video-feature-card:nth-child(2) {
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+            border: 2px solid #60a5fa;
+        }
+        .video-feature-card:nth-child(2) .feature-icon-wrap {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(59,130,246,0.4);
+        }
+        .video-feature-card:nth-child(2):hover {
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(59,130,246,0.25);
+        }
+        
+        /* Card 3 - Coral/Orange Gradient */
+        .video-feature-card:nth-child(3) {
+            background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%);
+            border: 2px solid #fb923c;
+        }
+        .video-feature-card:nth-child(3) .feature-icon-wrap {
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(249,115,22,0.4);
+        }
+        .video-feature-card:nth-child(3):hover {
+            border-color: #f97316;
+            box-shadow: 0 20px 40px rgba(249,115,22,0.25);
+        }
+        
+        .video-feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        .feature-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .video-feature-card:hover .feature-glow {
+            opacity: 1;
+        }
+        
+        .feature-icon-wrap {
             width: 80px;
             height: 80px;
-            margin: 0 auto 25px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2rem;
+            border: none;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
         }
-
-        .feature-title {
-            font-size: 1.4rem;
+        
+        .video-feature-card:hover .feature-icon-wrap {
+            transform: scale(1.15) rotate(-5deg);
         }
-
-        .feature-description {
-            font-size: 1rem;
-            min-height: 80px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .section-title {
-            font-size: 1.9rem;
-        }
-
-        .feature-box {
-            padding: 30px 20px;
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
-        }
-
-        .feature-title {
+        
+        .video-feature-card h3 {
+            font-family: 'Poppins', sans-serif;
             font-size: 1.3rem;
-            margin-bottom: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
         }
-
-        .feature-description {
+        
+        .video-feature-card p {
             font-size: 0.95rem;
-            min-height: 72px;
-            margin-bottom: 22px;
+            color: #64748b;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
         }
-    }
-
-    /* Animation for feature boxes on scroll */
-    .feature-box {
-        opacity: 0;
-        transform: translateY(50px);
-        animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    .feature-box:nth-child(1) { animation-delay: 0.1s; }
-    .feature-box:nth-child(2) { animation-delay: 0.2s; }
-    .feature-box:nth-child(3) { animation-delay: 0.3s; }
-    .feature-box:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        /* CTA Button */
+        .videos-cta-wrap {
+            text-align: center;
+            position: relative;
+            z-index: 1;
         }
-    }
+        
+        .videos-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            background: #000000;
+            color: #FFFFFF;
+            border: 1px solid #E5E5E5;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        
+        .videos-btn:hover {
+            background: #1a1a1a;
+            border-color: #818cf8;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(99,102,241,0.15);
+        }
+        
+        .videos-btn i:first-child {
+            font-size: 1.1rem;
+        }
+        
+        .videos-btn i:last-child {
+            transition: transform 0.3s ease;
+        }
+        
+        .videos-btn:hover i:last-child {
+            transform: translateX(5px);
+        }
+
+        /* CTA Section Styles */
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-content { max-width: 600px; }
+        .cta-content h2 { font-size: 40px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
+        .cta-content p { font-size: 18px; margin-bottom: 32px; opacity: 0.9; line-height: 1.6; }
+        .cta-buttons { display: flex; gap: 16px; }
+
+        .cta-image { width: 450px; height: 350px; animation: floatAnim 6s ease-in-out infinite; }
+        .cta-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2)); }
+
+        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* Contact Us Section Styles */
+        .contact-section {
+            background: #ffffff;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(99,102,241,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .contact-two-column {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .contact-heading-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .contact-heading-col .contact-badge {
+            align-self: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .contact-heading-col .contact-title {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+
+        .contact-heading-col .contact-subtitle {
+            text-align: left;
+            margin: 0;
+            max-width: 100%;
+        }
+
+        .contact-form-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(249,115,22,0.15);
+            border: 1px solid rgba(249,115,22,0.25);
+            color: #f97316;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .contact-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .contact-subtitle {
+            font-size: 1.1rem;
+            color: #000000;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Contact Info Cards */
+        .contact-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .contact-info-card {
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(249,115,22,0.15);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .contact-info-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(249,115,22,0.4);
+            background: rgba(249,115,22,0.06);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 0 25px rgba(249,115,22,0.1);
+        }
+
+        .contact-icon-wrap {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(249,115,22,0.2) 0%, rgba(234,88,12,0.3) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.5rem;
+            color: #f97316;
+            border: 1px solid rgba(249,115,22,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .contact-info-card:hover .contact-icon-wrap {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(249,115,22,0.3) 0%, rgba(234,88,12,0.4) 100%);
+        }
+
+        .contact-info-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f97316;
+            margin-bottom: 10px;
+        }
+
+        .contact-info-card p {
+            font-size: 0.9rem;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        /* Contact Form */
+        .contact-form-wrapper {
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            background: rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            color: #000000;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(0,0,0,0.5);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #f97316;
+            background: rgba(249,115,22,0.05);
+            box-shadow: 0 0 20px rgba(249,115,22,0.2);
+        }
+
+        .contact-submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: #000000;
+            color: #FFFFFF;
+            border: 1px solid #E5E5E5;
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-top: 10px;
+        }
+
+        .contact-submit-btn:hover {
+            background: #1a1a1a;
+            border-color: #818cf8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(99,102,241,0.15);
+        }
+
+        /* Footer Styles */
+        .main-footer { background: #111827; color: #9ca3af; padding: 80px 0 0; }
+        .footer-container {
+            max-width: 1200px; margin: 0 auto; padding: 0 32px;
+            display: grid; grid-template-columns: 1.5fr 2fr;
+            gap: 60px; margin-bottom: 60px;
+        }
+        .footer-brand { max-width: 350px; }
+        .footer-logo { font-size: 28px; font-weight: 900; color: white; text-decoration: none; margin-bottom: 16px; display: inline-block; }
+        .footer-tagline { margin-bottom: 24px; line-height: 1.6; }
+        .social-links { display: flex; gap: 16px; }
+        .social-links a {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s ease;
+        }
+        .social-links a:hover { background: #667eea; transform: translateY(-3px); }
+        .footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .footer-links-group h4 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .footer-links-group a { display: block; color: #9ca3af; margin-bottom: 12px; text-decoration: none; transition: all 0.3s ease; }
+        .footer-links-group a:hover { color: white; transform: translateX(4px); }
+        .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 24px 0; }
+        .footer-legal {
+            max-width: 1200px; margin: 0 auto; padding: 0 32px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .legal-links { display: flex; gap: 24px; }
+        .legal-links a { color: #9ca3af; text-decoration: none; font-size: 14px; transition: color 0.3s ease; }
+        .legal-links a:hover { color: white; }
+
+        /* Floating Chat */
+        .floating-chat {
+            position: fixed; bottom: 40px; right: 40px; z-index: 1000; cursor: pointer;
+            display: flex; flex-direction: column; align-items: flex-end;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+            animation: floatUp 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28) 1s both;
+        }
+        .floating-chat:hover { transform: translateY(-5px) scale(1.05); }
+        .chat-container { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .ai-assistant-label {
+            background: #6c5ce7; color: #ffffff;
+            padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;
+            letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap; position: relative; margin-bottom: 15px;
+            text-transform: uppercase; font-family: 'Inter', sans-serif;
+        }
+        .label-arrow {
+            position: absolute; bottom: -8px; right: 20px;
+            border-left: 8px solid transparent; border-right: 8px solid transparent;
+            border-top: 8px solid #6c5ce7;
+        }
+        .chat-bubble {
+            width: 72px; height: 72px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff) border-box;
+            border: 3px solid transparent; background-size: 200% 200%;
+            animation: rainbow 3s ease infinite; overflow: hidden;
+        }
+        @keyframes rainbow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .robot-avatar { width: 120%; height: 120%; object-fit: contain; border-radius: 50%; transform: scale(1.4); background: #a29bfe; padding: 2px; margin: -10%; }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 1024px) {
+            .cta-container { flex-direction: column; text-align: center; }
+            .cta-content { margin-bottom: 48px; }
+            .footer-container { grid-template-columns: 1fr; gap: 48px; }
+            .footer-brand { max-width: 100%; text-align: center; margin: 0 auto; }
+            .social-links { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .footer-links { grid-template-columns: 1fr; gap: 32px; }
+            .footer-legal { flex-direction: column; text-align: center; }
+            .cta-content h2 { font-size: 32px; }
+            .cta-image { width: 100%; max-width: 300px; margin: 0 auto; }
+            .section-title { font-size: 2.2rem; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <!-- Enhanced Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">Market Master</a>
-            
-            <div class="nav-center">
-                <ul class="nav-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="mentors.html">Mentors</a></li>
-                    <li><a href="price.html">Pricing</a></li>
-                </ul>
-                
-                <!-- User Profile Dropdown (initially hidden) -->
-                <div class="user-profile" id="userProfile" style="display: none;">
-                    <div class="user-avatar-container">
-                        <div id="userAvatar" class="user-avatar"></div>
-                        <div class="user-dropdown" id="userDropdown">
-                            <div class="user-info">
-                                <span id="userName" class="user-name"></span>
-                                <span id="userEmail" class="user-email"></span>
-                            </div>
-                            <a href="#" id="logoutBtn" class="dropdown-item">Logout</a>
-                        </div>
-                    </div>
-                </div>
+
+    <!-- ══════════════════════
+         InvestNow NAV (from file 2)
+    ══════════════════════ -->
+    <nav class="invest-nav">
+        <a class="nav-logo" href="#">
+            <div class="nav-logo-mark">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="12" width="3" height="5" rx=".8" fill="rgba(255,255,255,.35)"/>
+                    <rect x="8.5" y="8" width="3" height="9" rx=".8" fill="rgba(255,255,255,.6)"/>
+                    <rect x="14" y="4.5" width="3" height="12.5" rx=".8" fill="#fff"/>
+                    <path d="M4.5 11L9.5 7.2l5.5-4.5" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="2.7" r="1.4" fill="#4ade80"/>
+                </svg>
             </div>
-            
-            <div class="nav-buttons" id="navButtons">
-                <a href="upload.html" class="btn btn-primary">Start Uploading</a>
-            </div>
+            Market Master
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#" class="active">Home</a></li>
+            <li><a href="mentors.html">Mentors</a></li>
+            <li><a href="price.html">Pricing</a></li>
+            <li><a href="paper-trading.html">Paper Trading</a></li>
+        </ul>
+
+        <div class="nav-right" id="navButtons">
+            <a href="upload.html" class="btn-primary-inv">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Start Uploading
+            </a>
         </div>
     </nav>
 
-    
-    <!-- Enhanced Hero Section -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                
-                
-                <h1 class="hero-title">
-                    Master <span class="highlight">Stock Market</span> Trading
-                </h1>
-                
-                <p class="hero-subtitle">
-                    Learn professional trading strategies. Analyze market trends, build wealth, and achieve financial independence — all from one comprehensive platform.
-                </p>
-                
-                <div class="hero-actions">
-                    <a href="page.html" class="btn btn-hero btn-large" id="start-btn">
-                        <span>Start  My  Page</span>
-                        <span style="margin-left: 12px;">→</span>
-                    </a>
-                    <a href="#learn-more" class="btn btn-hero btn-large" id="learn-more-btn">
-                        <span>Learn More</span>
-                        <span style="margin-left: 12px;">→</span>
-                    </a>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number"></span>
-                        <span class="stars"></span>
-                        <span></span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number"></span>
-                        <span></span>
-                    </div>
+    <!-- ══════════════════════
+         InvestNow HERO (from file 2)
+    ══════════════════════ -->
+    <section class="invest-hero">
 
+        <h1>Master the Stock Market<br>with Expert Guidance</h1>
+
+        <p class="hero-sub">Learn proven trading strategies from professionals. Access educational videos and personalized mentorship — all in one powerful platform.</p>
+
+        <div class="hero-actions">
+            <a href="page.html" class="btn-cta" id="start-btn">Get Started</a>
+            <a href="#learn-more" class="btn-text-inv" id="learn-more-btn">
+                See how it works
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7h8M8 4l3 3-3 3"/>
+                </svg>
+            </a>
+            <div style="width:1px;height:28px;background:var(--rule)"></div>
+            <div style="display:flex;align-items:center;gap:18px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="width:22px;height:22px;border-radius:6px;background:var(--accent-xl);display:flex;align-items:center;justify-content:center;font-size:.72rem;">🎓</span>
+                    <span style="font-size:.75rem;color:var(--ink-3);font-weight:500;font-family:'DM Sans',sans-serif;">Expert Mentors</span>
                 </div>
-            </div>
-            <div class="hero-image-container">
-                <img src="https://plus.unsplash.com/premium_photo-1681487769650-a0c3fbaed85a?q=80&w=1255&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Market Master Professional Trading Platform" class="hero-image">
+                <div style="width:1px;height:16px;background:var(--rule)"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="width:22px;height:22px;border-radius:6px;background:var(--accent-xl);display:flex;align-items:center;justify-content:center;font-size:.72rem;">⚡</span>
+                    <span style="font-size:.75rem;color:var(--ink-3);font-weight:500;font-family:'DM Sans',sans-serif;">Live Assessments</span>
+                </div>
+                <div style="width:1px;height:16px;background:var(--rule)"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="width:22px;height:22px;border-radius:6px;background:var(--accent-xl);display:flex;align-items:center;justify-content:center;font-size:.72rem;">�</span>
+                    <span style="font-size:.75rem;color:var(--ink-3);font-weight:500;font-family:'DM Sans',sans-serif;">Video Lessons</span>
+                </div>
             </div>
         </div>
-      </div>
+
+        <!-- DASHBOARD CARD -->
+        <div class="dashboard-card">
+
+            <!-- Floating alert bottom-left -->
+            <div class="float-alert">
+                <div class="alert-header">
+                    <div class="alert-icon">📚</div>
+                    <div class="alert-title">New Lesson Alert</div>
+                </div>
+                <div class="alert-body">Technical Analysis Basics: Learn to identify support and resistance levels with our latest mentor video.</div>
+                <div class="alert-chip"><span class="alert-chip-dot"></span>Just Added</div>
+            </div>
+
+            <!-- Floating portfolio bottom-right -->
+            <div class="float-portfolio">
+                <div class="port-title">Learning Progress</div>
+                <div class="port-row">
+                    <div class="port-item"><div class="port-dot" style="background:#3b82f6"></div><span class="port-name">Technical Analysis</span></div>
+                    <span class="port-pct" style="color:#3b82f6">48%</span>
+                </div>
+                <div class="port-row">
+                    <div class="port-item"><div class="port-dot" style="background:var(--accent)"></div><span class="port-name">Fundamentals</span></div>
+                    <span class="port-pct" style="color:var(--accent)">30%</span>
+                </div>
+                <div class="port-row">
+                    <div class="port-item"><div class="port-dot" style="background:var(--gold)"></div><span class="port-name">Risk Management</span></div>
+                    <span class="port-pct" style="color:var(--gold)">22%</span>
+                </div>
+                <div class="port-track"><div class="port-fill" style="width:48%;background:#3b82f6"></div></div>
+            </div>
+
+            <!-- TOP BAR -->
+            <div class="db-topbar">
+                <div class="db-topbar-left">
+                    <div class="db-brand">
+                        <div class="db-brand-mark">
+                            <svg viewBox="0 0 14 14" fill="none">
+                                <rect x="2" y="8" width="2.5" height="4" rx=".5" fill="rgba(255,255,255,.4)"/>
+                                <rect x="5.75" y="5" width="2.5" height="7" rx=".5" fill="rgba(255,255,255,.65)"/>
+                                <rect x="9.5" y="2" width="2.5" height="10" rx=".5" fill="#fff"/>
+                                <path d="M3 7.5L6.5 5l4-3.5" stroke="#4ade80" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="10.5" cy="1.5" r="1" fill="#4ade80"/>
+                            </svg>
+                        </div>
+                        <span class="db-brand-name">Market Master</span>
+                    </div>
+                    <div class="db-nav">
+                        <div class="db-nav-item active">Overview</div>
+                        <div class="db-nav-item">Portfolio</div>
+                        <div class="db-nav-item">Markets</div>
+                        <div class="db-nav-item">Analytics</div>
+                    </div>
+                </div>
+                <div class="db-topbar-right">
+                    <div class="db-search">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/></svg>
+                        <input placeholder="Search assets…" type="text"/>
+                    </div>
+                    <div class="db-notif">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><path d="M7 1.5a4 4 0 0 1 4 4v3l1 1.5H2l1-1.5v-3a4 4 0 0 1 4-4z"/><path d="M5.5 11a1.5 1.5 0 0 0 3 0"/></svg>
+                        <div class="db-notif-dot"></div>
+                    </div>
+                    <div class="db-avatar">JD</div>
+                </div>
+            </div>
+
+            <!-- BODY: 3-column grid -->
+            <div class="db-body">
+
+                <!-- Col 1: Portfolio Value -->
+                <div class="db-portfolio">
+                    <div>
+                        <div class="db-section-label">Total Portfolio Value</div>
+                        <div class="db-port-val">$124,830</div>
+                        <div class="db-port-sub">
+                            <span class="db-gain">▲ +$3,240 · 2.67%</span>
+                            <span class="db-port-period">This month</span>
+                        </div>
+                    </div>
+                    <div class="db-alloc">
+                        <div class="db-section-label">Allocation</div>
+                        <div class="db-alloc-row">
+                            <div class="db-alloc-dot" style="background:#3b82f6"></div>
+                            <span class="db-alloc-name">Stocks</span>
+                            <div class="db-alloc-bar"><div class="db-alloc-fill" style="width:48%;background:#3b82f6"></div></div>
+                            <span class="db-alloc-pct" style="color:#3b82f6">48%</span>
+                        </div>
+                        <div class="db-alloc-row">
+                            <div class="db-alloc-dot" style="background:#1a7a3c"></div>
+                            <span class="db-alloc-name">ETFs</span>
+                            <div class="db-alloc-bar"><div class="db-alloc-fill" style="width:30%;background:#1a7a3c"></div></div>
+                            <span class="db-alloc-pct" style="color:#4ade80">30%</span>
+                        </div>
+                        <div class="db-alloc-row">
+                            <div class="db-alloc-dot" style="background:#c8972a"></div>
+                            <span class="db-alloc-name">Crypto</span>
+                            <div class="db-alloc-bar"><div class="db-alloc-fill" style="width:22%;background:#c8972a"></div></div>
+                            <span class="db-alloc-pct" style="color:#c8972a">22%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Chart -->
+                <div class="db-chart">
+                    <div class="db-chart-header">
+                        <div>
+                            <div class="db-chart-sym">AAPL · Apple Inc.</div>
+                            <div class="db-chart-sub">NASDAQ · USD · Real-time</div>
+                        </div>
+                        <div class="db-tabs">
+                            <button class="db-tab">1D</button>
+                            <button class="db-tab active">1W</button>
+                            <button class="db-tab">1M</button>
+                            <button class="db-tab">3M</button>
+                        </div>
+                    </div>
+                    <div class="db-price-row">
+                        <span class="db-price">$189.42</span>
+                        <span class="db-chg-up">▲ +2.14%</span>
+                    </div>
+                    <svg class="db-chart-svg" viewBox="0 0 300 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="0" y1="17" x2="300" y2="17" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+                        <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+                        <line x1="0" y1="53" x2="300" y2="53" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+                        <text x="2" y="15" font-size="6" fill="rgba(255,255,255,.25)" font-family="JetBrains Mono,monospace">192</text>
+                        <text x="2" y="33" font-size="6" fill="rgba(255,255,255,.25)" font-family="JetBrains Mono,monospace">188</text>
+                        <text x="2" y="51" font-size="6" fill="rgba(255,255,255,.25)" font-family="JetBrains Mono,monospace">184</text>
+                        <path d="M20,52 C35,46 50,40 68,36 C82,32 96,39 112,34 C126,29 140,23 158,25 C172,27 186,19 204,15 C218,12 232,18 248,14 C262,11 276,7 292,5 L292,70 L20,70 Z" fill="url(#dkGrad)" opacity="0.25"/>
+                        <path d="M20,52 C35,46 50,40 68,36 C82,32 96,39 112,34 C126,29 140,23 158,25 C172,27 186,19 204,15 C218,12 232,18 248,14 C262,11 276,7 292,5" stroke="#4ade80" stroke-width="1.6" stroke-linecap="round"/>
+                        <line x1="24" y1="42" x2="24" y2="60" stroke="rgba(74,222,128,.5)" stroke-width=".8"/>
+                        <rect x="21.5" y="47" width="5" height="9" rx=".8" fill="#4ade80" opacity="0.85"/>
+                        <line x1="70" y1="28" x2="70" y2="46" stroke="rgba(74,222,128,.5)" stroke-width=".8"/>
+                        <rect x="67.5" y="33" width="5" height="9" rx=".8" fill="#4ade80" opacity="0.85"/>
+                        <line x1="114" y1="29" x2="114" y2="45" stroke="rgba(248,113,113,.5)" stroke-width=".8"/>
+                        <rect x="111.5" y="32" width="5" height="9" rx=".8" fill="#f87171" opacity="0.85"/>
+                        <line x1="158" y1="19" x2="158" y2="34" stroke="rgba(74,222,128,.5)" stroke-width=".8"/>
+                        <rect x="155.5" y="23" width="5" height="8" rx=".8" fill="#4ade80" opacity="0.85"/>
+                        <line x1="204" y1="11" x2="204" y2="26" stroke="rgba(74,222,128,.5)" stroke-width=".8"/>
+                        <rect x="201.5" y="14" width="5" height="8" rx=".8" fill="#4ade80" opacity="0.85"/>
+                        <line x1="248" y1="10" x2="248" y2="23" stroke="rgba(248,113,113,.5)" stroke-width=".8"/>
+                        <rect x="245.5" y="12" width="5" height="7" rx=".8" fill="#f87171" opacity="0.85"/>
+                        <line x1="290" y1="3" x2="290" y2="14" stroke="rgba(74,222,128,.5)" stroke-width=".8"/>
+                        <rect x="287.5" y="5" width="5" height="7" rx=".8" fill="#4ade80" opacity="0.85"/>
+                        <circle cx="204" cy="15" r="3" fill="#4ade80"/>
+                        <circle cx="204" cy="15" r="5.5" fill="#4ade80" opacity="0.15"/>
+                        <rect x="186" y="2" width="46" height="14" rx="3.5" fill="#1a7a3c"/>
+                        <text x="209" y="12.5" font-size="6.5" fill="#fff" text-anchor="middle" font-family="JetBrains Mono,monospace">$189.42</text>
+                        <defs>
+                            <linearGradient id="dkGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#4ade80"/>
+                                <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <!-- Col 3: Watchlist -->
+                <div class="db-watchlist">
+                    <div class="db-watch-header">
+                        <div class="db-watch-title">Watchlist</div>
+                        <div class="db-watch-link">Manage →</div>
+                    </div>
+
+                    <div class="db-watch-row">
+                        <div class="db-watch-icon">TSLA</div>
+                        <div><div class="db-watch-sym">TSLA</div><div class="db-watch-name">Tesla Inc.</div></div>
+                        <svg class="db-spark" viewBox="0 0 44 22" fill="none">
+                            <path d="M2,18 C7,15 11,13 16,16 C20,18 24,10 28,7 C32,4 37,8 42,5" stroke="#f87171" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                        </svg>
+                        <div class="db-watch-right"><div class="db-watch-price">$248.70</div><div class="db-watch-chg dn">▼ 1.08%</div></div>
+                    </div>
+
+                    <div class="db-watch-row">
+                        <div class="db-watch-icon">NVDA</div>
+                        <div><div class="db-watch-sym">NVDA</div><div class="db-watch-name">NVIDIA Corp.</div></div>
+                        <svg class="db-spark" viewBox="0 0 44 22" fill="none">
+                            <path d="M2,16 C7,13 12,11 17,8 C22,5 27,9 32,6 C36,3 39,5 42,3" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                        </svg>
+                        <div class="db-watch-right"><div class="db-watch-price">$875.22</div><div class="db-watch-chg up">▲ 3.55%</div></div>
+                    </div>
+
+                    <div class="db-watch-row">
+                        <div class="db-watch-icon">MSFT</div>
+                        <div><div class="db-watch-sym">MSFT</div><div class="db-watch-name">Microsoft Corp.</div></div>
+                        <svg class="db-spark" viewBox="0 0 44 22" fill="none">
+                            <path d="M2,14 C7,12 12,14 17,10 C22,7 27,8 32,5 C36,3 40,6 42,4" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                        </svg>
+                        <div class="db-watch-right"><div class="db-watch-price">$415.30</div><div class="db-watch-chg up">▲ 0.92%</div></div>
+                    </div>
+
+                    <div class="db-watch-row">
+                        <div class="db-watch-icon">BTC</div>
+                        <div><div class="db-watch-sym">BTC</div><div class="db-watch-name">Bitcoin</div></div>
+                        <svg class="db-spark" viewBox="0 0 44 22" fill="none">
+                            <path d="M2,18 C6,14 10,10 15,12 C20,14 24,8 29,5 C33,3 38,7 42,4" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                        </svg>
+                        <div class="db-watch-right"><div class="db-watch-price">$67,410</div><div class="db-watch-chg up">▲ 1.93%</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM STATS -->
+            <div class="db-stats">
+                <div class="db-stat">
+                    <div class="db-stat-icon">💼</div>
+                    <div><div class="db-stat-val">$124,830</div><div class="db-stat-label">Portfolio Value</div></div>
+                </div>
+                <div class="db-stat">
+                    <div class="db-stat-icon">📈</div>
+                    <div><div class="db-stat-val" style="color:#4ade80">+18.4%</div><div class="db-stat-label">YTD Return</div></div>
+                </div>
+                <div class="db-stat">
+                    <div class="db-stat-icon">⚡</div>
+                    <div><div class="db-stat-val">47</div><div class="db-stat-label">Active Positions</div></div>
+                </div>
+                <div class="db-stat">
+                    <div class="db-stat-icon">🔒</div>
+                    <div><div class="db-stat-val">$8,200</div><div class="db-stat-label">Available Cash</div></div>
+                </div>
+            </div>
+
+        </div><!-- /dashboard-card -->
+
     </section>
 
     <!-- My Videos Section -->
-    <section class="cta-section" id="my-videos" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); position: relative; overflow: hidden;">
-        <!-- My Videos Heading at Top -->
-        <div style="text-align: center; padding: 1rem 2rem 0 2rem;">
-            <h2 style="color: white; font-size: 3.5rem; font-weight: 900; margin: 0; text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); letter-spacing: -0.02em; animation: slideInUp 0.8s ease-out;">My Videos</h2>
+    <section class="my-videos-section" id="my-videos">
+        <!-- Section Header -->
+        <div class="videos-section-header">
+            <span class="section-badge">
+                <i class="fas fa-play-circle"></i>
+                Your Content Library
+            </span>
+            <h2 class="videos-title">My Videos</h2>
+            <p class="videos-subtitle">Access your unlocked educational content and continue your journey to trading mastery</p>
         </div>
         
-        <!-- Animated Background Elements -->
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
-        <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.03); border-radius: 50%; animation: float 8s ease-in-out infinite reverse;"></div>
-        <div style="position: absolute; top: 50%; right: 10%; width: 100px; height: 100px; background: rgba(255, 255, 255, 0.02); border-radius: 50%; animation: pulse 4s ease-in-out infinite;"></div>
-        
-        <div class="cta-container" style="position: relative; z-index: 2;">
-            <div class="cta-content" style="text-align: center; max-width: 800px; margin: 0 auto; padding: 0 2rem 1.5rem 2rem;">
-                <!-- Description with Typography -->
-                <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.3rem; margin-bottom: 1rem; line-height: 1.7; font-weight: 400; animation: slideInUp 0.8s ease-out 0.2s both;">View all your unlocked videos and continue your learning journey. Watch your purchased content anytime, anywhere.</p>
-                
-                <!-- Feature Highlights with Button below Watch Anywhere -->
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; animation: slideInUp 0.8s ease-out 0.4s both;">
-                    <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: white;">
-                            <div style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-unlock" style="font-size: 1rem;"></i>
-                            </div>
-                            <span style="font-size: 0.95rem;">Lifetime Access</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: white;">
-                            <div style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-mobile-alt" style="font-size: 1rem;"></i>
-                            </div>
-                            <span style="font-size: 0.95rem;">Watch Anywhere</span>
-                        </div>
-                    </div>
-                    
-                    <!-- CTA Button below Watch Anywhere -->
-                    <div class="cta-buttons" style="animation: slideInUp 0.8s ease-out 0.6s both;">
-                        <a href="/myvideos" id="myVideosBtn" style="
-                            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-                            color: white;
-                            padding: 1.25rem 3rem;
-                            font-size: 1.2rem;
-                            font-weight: 700;
-                            border-radius: 50px;
-                            text-decoration: none;
-                            display: inline-block;
-                            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
-                            border: 2px solid rgba(255, 255, 255, 0.1);
-                            backdrop-filter: blur(10px);
-                            position: relative;
-                            overflow: hidden;
-                        " onmouseover="this.style.transform='translateY(-3px) scale(1.05)'; this.style.boxShadow='0 20px 40px rgba(52, 152, 219, 0.5)';" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 10px 30px rgba(52, 152, 219, 0.3)';">
-                            <span style="position: relative; z-index: 2;">
-                                <i class="fas fa-video" style="margin-right: 0.75rem;"></i>
-                                My Videos
-                            </span>
-                            <!-- Button Shine Effect -->
-                            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%); transform: rotate(45deg); animation: shine 3s ease-in-out infinite;"></div>
-                        </a>
-                    </div>
+        <!-- Features Grid -->
+        <div class="videos-features-grid">
+            <div class="video-feature-card">
+                <div class="feature-glow"></div>
+                <div class="feature-icon-wrap">
+                    <i class="fas fa-infinity"></i>
                 </div>
+                <h3>Lifetime Access</h3>
+                <p>Once purchased, your videos remain accessible forever with no expiration</p>
+            </div>
+            
+            <div class="video-feature-card">
+                <div class="feature-glow"></div>
+                <div class="feature-icon-wrap">
+                    <i class="fas fa-laptop-house"></i>
+                </div>
+                <h3>Watch Anywhere</h3>
+                <p>Stream seamlessly on any device - desktop, tablet, or mobile</p>
+            </div>
+            
+            <div class="video-feature-card">
+                <div class="feature-glow"></div>
+                <div class="feature-icon-wrap">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3>Track Progress</h3>
+                <p>Monitor your learning journey with built-in progress tracking</p>
             </div>
         </div>
         
-        <!-- Custom CSS Animations -->
-        <style>
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.05; }
-            50% { transform: scale(1.1); opacity: 0.1; }
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.05); }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes slideInUp {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-        }
-        </style>
+        <!-- CTA Button -->
+        <div class="videos-cta-wrap">
+            <a href="/myvideos" id="myVideosBtn" class="videos-btn">
+                <i class="fas fa-video"></i>
+                <span>View My Unlocked Videos</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
     </section>
 
     <!-- CTA Section - Assessment -->
@@ -2007,40 +1793,51 @@
         </div>
     </section>
 
-    <!-- Learn More Section -->
-    <section class="learn-more-section" id="learn-more">
-        <div class="learn-more-container">
-            <div class="section-header">
-                <h2 class="section-title">Why Choose Market Master?</h2>
-                <p class="section-subtitle">Discover the features that make us the leading platform for stock market education and trading success</p>
-            </div>
-            
-            <div class="features-grid">
-                <!-- Feature Box 1 - Expert Courses - Blue/Purple -->
-                <div class="feature-box feature-box-1">
-                    <div class="feature-icon feature-icon-1">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <h3>Expert Courses</h3>
-                    <p>Learn from industry experts with comprehensive courses covering trading strategies, technical analysis, and market fundamentals.</p>
+    <!-- Contact Us Section -->
+    <section class="contact-section" id="contact">
+        <div class="contact-container">
+            <div class="contact-two-column">
+                <!-- Left Column: Heading -->
+                <div class="contact-heading-col">
+                    <span class="contact-badge">
+                        <i class="fas fa-envelope"></i>
+                        Get In Touch
+                    </span>
+                    <h2 class="contact-title">Contact Us</h2>
+                    <p class="contact-subtitle">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
                 </div>
                 
-                <!-- Feature Box 2 - Live Trading - Green/Teal -->
-                <div class="feature-box feature-box-2">
-                    <div class="feature-icon feature-icon-2">
-                        <i class="fas fa-chart-line"></i>
+                <!-- Right Column: Form -->
+                <div class="contact-form-col">
+                    <div class="contact-form-wrapper">
+                        <form class="contact-form" id="contactForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name">Full Name</label>
+                                    <input type="text" id="name" name="name"  required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" name="subject" placeholder="How can we help?" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" rows="4" placeholder="Tell us more about your inquiry..." required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="contact-submit-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send Message</span>
+                            </button>
+                        </form>
                     </div>
-                    <h3>Live Trading Sessions</h3>
-                    <p>Participate in real-time trading sessions, watch experts analyze market movements, and learn practical trading techniques.</p>
-                </div>
-                
-                <!-- Feature Box 3 - Community - Orange/Red -->
-                <div class="feature-box feature-box-3">
-                    <div class="feature-icon feature-icon-3">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Trading Community</h3>
-                    <p>Join a vibrant community of traders, share insights, discuss strategies, and grow together with like-minded individuals.</p>
                 </div>
             </div>
         </div>
@@ -2048,274 +1845,166 @@
 
     
     <script>
-        
-        // Enhanced navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-        
-        // Go to My Videos function
-        function goToMyVideos() {
-            window.location.href = '/myvideos';
-        }
-        
-        // Enhanced start button interaction
-        document.getElementById('start-btn').addEventListener('click', function() {
-            const btn = this;
-            const originalHTML = btn.innerHTML;
-            
-            btn.innerHTML = '<span class="loading"></span> <span>Creating Your Page...</span>';
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.8';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalHTML;
-                btn.style.pointerEvents = 'auto';
-                btn.style.opacity = '1';
-                
-                // Enhanced success notification
-                const successMsg = document.createElement('div');
-                successMsg.className = 'success-notification';
-                successMsg.innerHTML = '🎉 Welcome to CreativeHub Premium!';
-                document.body.appendChild(successMsg);
-                
-                setTimeout(() => {
-                    successMsg.style.animation = 'slideInRight 0.4s reverse';
-                    setTimeout(() => successMsg.remove(), 400);
-                }, 4000);
-            }, 2500);
-        });
-        
         // Enhanced smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-            });
-        });
-        
-        // Enhanced profile card interactions
-        const profileCards = document.querySelectorAll('.profile-card');
-        profileCards.forEach((card, index) => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-12px) scale(1.03) rotate(1deg)';
-                card.style.zIndex = '10';
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0) scale(1) rotate(0deg)';
-                card.style.zIndex = '1';
-            });
-            
-            // Staggered animation on load
-            card.style.animationDelay = `${0.6 + index * 0.1}s`;
-        });
-        
-        // Enhanced intersection observer
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0) scale(1)';
-                }
-            });
-        }, observerOptions);
-        
-        // Observe elements for enhanced animations
-        document.querySelectorAll('.feature-item').forEach((el, index) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(60px) scale(0.9)';
-            el.style.transition = `all 0.8s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.2}s`;
-            observer.observe(el);
-        });
-        
-        // Enhanced page load animation
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '1';
-            
-            // Add floating animation to hero elements
-            const floatingElements = document.querySelectorAll('.profile-card');
-            floatingElements.forEach((el, index) => {
-                el.style.animation = `float 6s ease-in-out infinite ${index * 0.5}s`;
-            });
-        });
-        
-        // Add floating keyframes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes float {
-                0%, 100% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-10px) rotate(1deg); }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Enhanced demo button interaction
-        document.querySelector('.btn-demo').addEventListener('click', function() {
-            const btn = this;
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                btn.style.transform = 'scale(1)';
-            }, 150);
-            
-            // Demo modal simulation
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.8);
-                backdrop-filter: blur(10px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 2000;
-                animation: fadeInScale 0.3s ease-out;
-            `;
-            
-            const content = document.createElement('div');
-            content.style.cssText = `
-                background: white;
-                padding: 40px;
-                border-radius: 20px;
-                text-align: center;
-                max-width: 400px;
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            `;
-            content.innerHTML = `
-                <h3 style="margin-bottom: 16px; font-size: 24px; font-weight: 700;">🎬 Demo Coming Soon!</h3>
-                <p style="color: #666; margin-bottom: 24px;">We're preparing an amazing demo experience for you.</p>
-                <button onclick="this.closest('.modal').remove()" style="background: var(--gradient-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Close</button>
-            `;
-            
-            modal.className = 'modal';
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
             });
         });
         
         // Render auth state in header using localStorage 'userProfile'
-        // Fetch session user from API and render header
         const navButtons = document.getElementById('navButtons');
         async function renderHeaderFromSession() {
             if (!navButtons) return;
             try {
-                // Always call API on backend origin so cookies/sessions work,
-                // even if this page is opened from file:// or another port.
                 const res = await fetch('http://localhost:4000/api/me', { credentials: 'include' });
                 if (!res.ok) throw new Error('No session');
                 const me = await res.json();
                 const first = String(me.username || '').charAt(0).toUpperCase() || 'U';
                 
-                // Update header buttons for logged-in user
+                const isMentor = me.userType === 'mentor';
+                const myEarningsLink = isMentor ? `
+                            <a href="myearnings.html" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                My Earnings
+                            </a>
+                            <div style="border-top: 1px solid #eee; margin: 8px 0;"></div>
+                ` : '';
+                
                 navButtons.innerHTML = `
                     <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
-                        <div id="userAvatar" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 16px; font-weight: 600; text-transform: uppercase; border: 3px solid #FF6F61; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">${first}</div>
-                        <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 200px; z-index: 1000;">
-                            <a href="#" onclick="logout()" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-top: 1px solid #eee; transition: background 0.2s ease;">
-                                <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> Logout
+                        <div id="userAvatar" onclick="toggleProfileDropdown()" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600; text-transform: uppercase; border: 3px solid #FF6F61; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">${first}</div>
+                        <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 55px; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; padding: 16px;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                                <div style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600;">${first}</div>
+                                <div>
+                                    <div style="font-weight: 600; color: #333; font-size: 15px;">${me.username || 'User'}</div>
+                                    <div style="font-size: 13px; color: #666;">${me.email || ''}</div>
+                                </div>
+                            </div>
+                            ${myEarningsLink}
+                            <a href="#" onclick="logout(); return false;" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                Logout
                             </a>
                         </div>
                     </div>
-                    <a href="upload.html" class="btn btn-primary">Start Uploading</a>
+                    <a href="upload.html" class="btn-primary-inv" style="display:flex;align-items:center;gap:7px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Start Uploading
+                    </a>
                 `;
                 
-                // Hide "Start My Page" button from hero section
-                const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                console.log('Start My Page button found:', startMyPageBtn); // Debug log
+                const startMyPageBtn = document.getElementById('start-btn');
                 if (startMyPageBtn) {
-                    console.log('Hiding Start My Page button'); // Debug log
                     startMyPageBtn.style.display = 'none';
-                    // Also try adding a class for more robust hiding
                     startMyPageBtn.classList.add('hidden');
-                } else {
-                    console.log('Start My Page button not found'); // Debug log
-                    // Try again after a short delay
-                    setTimeout(() => {
-                        const delayedBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                        console.log('Delayed search - Start My Page button found:', delayedBtn);
-                        if (delayedBtn) {
-                            delayedBtn.style.display = 'none';
-                            delayedBtn.classList.add('hidden');
-                        }
-                    }, 100);
                 }
             } catch (error) {
-                // Check if user is actually logged in via localStorage before showing login popup
                 const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
                 if (userProfile) {
-                    // User has local profile data, use it instead of showing login popup
                     const user = JSON.parse(userProfile);
-                    const userData = user.user || user; // Handle both formats
+                    const userData = user.user || user;
                     const first = String(userData.username || '').charAt(0).toUpperCase() || 'U';
+                    const isMentor = userData.userType === 'mentor';
+                    const myEarningsLink = isMentor ? `
+                                <a href="myearnings.html" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    My Earnings
+                                </a>
+                                <div style="border-top: 1px solid #eee; margin: 8px 0;"></div>
+                    ` : '';
                     
                     navButtons.innerHTML = `
                         <div id="userProfile" style="display: block; margin: 0 15px; position: relative;">
-                            <div id="userAvatar" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 16px; font-weight: 600; text-transform: uppercase; border: 3px solid #FF6F61; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">${first}</div>
-                            <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 200px; z-index: 1000;">
-                                <a href="#" onclick="logout()" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-top: 1px solid #eee; transition: background 0.2s ease;">
-                                    <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> Logout
+                            <div id="userAvatar" onclick="toggleProfileDropdown()" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600; text-transform: uppercase; border: 3px solid #FF6F61; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease;">${first}</div>
+                            <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; top: 55px; right: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; padding: 16px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                                    <div style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #008080; color: white; font-size: 18px; font-weight: 600;">${first}</div>
+                                    <div>
+                                        <div style="font-weight: 600; color: #333; font-size: 15px;">${userData.username || 'User'}</div>
+                                        <div style="font-size: 13px; color: #666;">${userData.email || ''}</div>
+                                    </div>
+                                </div>
+                            ${myEarningsLink}
+                                <a href="#" onclick="logout(); return false;" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #333; text-decoration: none; border-radius: 6px; transition: background 0.2s; font-size: 14px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                    Logout
                                 </a>
                             </div>
                         </div>
-                        <a href="upload.html" class="btn btn-primary">Start Uploading</a>
+                        <a href="upload.html" class="btn-primary-inv" style="display:flex;align-items:center;gap:7px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Start Uploading
+                        </a>
                     `;
                     
-                    // Hide "Start My Page" button
-                    const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
+                    const startMyPageBtn = document.getElementById('start-btn');
                     if (startMyPageBtn) {
                         startMyPageBtn.style.display = 'none';
                         startMyPageBtn.classList.add('hidden');
                     }
                 } else {
-                    // Show default buttons for logged-out user
                     navButtons.innerHTML = `
-                        <a href="signin.html" class="btn btn-secondary" style="border: 0.5px solid #000;">Sign In</a>
-                        <a href="upload.html" class="btn btn-primary">Start Uploading</a>
+                        <a href="upload.html" class="btn-primary-inv" style="display:flex;align-items:center;gap:7px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Start Uploading
+                        </a>
                     `;
                     
-                    // Show "Start My Page" button for logged-out user
                     const startMyPageBtn = document.getElementById('start-btn');
-                    console.log('Logged out - Start My Page button found:', startMyPageBtn); // Debug log
-                    if (startMyPageBtn) {
-                        console.log('Showing Start My Page button'); // Debug log
-                        startMyPageBtn.style.display = 'inline-flex';
-                    } else {
-                        console.log('Logged out - Start My Page button not found'); // Debug log
-                    }
+                    if (startMyPageBtn) startMyPageBtn.style.display = 'inline-flex';
                 }
             }
         }
         
-        // Wait for DOM to be ready before rendering
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_BASE_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+                localStorage.removeItem('userAuth');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'index.html';
+            } catch (error) {
+                localStorage.removeItem('userAuth');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'index.html';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, calling renderHeaderFromSession'); // Debug log
             renderHeaderFromSession();
+            
+            // Use event delegation for dynamically rendered buttons
+            document.body.addEventListener('click', function(e) {
+                // Handle Start Uploading button clicks
+                const uploadLink = e.target.closest('a[href="upload.html"]');
+                if (uploadLink) {
+                    e.preventDefault();
+                    checkUserTypeAndRedirect('upload.html');
+                }
+                
+                // Handle View My Unlocked Videos button clicks
+                const myVideosBtn = e.target.closest('#myVideosBtn');
+                if (myVideosBtn) {
+                    e.preventDefault();
+                    checkAuthenticationAndRedirect('/myvideos');
+                }
+            });
         });
     </script>
     
-    <!-- Enhanced Floating Chat with Professional Label -->
+    <!-- Enhanced Floating Chat -->
     <div class="floating-chat" id="floatingChat">
         <div class="chat-container">
             <div class="ai-assistant-label">
@@ -2327,280 +2016,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-        /* Enhanced Floating Chat Button Styles */
-        .floating-chat {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            z-index: 1000;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
-
-        .floating-chat:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-        }
-
-        .floating-chat:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .chat-icon {
-            position: relative;
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-bubble {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            z-index: 2;
-            overflow: hidden;
-            padding: 0;
-            border: 2px solid #000000;
-            box-sizing: border-box;
-        }
-
-        .chat-bubble:hover {
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
-        }
-
-        .chat-bubble:active {
-            transform: translateY(-2px) scale(0.98);
-        }
-
-        /* Tooltip styles */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-        }
-
-        .ai-assistant-label {
-            background: #6c5ce7;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeIn 0.5s ease-out;
-            white-space: nowrap;
-            position: relative;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            font-family: 'Inter', sans-serif;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .label-arrow {
-            position: absolute;
-            bottom: -8px;
-            right: 20px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid #6c5ce7;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .chat-bubble {
-            position: relative;
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-            background: #a29bfe;
-            padding: 4px;
-            /* Rainbow border effect */
-            background: linear-gradient(45deg, 
-                #ff0000, #ff7f00, #ffff00, #00ff00, 
-                #0000ff, #4b0082, #8b00ff) border-box;
-            border: 3px solid transparent;
-            background-size: 200% 200%;
-            animation: rainbow 3s ease infinite;
-        }
-        
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .chat-bubble .tooltip {
-            visibility: hidden;
-            width: 100px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-            font-weight: 500;
-            pointer-events: none;
-        }
-
-        .chat-bubble .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-        }
-
-        .chat-bubble:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .robot-avatar {
-            width: 120%;
-            height: 120%;
-            object-fit: contain;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-            transform: scale(1.4);
-            background: #a29bfe;
-            padding: 2px;
-            margin: -10%;
-        }
-
-        .chat-bubble:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .chat-bubble:active {
-            transform: translateY(-1px);
-        }
-
-        .chat-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background: #ff4757;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
-            z-index: 3;
-            animation: bounce 2s infinite;
-            border: 2px solid white;
-        }
-
-        .pulse-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 72px;
-            height: 72px;
-            background: rgba(102, 126, 234, 0.3);
-            border-radius: 50%;
-            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0.8);
-                opacity: 0.5;
-            }
-            70% {
-                transform: translate(-50%, -50%) scale(1.4);
-                opacity: 0;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* Add smooth hover effect on the icon */
-        .floating-chat:hover .chat-bubble svg {
-            transform: rotate(10deg);
-        }
-
-        /* Add a subtle floating animation */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .floating-chat {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        /* Animation for first load */
-        @keyframes floatUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .floating-chat {
-            animation: floatUp 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28) 1s both;
-        }
-    </style>
 
     <!-- Footer -->
     <footer class="main-footer">
@@ -2670,435 +2085,79 @@
         </div>
     </footer>
 
-    <style>
-        
-        /* CTA Section Styles */
-        .cta-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 120px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-content {
-            max-width: 600px;
-        }
-
-        .cta-content h2 {
-            font-size: 40px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .cta-content p {
-            font-size: 18px;
-            margin-bottom: 32px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 16px;
-        }
-
-        .cta-image {
-            width: 450px;
-            height: 350px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .cta-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 20px;
-            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        /* Footer Styles */
-        .main-footer {
-            background: #111827;
-            color: #9ca3af;
-            padding: 80px 0 0;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: grid;
-            grid-template-columns: 1.5fr 2fr;
-            gap: 60px;
-            margin-bottom: 60px;
-        }
-
-        .footer-brand {
-            max-width: 350px;
-        }
-
-        .footer-logo {
-            font-size: 28px;
-            font-weight: 900;
-            color: white;
-            text-decoration: none;
-            margin-bottom: 16px;
-            display: inline-block;
-        }
-
-        .footer-tagline {
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            background: #667eea;
-            transform: translateY(-3px);
-        }
-
-        .footer-links {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-        }
-
-        .footer-links-group h4 {
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .footer-links-group a {
-            display: block;
-            color: #9ca3af;
-            margin-bottom: 12px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .footer-links-group a:hover {
-            color: white;
-            transform: translateX(4px);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 24px 0;
-        }
-
-        .footer-legal {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .legal-links {
-            display: flex;
-            gap: 24px;
-        }
-
-        .legal-links a {
-            color: #9ca3af;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-
-        .legal-links a:hover {
-            color: white;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 1024px) {
-            .cta-container {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .cta-content {
-                margin-bottom: 48px;
-            }
-
-            .footer-container {
-                grid-template-columns: 1fr;
-                gap: 48px;
-            }
-
-            .footer-brand {
-                max-width: 100%;
-                text-align: center;
-                margin: 0 auto;
-            }
-
-            .social-links {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .footer-links {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            .footer-legal {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .legal-links {
-                margin-top: 8px;
-            }
-
-            .cta-content h2 {
-                font-size: 32px;
-            }
-
-            .cta-image {
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .section-title {
-                font-size: 32px;
-            }
-
-            .section-subtitle {
-                font-size: 16px;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .cta-buttons .btn {
-                width: 100%;
-                text-align: center;
-            }
-        }
-    </style>
-
     <!-- User Authentication Script -->
     <script>
         const API_BASE_URL = 'http://localhost:4000';
 
-        // Check authentication status and update UI
         async function checkAuthStatus() {
             try {
-                // First check localStorage as fallback
                 const localAuth = localStorage.getItem('userAuth');
                 if (localAuth) {
                     try {
                         const authData = JSON.parse(localAuth);
                         if (authData.isAuthenticated && authData.user) {
-                            console.log('User authenticated via localStorage');
                             updateUIForLoggedInUser(authData.user);
                             return;
                         }
-                    } catch (e) {
-                        console.warn('Invalid localStorage auth data:', e);
-                    }
+                    } catch (e) {}
                 }
 
-                console.log('Checking auth status from:', `${API_BASE_URL}/api/check-auth`);
                 const response = await fetch(`${API_BASE_URL}/api/check-auth`, {
-                    method: 'GET',
-                    credentials: 'include', // Important for sending cookies
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                    method: 'GET', credentials: 'include',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
                 });
 
-                console.log('Auth check response status:', response.status);
-                
                 const data = await response.json();
-                console.log('Auth check response data:', data);
                 
                 if (data.isAuthenticated && data.user) {
-                    console.log('User is authenticated, updating UI for:', data.user);
-                    // Store in localStorage as backup
-                    localStorage.setItem('userAuth', JSON.stringify({
-                        isAuthenticated: true,
-                        user: data.user,
-                        timestamp: Date.now()
-                    }));
+                    localStorage.setItem('userAuth', JSON.stringify({ isAuthenticated: true, user: data.user, timestamp: Date.now() }));
                     updateUIForLoggedInUser(data.user);
                 } else {
-                    console.log('User is not authenticated');
-                    // Clear localStorage
                     localStorage.removeItem('userAuth');
                     updateUIForLoggedOutUser();
                 }
             } catch (error) {
-                console.error('Error checking auth status:', error);
-                // Try localStorage fallback
                 const localAuth = localStorage.getItem('userAuth');
                 if (localAuth) {
                     try {
                         const authData = JSON.parse(localAuth);
-                        if (authData.isAuthenticated && authData.user) {
-                            updateUIForLoggedInUser(authData.user);
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('LocalStorage fallback failed:', e);
-                    }
+                        if (authData.isAuthenticated && authData.user) { updateUIForLoggedInUser(authData.user); return; }
+                    } catch (e) {}
                 }
                 updateUIForLoggedOutUser();
             }
         }
 
-        // Update UI for logged in user
         function updateUIForLoggedInUser(user) {
-            const userProfile = document.getElementById('userProfile');
-            const userAvatar = document.getElementById('userAvatar');
-            const userName = document.getElementById('userName');
-            const userEmail = document.getElementById('userEmail');
+            // Profile is now handled by renderHeaderFromSession in the nav
+            const startMyPageBtn = document.getElementById('start-btn');
+            if (startMyPageBtn) { startMyPageBtn.style.display = 'none'; startMyPageBtn.classList.add('hidden'); }
             
-            if (userProfile && userAvatar && userName && userEmail) {
-                // Update user info - use correct field names from API response
-                const username = user.username || user.name || 'User';
-                const firstLetter = String(username).charAt(0).toUpperCase() || 'U';
-                userAvatar.textContent = firstLetter;
-                userName.textContent = username;
-                userEmail.textContent = user.email || '';
-                
-                // Show user profile
-                userProfile.style.display = 'block';
-                
-                // Hide "Start Trading" button when user is logged in
-                const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-                if (startMyPageBtn) {
-                    startMyPageBtn.style.display = 'none';
-                    startMyPageBtn.classList.add('hidden');
-                }
-                
-                // Show "Learn More" button when user is logged in
-                const learnMoreBtn = document.getElementById('learn-more-btn');
-                if (learnMoreBtn) {
-                    learnMoreBtn.style.display = 'inline-flex';
-                    learnMoreBtn.classList.remove('hidden');
-                }
-                
-                // Remove existing event listeners to prevent duplicates
-                const newAvatar = userAvatar.cloneNode(true);
-                userAvatar.parentNode.replaceChild(newAvatar, userAvatar);
-                
-                // Add click event for dropdown toggle
-                newAvatar.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const dropdown = document.getElementById('userDropdown');
-                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                });
-            }
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                const dropdown = document.getElementById('userDropdown');
-                if (userProfile && !userProfile.contains(e.target) && dropdown) {
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
-
-        // Update UI for logged out user
-        function updateUIForLoggedOutUser() {
-            const userProfile = document.getElementById('userProfile');
-            if (userProfile) {
-                userProfile.style.display = 'none';
-            }
-            
-            // Show "Start Trading" button when user is logged out
-            const startMyPageBtn = document.getElementById('start-btn') || document.querySelector('a[href="page.html"].btn-hero');
-            if (startMyPageBtn) {
-                startMyPageBtn.style.display = 'inline-flex';
-                startMyPageBtn.classList.remove('hidden');
-            }
-            
-            // Hide "Learn More" button when user is logged out
             const learnMoreBtn = document.getElementById('learn-more-btn');
-            if (learnMoreBtn) {
-                learnMoreBtn.style.display = 'none';
-                learnMoreBtn.classList.add('hidden');
-            }
+            if (learnMoreBtn) { learnMoreBtn.style.display = 'inline-flex'; learnMoreBtn.classList.remove('hidden'); }
         }
 
-        // Handle logout
+        function updateUIForLoggedOutUser() {
+            const startMyPageBtn = document.getElementById('start-btn');
+            if (startMyPageBtn) { startMyPageBtn.style.display = 'inline-flex'; startMyPageBtn.classList.remove('hidden'); }
+            
+            const learnMoreBtn = document.getElementById('learn-more-btn');
+            if (learnMoreBtn) { learnMoreBtn.style.display = 'none'; learnMoreBtn.classList.add('hidden'); }
+        }
+
         document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
             e.preventDefault();
             try {
-                const response = await fetch(`${API_BASE_URL}/api/logout`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                // Clear localStorage on logout
+                const response = await fetch(`${API_BASE_URL}/api/logout`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' } });
                 localStorage.removeItem('userAuth');
-                
-                if (response.ok) {
-                    window.location.href = 'index.html';
-                }
+                if (response.ok) window.location.href = 'index.html';
             } catch (error) {
-                console.error('Logout failed:', error);
-                // Still clear localStorage even if logout fails
                 localStorage.removeItem('userAuth');
             }
         });
 
-        // Check auth status when page loads
         document.addEventListener('DOMContentLoaded', checkAuthStatus);
 
-        // Start Assessment button with login check
         const startAssessmentBtn = document.getElementById('startAssessmentBtn');
         if (startAssessmentBtn) {
             startAssessmentBtn.addEventListener('click', function(e) {
@@ -3107,7 +2166,6 @@
             });
         }
 
-        // Chat button functionality (open in same tab to avoid popup blockers)
         const floatingChat = document.getElementById('floatingChat');
         if (floatingChat) {
             floatingChat.addEventListener('click', function () {
@@ -3115,7 +2173,6 @@
             });
         }
 
-        // Login popup functions
         function showLoginPopup() {
             const popup = document.getElementById('loginPopupOverlay');
             popup.style.display = 'flex';
@@ -3128,15 +2185,10 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Mentor popup functions
         function showMentorPopup() {
             const popup = document.getElementById('mentorPopupOverlay');
             popup.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                closeMentorPopup();
-            }, 5000);
+            setTimeout(() => { closeMentorPopup(); }, 5000);
         }
 
         function closeMentorPopup() {
@@ -3144,120 +2196,39 @@
             popup.style.display = 'none';
         }
 
-        // Check user type and handle upload access
         async function checkUserTypeAndRedirect(redirectUrl) {
             try {
-                // Always fetch fresh data from API to avoid localStorage issues
-                console.log('=== DEBUG: Fetching fresh user data from API ===');
-                
-                const response = await fetch(`${API_BASE_URL}/api/me`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Not authenticated');
-                }
-
+                const response = await fetch(`${API_BASE_URL}/api/me`, { method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
+                if (!response.ok) throw new Error('Not authenticated');
                 const user = await response.json();
-                console.log('=== DEBUG: Fresh API response ===');
-                console.log(user);
-                
-                // TEMPORARY FIX: Force set userType for your user
-                if (user.email === 'bhanuprakashtungala@gmail.com' && !user.userType) {
-                    user.userType = 'mentor';
-                    console.log('=== TEMPORARY FIX: Set userType to mentor ===');
-                }
-                
-                // Update localStorage with fresh data
-                localStorage.setItem('userAuth', JSON.stringify({
-                    isAuthenticated: true,
-                    user: user,
-                    timestamp: Date.now()
-                }));
-                
-                if (user.userType === 'mentor') {
-                    // User is a mentor, allow access
-                    console.log('✅ User is mentor, allowing access to:', redirectUrl);
-                    window.location.href = redirectUrl;
-                } else {
-                    // User is a learner, show mentor-only popup
-                    console.log('❌ User is learner, showing mentor popup');
-                    showMentorPopup();
-                }
+                if (user.email === 'bhanuprakashtungala@gmail.com' && !user.userType) user.userType = 'mentor';
+                localStorage.setItem('userAuth', JSON.stringify({ isAuthenticated: true, user: user, timestamp: Date.now() }));
+                if (user.userType === 'mentor') { window.location.href = redirectUrl; } else { showMentorPopup(); }
             } catch (error) {
-                console.error('Error checking user type:', error);
-                // Check localStorage as fallback
                 const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
                 if (userProfile) {
                     const user = JSON.parse(userProfile);
-                    const userData = user.user || user; // Handle both formats
-                    
-                    // TEMPORARY FIX: Force set userType for your user
-                    if (userData.email === 'bhanuprakashtungala@gmail.com' && !userData.userType) {
-                        userData.userType = 'mentor';
-                        console.log('=== TEMPORARY FIX: Set userType to mentor in fallback ===');
-                    }
-                    
-                    if (userData.userType === 'mentor') {
-                        console.log('Fallback: User is mentor, allowing access');
-                        window.location.href = redirectUrl;
-                    } else {
-                        console.log('Fallback: User is learner, showing mentor popup');
-                        showMentorPopup();
-                    }
-                } else {
-                    showLoginPopup();
-                }
+                    const userData = user.user || user;
+                    if (userData.email === 'bhanuprakashtungala@gmail.com' && !userData.userType) userData.userType = 'mentor';
+                    if (userData.userType === 'mentor') { window.location.href = redirectUrl; } else { showMentorPopup(); }
+                } else { showLoginPopup(); }
             }
         }
+
         async function checkAuthenticationAndRedirect(redirectUrl) {
             try {
-                // First check if user has local profile data
                 const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
-                if (userProfile) {
-                    // User has local profile data, redirect directly
-                    window.location.href = redirectUrl;
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE_URL}/api/check-auth`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
+                if (userProfile) { window.location.href = redirectUrl; return; }
+                const response = await fetch(`${API_BASE_URL}/api/check-auth`, { method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
                 const data = await response.json();
-                
-                if (data.isAuthenticated && data.user) {
-                    // User is logged in, redirect to the requested page
-                    window.location.href = redirectUrl;
-                } else {
-                    // User is not logged in, show login popup
-                    showLoginPopup();
-                }
+                if (data.isAuthenticated && data.user) { window.location.href = redirectUrl; } else { showLoginPopup(); }
             } catch (error) {
-                console.error('Error checking authentication:', error);
-                // Check localStorage as fallback
                 const userProfile = localStorage.getItem('userProfile') || localStorage.getItem('userAuth');
-                if (userProfile) {
-                    window.location.href = redirectUrl;
-                } else {
-                    showLoginPopup();
-                }
+                if (userProfile) { window.location.href = redirectUrl; } else { showLoginPopup(); }
             }
         }
 
-        // Add click handlers for protected links
         document.addEventListener('DOMContentLoaded', function() {
-            // Handle Mentors link
             const mentorsLink = document.querySelector('a[href="mentors.html"]');
             if (mentorsLink) {
                 mentorsLink.addEventListener('click', function(e) {
@@ -3266,7 +2237,6 @@
                 });
             }
 
-            // Handle Upload button
             const uploadLinks = document.querySelectorAll('a[href="upload.html"]');
             uploadLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -3275,13 +2245,10 @@
                 });
             });
 
-            // Close popup when clicking overlay
             const popupOverlay = document.getElementById('loginPopupOverlay');
             if (popupOverlay) {
                 popupOverlay.addEventListener('click', function(e) {
-                    if (e.target === popupOverlay) {
-                        closeLoginPopup();
-                    }
+                    if (e.target === popupOverlay) closeLoginPopup();
                 });
             }
         });
@@ -3290,9 +2257,7 @@
     <!-- Login Popup -->
     <div class="login-popup-overlay" id="loginPopupOverlay">
         <div class="login-popup">
-            <div class="login-popup-icon">
-                🔒
-            </div>
+            <div class="login-popup-icon">🔒</div>
             <h3>Please Login First</h3>
             <p>You need to be logged in to access this feature. Login now to continue exploring all our amazing features!</p>
             <div class="login-popup-buttons">
@@ -3305,9 +2270,7 @@
     <!-- Mentor-only Popup -->
     <div class="mentor-popup-overlay" id="mentorPopupOverlay">
         <div class="mentor-popup">
-            <div class="mentor-popup-icon">
-                🚫
-            </div>
+            <div class="mentor-popup-icon">🚫</div>
             <h4>Mentors Only</h4>
             <p>Only mentors can access the upload feature. If you're a mentor, please make sure you're logged in with a mentor account.</p>
             <button class="mentor-popup-close" onclick="closeMentorPopup()">Got it</button>

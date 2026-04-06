@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Earnings - Market Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #008080;
+            --secondary-color: #FF6F61;
+            --accent-color: #4ade80;
+            --dark-color: #0d1f12;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --gradient-primary: linear-gradient(135deg, #008080 0%, #006666 100%);
+            --gradient-accent: linear-gradient(135deg, #FF6F61 0%, #ff8a7a 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav.invest-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 52px;
+            height: 76px;
+            background: rgba(13, 31, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-color);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-primary-inv {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-primary-inv:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 100px;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--gradient-primary);
+            padding: 40px 0;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .mentor-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mentor-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            border: 3px solid white;
+        }
+
+        .mentor-info h3 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .mentor-info p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card.earnings::before {
+            background: var(--gradient-accent);
+        }
+
+        .stat-card.sales::before {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #22c55e 100%);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: rgba(0, 128, 128, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-card.earnings .stat-icon {
+            background: rgba(255, 111, 97, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .stat-card.sales .stat-icon {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--success-color);
+            background: rgba(34, 197, 94, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .stat-card.earnings .stat-value {
+            color: var(--secondary-color);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Videos Section */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-filter {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-filter:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .earnings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .earnings-table thead {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .earnings-table th {
+            padding: 20px 24px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .earnings-table th:last-child {
+            text-align: right;
+        }
+
+        .earnings-table th,
+        .earnings-table td {
+            padding: 20px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .earnings-table th:nth-child(2),
+        .earnings-table td:nth-child(2),
+        .earnings-table th:nth-child(3),
+        .earnings-table td:nth-child(3),
+        .earnings-table th:nth-child(4),
+        .earnings-table td:nth-child(4),
+        .earnings-table th:nth-child(5),
+        .earnings-table td:nth-child(5) {
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        .earnings-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .earnings-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .video-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .video-thumbnail {
+            width: 80px;
+            height: 56px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .video-details h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .video-details p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .video-title {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 2px;
+        }
+
+        .price-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 128, 128, 0.1);
+            color: var(--primary-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .sales-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sales-count i {
+            color: var(--success-color);
+        }
+
+        .revenue-cell {
+            text-align: right;
+        }
+
+        .revenue-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .revenue-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Discount Styles */
+        .discount-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 111, 97, 0.15);
+            color: #d63031;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .discount-badge i {
+            color: #d63031;
+        }
+
+        .discount-amount {
+            font-size: 0.8rem;
+            color: #d63031;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .no-discount {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .no-discount i {
+            color: var(--text-secondary);
+        }
+
+        .discount-note {
+            font-size: 0.75rem;
+            color: #d63031;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .discount-note i {
+            margin-right: 4px;
+        }
+
+        /* Have Got Discount Styles */
+        .have-discount-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(39, 174, 96, 0.15);
+            color: #27ae60;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .have-discount-badge i {
+            color: #27ae60;
+        }
+
+        .no-discount-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .no-discount-badge i {
+            color: #95a5a6;
+        }
+
+        .discount-ratio {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 48px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .btn-upload {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(255, 111, 97, 0.05);
+            border-radius: 16px;
+            margin: 20px;
+        }
+
+        .error-state i {
+            font-size: 48px;
+            color: var(--secondary-color);
+            margin-bottom: 16px;
+        }
+
+        .error-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .error-state p {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .page-header-content {
+                flex-direction: column;
+                gap: 24px;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav.invest-nav {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 16px;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .earnings-table {
+                font-size: 0.875rem;
+            }
+
+            .earnings-table th,
+            .earnings-table td {
+                padding: 16px;
+            }
+
+            .earnings-table th:nth-child(2),
+            .earnings-table td:nth-child(2),
+            .earnings-table th:nth-child(3),
+            .earnings-table td:nth-child(3),
+            .earnings-table th:nth-child(4),
+            .earnings-table td:nth-child(4),
+            .earnings-table th:nth-child(5),
+            .earnings-table td:nth-child(5) {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .video-thumbnail {
+                width: 60px;
+                height: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="invest-nav">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="12" width="3" height="5" rx=".8" fill="rgba(255,255,255,.35)"/>
+                    <rect x="8.5" y="8" width="3" height="9" rx=".8" fill="rgba(255,255,255,.6)"/>
+                    <rect x="14" y="4.5" width="3" height="12.5" rx=".8" fill="#fff"/>
+                    <path d="M4.5 11L9.5 7.2l5.5-4.5" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="2.7" r="1.4" fill="#4ade80"/>
+                </svg>
+            </div>
+            Market Master
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="mentors.html">Mentors</a></li>
+            <li><a href="price.html">Pricing</a></li>
+        </ul>
+
+        <div class="nav-right" id="navButtons">
+            <a href="upload.html" class="btn-primary-inv">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Upload Video
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <div class="page-header-content">
+                    <div class="page-title">
+                        <h1>My Earnings</h1>
+                        <p>Track your video sales and revenue performance</p>
+                    </div>
+                    <div class="mentor-profile">
+                        <div class="mentor-avatar" id="mentorAvatar">M</div>
+                        <div class="mentor-info">
+                            <h3 id="mentorName">Loading...</h3>
+                            <p id="mentorEmail">loading@example.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="totalVideos">0</div>
+                    <div class="stat-label">Total Videos Uploaded</div>
+                </div>
+
+                <div class="stat-card sales">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="totalSales">0</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+
+                <div class="stat-card earnings">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="totalEarnings">₹0</div>
+                    <div class="stat-label">Total Earnings</div>
+                </div>
+            </div>
+
+            <!-- Videos Table -->
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Video Performance
+                </h2>
+                <div class="section-actions">
+                    <button class="btn-filter" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div id="loadingState" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading your earnings data...</p>
+                </div>
+
+                <div id="errorState" class="error-state" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Failed to load data</h3>
+                    <p>Please try again later or contact support.</p>
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-video-slash"></i>
+                    </div>
+                    <h3>No Videos Yet</h3>
+                    <p>Start uploading videos to see your earnings and sales data here.</p>
+                    <a href="upload.html" class="btn-upload">
+                        <i class="fas fa-upload"></i>
+                        Upload Your First Video
+                    </a>
+                </div>
+
+                <table class="earnings-table" id="earningsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Topic Name</th>
+                            <th>Price</th>
+                            <th>Sales</th>
+                            <th>Discount</th>
+                            <th>Have Got Discount</th>
+                            <th style="text-align: right;">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody id="earningsTableBody">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Format currency
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN');
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // Load earnings data
+        async function loadEarningsData() {
+            try {
+                const response = await fetch('http://localhost:4000/api/mentor/earnings', {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = 'page.html';
+                        return;
+                    }
+                    if (response.status === 403) {
+                        alert('Only mentors can access this page.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    throw new Error('Failed to load earnings data');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayEarningsData(data);
+                } else {
+                    throw new Error(data.error || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('Error loading earnings:', error);
+                showError();
+            }
+        }
+
+        // Display earnings data
+        function displayEarningsData(data) {
+            console.log('API Response videos:', data.videos);
+            if (data.videos.length > 0) {
+                console.log('First video object:', data.videos[0]);
+                console.log('First video topic:', data.videos[0].topic);
+            }
+            // Update mentor info
+            const mentor = data.mentor;
+            document.getElementById('mentorName').textContent = mentor.username;
+            document.getElementById('mentorEmail').textContent = mentor.email;
+            document.getElementById('mentorAvatar').textContent = mentor.username.charAt(0).toUpperCase();
+
+            // Update stats
+            const stats = data.stats;
+            document.getElementById('totalVideos').textContent = stats.totalVideos;
+            document.getElementById('totalSales').textContent = stats.totalPurchases.toLocaleString('en-IN');
+            document.getElementById('totalEarnings').textContent = formatCurrency(stats.totalEarnings);
+
+            // Hide loading
+            document.getElementById('loadingState').style.display = 'none';
+
+            // Show empty state or table
+            if (data.videos.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('earningsTable').style.display = 'none';
+            } else {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('earningsTable').style.display = 'table';
+
+                // Populate table
+                const tbody = document.getElementById('earningsTableBody');
+                tbody.innerHTML = data.videos.map(video => {
+                    const hasDiscounts = video.discountedPurchases > 0;
+                    
+                    // Discount column - shows discount % and amount given
+                    const discountInfo = hasDiscounts ? `
+                        <div class="discount-badge">
+                            <i class="fas fa-percentage"></i>
+                            Discount Offered: ${((video.totalDiscountAmount / (video.revenue + video.totalDiscountAmount)) * 100).toFixed(0)}%
+                        </div>
+                        <div class="discount-amount">
+                            Total Discount Amount: ${formatCurrency(video.totalDiscountAmount)}
+                        </div>
+                    ` : `
+                        <div class="no-discount">
+                            <i class="fas fa-tag"></i>
+                            No Discount Offered
+                        </div>
+                    `;
+                    
+                    // Have Got Discount column - shows how many buyers used discount
+                    const haveGotDiscount = hasDiscounts ? `
+                        <div class="have-discount-badge">
+                            <i class="fas fa-users"></i>
+                            <span>${video.discountedPurchases} buyers used discount</span>
+                        </div>
+                        <div class="discount-ratio">
+                            ${video.discountedPurchases} out of ${video.purchaseCount} purchases
+                        </div>
+                    ` : `
+                        <div class="no-discount-badge">
+                            <i class="fas fa-user-check"></i>
+                            <span>All buyers paid full price</span>
+                        </div>
+                    `;
+                    
+                    return `
+                    <tr>
+                        <td>
+                            <div class="video-info">
+                                <div class="video-thumbnail">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="video-details">
+                                    <h4>${video.topic && video.topic !== 'N/A' ? video.topic : '-'}</h4>
+                                    <p>Uploaded on ${formatDate(video.uploadDate)}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="price-badge">
+                                <i class="fas fa-rupee-sign"></i>
+                                ${video.price}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="sales-count">
+                                <i class="fas fa-shopping-bag"></i>
+                                ${video.purchaseCount} sales
+                            </div>
+                        </td>
+                        <td>
+                            ${discountInfo}
+                        </td>
+                        <td>
+                            ${haveGotDiscount}
+                        </td>
+                        <td class="revenue-cell">
+                            <div class="revenue-value">${formatCurrency(video.revenue)}</div>
+                            <div class="revenue-label">${video.purchaseCount} × avg ₹${(video.revenue / video.purchaseCount || 0).toFixed(0)}</div>
+                            ${hasDiscounts ? `<div class="discount-note"><i class="fas fa-info-circle"></i> After discounts applied</div>` : ''}
+                        </td>
+                    </tr>
+                `}).join('');
+            }
+        }
+
+        // Show error state
+        function showError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('earningsTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // Refresh data
+        function refreshData() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('earningsTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            loadEarningsData();
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadEarningsData);
+    </script>
+</body>
+</html>

@@ -50,6 +50,19 @@ if (!GROQ_API_KEY) {
 
 const groq = GROQ_API_KEY ? new Groq({ apiKey: GROQ_API_KEY }) : null;
 
+// ====== Alpha Vantage API Configuration ======
+const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
+
+if (!ALPHA_VANTAGE_API_KEY) {
+  console.warn(
+    '[WARN] ALPHA_VANTAGE_API_KEY is not set. Paper trading stock quotes will not work.'
+  );
+}
+
+// Cache for stock prices to avoid API limits (5 calls per minute on free tier)
+const stockPriceCache = new Map();
+const CACHE_DURATION = 60000; // 60 seconds
+
 const userSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true },
@@ -120,6 +133,47 @@ const videoAccessSchema = new mongoose.Schema({
 });
 
 const VideoAccess = mongoose.models.VideoAccess || mongoose.model('VideoAccess', videoAccessSchema);
+
+// ====== Paper Trading Schemas ======
+const paperTradingBalanceSchema = new mongoose.Schema({
+  userId: { type: String, required: true, unique: true },
+  balance: { type: Number, default: 100000 }, // Starting with ₹100,000
+  currency: { type: String, default: 'INR' },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const PaperTradingBalance = mongoose.models.PaperTradingBalance || mongoose.model('PaperTradingBalance', paperTradingBalanceSchema);
+
+const paperTradingHoldingSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  symbol: { type: String, required: true },
+  companyName: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  avgBuyPrice: { type: Number, required: true },
+  totalInvestment: { type: Number, required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Compound index for unique holdings per user per stock
+paperTradingHoldingSchema.index({ userId: 1, symbol: 1 }, { unique: true });
+
+const PaperTradingHolding = mongoose.models.PaperTradingHolding || mongoose.model('PaperTradingHolding', paperTradingHoldingSchema);
+
+const paperTradingTransactionSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  symbol: { type: String, required: true },
+  companyName: { type: String, required: true },
+  type: { type: String, enum: ['BUY', 'SELL'], required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  totalAmount: { type: Number, required: true },
+  balanceAfter: { type: Number, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const PaperTradingTransaction = mongoose.models.PaperTradingTransaction || mongoose.model('PaperTradingTransaction', paperTradingTransactionSchema);
 
 // ====== File Upload Configuration ======
 // Ensure uploads directory exists (skip in serverless)
@@ -292,6 +346,11 @@ app.get('/myvideos', (req, res) => {
 // Serve mentors page
 app.get('/mentors', (req, res) => {
   res.sendFile(path.join(__dirname, 'mlearning', 'mlearning', 'mentors.html'));
+});
+
+// Serve paper-trading page
+app.get('/paper-trading', (req, res) => {
+  res.sendFile(path.join(__dirname, 'mlearning', 'mlearning', 'paper-trading.html'));
 });
 
 // Serve static files from mlearning directory
@@ -544,7 +603,7 @@ app.post('/api/create-upload-order', requireAuth, async (req, res) => {
   try {
     console.log('=== CREATE UPLOAD ORDER REQUEST ===');
     
-    const amount = 100; // ₹100 INR ($1.20)
+    const amount = 200; // ₹200 INR ($2.40)
     const currency = 'INR';
     
     // Generate short receipt (max 40 chars for Razorpay)
@@ -1228,6 +1287,125 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
+// ====== Mentor Earnings API ======
+
+// Get mentor earnings data
+app.get('/api/mentor/earnings', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    // Find the user to verify they are a mentor
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+    
+    if (user.userType !== 'mentor') {
+      return res.status(403).json({ error: 'Access denied. Only mentors can view earnings.' });
+    }
+
+    console.log('=== FETCHING MENTOR EARNINGS ===');
+    console.log('User:', user.email);
+
+    // Get all videos uploaded by this mentor using uploaderEmail
+    const videos = await Video.find({ uploaderEmail: user.email })
+      .select('title topic createdAt price uploaderEmail')
+      .sort({ createdAt: -1 })
+      .lean();
+    
+    console.log(`Found ${videos.length} videos for mentor ${user.email}`);
+    if (videos.length > 0) {
+      console.log('First video from DB:', { 
+        title: videos[0].title, 
+        topic: videos[0].topic,
+        keys: Object.keys(videos[0])
+      });
+    }
+    console.log(`Found ${videos.length} videos for mentor`);
+
+    // Calculate earnings per video by querying VideoAccess collection
+    const videoStats = [];
+    for (const video of videos) {
+      console.log('Video object keys:', Object.keys(video));
+      console.log('Video topic value:', video.topic);
+      // Get all access records for this video to calculate discounts
+      const accessRecords = await VideoAccess.find({ videoId: video._id.toString() });
+      const purchaseCount = accessRecords.length;
+      
+      // Calculate revenue and discount information
+      let revenuePerVideo = 0;
+      let totalDiscountAmount = 0;
+      let discountedPurchases = 0;
+      
+      const purchaseDetails = accessRecords.map(record => {
+        const originalPrice = video.price || 0;
+        const actualPaid = record.amount || originalPrice;
+        const discountAmount = originalPrice - actualPaid;
+        const hasDiscount = discountAmount > 0;
+        
+        if (hasDiscount) {
+          totalDiscountAmount += discountAmount;
+          discountedPurchases++;
+        }
+        
+        revenuePerVideo += actualPaid;
+        
+        return {
+          userId: record.userId,
+          purchasedAt: record.unlockedAt,
+          originalPrice: originalPrice,
+          actualPaid: actualPaid,
+          discountAmount: discountAmount,
+          hasDiscount: hasDiscount
+        };
+      });
+      
+      console.log(`Video: ${video.title}, Topic: ${video.topic}, Purchases: ${purchaseCount}, Revenue: ₹${revenuePerVideo}, Discounts: ${discountedPurchases}`);
+      
+      videoStats.push({
+        videoId: video._id,
+        title: video.title,
+        topic: video.topic,
+        uploadDate: video.createdAt,
+        price: video.price || 0,
+        purchaseCount: purchaseCount,
+        revenue: revenuePerVideo,
+        discountedPurchases: discountedPurchases,
+        totalDiscountAmount: totalDiscountAmount,
+        purchases: purchaseDetails
+      });
+    }
+
+    // Calculate totals
+    const totalVideos = videos.length;
+    const totalPurchases = videoStats.reduce((sum, v) => sum + v.purchaseCount, 0);
+    const totalEarnings = videoStats.reduce((sum, v) => sum + v.revenue, 0);
+
+    console.log(`Total Videos: ${totalVideos}, Total Purchases: ${totalPurchases}, Total Earnings: ₹${totalEarnings}`);
+
+    res.json({
+      success: true,
+      mentor: {
+        username: user.username,
+        email: user.email
+      },
+      stats: {
+        totalVideos,
+        totalPurchases,
+        totalEarnings
+      },
+      videos: videoStats
+    });
+
+  } catch (error) {
+    console.error('Error fetching mentor earnings:', error);
+    res.status(500).json({ error: 'Failed to fetch earnings data' });
+  }
+});
+
 // ====== Groq chat endpoint ======
 app.post('/api/chat', async (req, res) => {
   try {
@@ -1735,6 +1913,572 @@ app.delete('/api/admin/coupons/clean-used', adminAuth, async (req, res) => {
   }
 });
 
+// ====== Paper Trading System ======
+
+// Popular stocks for paper trading (NSE/BSE symbols)
+const POPULAR_STOCKS = [
+  { symbol: 'RELIANCE.BSE', name: 'Reliance Industries', exchange: 'BSE' },
+  { symbol: 'TCS.BSE', name: 'Tata Consultancy Services', exchange: 'BSE' },
+  { symbol: 'HDFCBANK.BSE', name: 'HDFC Bank', exchange: 'BSE' },
+  { symbol: 'INFY.BSE', name: 'Infosys', exchange: 'BSE' },
+  { symbol: 'ICICIBANK.BSE', name: 'ICICI Bank', exchange: 'BSE' },
+  { symbol: 'HINDUNILVR.BSE', name: 'Hindustan Unilever', exchange: 'BSE' },
+  { symbol: 'SBIN.BSE', name: 'State Bank of India', exchange: 'BSE' },
+  { symbol: 'BAJFINANCE.BSE', name: 'Bajaj Finance', exchange: 'BSE' },
+  { symbol: 'BHARTIARTL.BSE', name: 'Bharti Airtel', exchange: 'BSE' },
+  { symbol: 'ITC.BSE', name: 'ITC Limited', exchange: 'BSE' },
+  { symbol: 'KOTAKBANK.BSE', name: 'Kotak Mahindra Bank', exchange: 'BSE' },
+  { symbol: 'LT.BSE', name: 'Larsen & Toubro', exchange: 'BSE' },
+  { symbol: 'AXISBANK.BSE', name: 'Axis Bank', exchange: 'BSE' },
+  { symbol: 'ASIANPAINT.BSE', name: 'Asian Paints', exchange: 'BSE' },
+  { symbol: 'MARUTI.BSE', name: 'Maruti Suzuki', exchange: 'BSE' },
+  { symbol: 'TITAN.BSE', name: 'Titan Company', exchange: 'BSE' },
+  { symbol: 'SUNPHARMA.BSE', name: 'Sun Pharmaceutical', exchange: 'BSE' },
+  { symbol: 'WIPRO.BSE', name: 'Wipro', exchange: 'BSE' },
+  { symbol: 'NESTLEIND.BSE', name: 'Nestle India', exchange: 'BSE' },
+  { symbol: 'POWERGRID.BSE', name: 'Power Grid Corp', exchange: 'BSE' },
+  { symbol: 'NTPC.BSE', name: 'NTPC Limited', exchange: 'BSE' },
+  { symbol: 'ULTRACEMCO.BSE', name: 'UltraTech Cement', exchange: 'BSE' },
+  { symbol: 'M&M.BSE', name: 'Mahindra & Mahindra', exchange: 'BSE' },
+  { symbol: 'BAJAJFINSV.BSE', name: 'Bajaj Finserv', exchange: 'BSE' },
+  { symbol: 'ADANIENT.BSE', name: 'Adani Enterprises', exchange: 'BSE' },
+  { symbol: 'ADANIPORTS.BSE', name: 'Adani Ports', exchange: 'BSE' },
+  { symbol: 'COALINDIA.BSE', name: 'Coal India', exchange: 'BSE' },
+  { symbol: 'HCLTECH.BSE', name: 'HCL Technologies', exchange: 'BSE' },
+  { symbol: 'TECHM.BSE', name: 'Tech Mahindra', exchange: 'BSE' },
+  { symbol: 'ONGC.BSE', name: 'Oil & Natural Gas Corp', exchange: 'BSE' },
+  { symbol: 'JSWSTEEL.BSE', name: 'JSW Steel', exchange: 'BSE' },
+  { symbol: 'TATAMOTORS.BSE', name: 'Tata Motors', exchange: 'BSE' },
+  { symbol: 'GRASIM.BSE', name: 'Grasim Industries', exchange: 'BSE' },
+  { symbol: 'HDFCLIFE.BSE', name: 'HDFC Life Insurance', exchange: 'BSE' },
+  { symbol: 'SBILIFE.BSE', name: 'SBI Life Insurance', exchange: 'BSE' },
+  { symbol: 'TATASTEEL.BSE', name: 'Tata Steel', exchange: 'BSE' },
+  { symbol: 'APOLLOHOSP.BSE', name: 'Apollo Hospitals', exchange: 'BSE' },
+  { symbol: 'INDUSINDBK.BSE', name: 'IndusInd Bank', exchange: 'BSE' },
+  { symbol: 'EICHERMOT.BSE', name: 'Eicher Motors', exchange: 'BSE' },
+  { symbol: 'UPL.BSE', name: 'UPL Limited', exchange: 'BSE' },
+  { symbol: 'BPCL.BSE', name: 'Bharat Petroleum', exchange: 'BSE' },
+  { symbol: 'DIVISLAB.BSE', name: "Divi's Laboratories", exchange: 'BSE' },
+  { symbol: 'CIPLA.BSE', name: 'Cipla', exchange: 'BSE' },
+  { symbol: 'HEROMOTOCO.BSE', name: 'Hero MotoCorp', exchange: 'BSE' },
+  { symbol: 'DRREDDY.BSE', name: "Dr. Reddy's Laboratories", exchange: 'BSE' },
+  { symbol: 'BRITANNIA.BSE', name: 'Britannia Industries', exchange: 'BSE' },
+  { symbol: 'SHREECEM.BSE', name: 'Shree Cement', exchange: 'BSE' },
+  { symbol: 'TATACONSUM.BSE', name: 'Tata Consumer Products', exchange: 'BSE' },
+  { symbol: 'HINDALCO.BSE', name: 'Hindalco Industries', exchange: 'BSE' },
+  { symbol: 'DABUR.BSE', name: 'Dabur India', exchange: 'BSE' }
+];
+
+// Get stock quote from Alpha Vantage with caching
+async function getStockQuote(symbol) {
+  try {
+    // Check cache first
+    const cacheKey = symbol.toUpperCase();
+    const cached = stockPriceCache.get(cacheKey);
+    
+    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+      console.log(`Using cached price for ${symbol}: ₹${cached.price}`);
+      return cached;
+    }
+    
+    if (!ALPHA_VANTAGE_API_KEY) {
+      // Return mock data for testing without API
+      console.log(`ALPHA_VANTAGE_API_KEY not set, returning mock data for ${symbol}`);
+      const mockPrice = Math.round((Math.random() * 2000 + 100) * 100) / 100;
+      const mockData = {
+        symbol: symbol,
+        price: mockPrice,
+        change: Math.round((Math.random() * 20 - 10) * 100) / 100,
+        changePercent: Math.round((Math.random() * 5 - 2.5) * 100) / 100,
+        currency: 'INR',
+        timestamp: Date.now(),
+        isMock: true
+      };
+      stockPriceCache.set(cacheKey, mockData);
+      return mockData;
+    }
+    
+    // Call Alpha Vantage API
+    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(symbol)}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data['Global Quote'] && data['Global Quote']['05. price']) {
+      const quote = data['Global Quote'];
+      const price = parseFloat(quote['05. price']);
+      const change = parseFloat(quote['09. change'] || '0');
+      const changePercent = parseFloat((quote['10. change percent'] || '0').replace('%', ''));
+      
+      const result = {
+        symbol: symbol,
+        price: price,
+        change: change,
+        changePercent: changePercent,
+        currency: 'INR',
+        timestamp: Date.now(),
+        isMock: false
+      };
+      
+      stockPriceCache.set(cacheKey, result);
+      console.log(`Fetched live price for ${symbol}: ₹${price}`);
+      return result;
+    } else {
+      // Fallback to mock data if API returns empty
+      console.log(`Alpha Vantage returned no data for ${symbol}, using mock data`);
+      const mockPrice = Math.round((Math.random() * 2000 + 100) * 100) / 100;
+      const mockData = {
+        symbol: symbol,
+        price: mockPrice,
+        change: Math.round((Math.random() * 20 - 10) * 100) / 100,
+        changePercent: Math.round((Math.random() * 5 - 2.5) * 100) / 100,
+        currency: 'INR',
+        timestamp: Date.now(),
+        isMock: true
+      };
+      stockPriceCache.set(cacheKey, mockData);
+      return mockData;
+    }
+  } catch (error) {
+    console.error(`Error fetching stock quote for ${symbol}:`, error);
+    // Return mock data on error
+    const mockPrice = Math.round((Math.random() * 2000 + 100) * 100) / 100;
+    return {
+      symbol: symbol,
+      price: mockPrice,
+      change: Math.round((Math.random() * 20 - 10) * 100) / 100,
+      changePercent: Math.round((Math.random() * 5 - 2.5) * 100) / 100,
+      currency: 'INR',
+      timestamp: Date.now(),
+      isMock: true
+    };
+  }
+}
+
+// Get available stocks for paper trading
+app.get('/api/paper-trading/stocks', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      stocks: POPULAR_STOCKS
+    });
+  } catch (error) {
+    console.error('Error fetching stocks:', error);
+    res.status(500).json({ error: 'Failed to fetch stocks' });
+  }
+});
+
+// Get real-time stock quote
+app.get('/api/paper-trading/quote/:symbol', async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    
+    if (!symbol) {
+      return res.status(400).json({ error: 'Stock symbol is required' });
+    }
+    
+    const quote = await getStockQuote(symbol);
+    
+    res.json({
+      success: true,
+      quote: quote
+    });
+  } catch (error) {
+    console.error('Error fetching stock quote:', error);
+    res.status(500).json({ error: 'Failed to fetch stock quote' });
+  }
+});
+
+// Get user balance - requires login
+app.get('/api/paper-trading/balance', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Please log in to access paper trading' });
+    }
+    
+    const userId = req.session.userId;
+    
+    let balance = await PaperTradingBalance.findOne({ userId: userId });
+    
+    if (!balance) {
+      // Create initial balance of ₹100,000
+      balance = new PaperTradingBalance({
+        userId: userId,
+        balance: 100000,
+        currency: 'INR'
+      });
+      await balance.save();
+      console.log(`Created paper trading account with ₹100,000 for user: ${userId}`);
+    }
+    
+    res.json({
+      success: true,
+      balance: {
+        amount: balance.balance,
+        currency: balance.currency,
+        formatted: `₹${balance.balance.toLocaleString('en-IN')}`
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching balance:', error);
+    res.status(500).json({ error: 'Failed to fetch balance' });
+  }
+});
+
+// Get user portfolio - requires login
+app.get('/api/paper-trading/portfolio', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Please log in to access paper trading' });
+    }
+    
+    const userId = req.session.userId;
+    
+    const holdings = await PaperTradingHolding.find({ userId: userId });
+    const balance = await PaperTradingBalance.findOne({ userId: userId });
+    
+    if (!balance) {
+      // Create new account with initial balance
+      const newBalance = new PaperTradingBalance({
+        userId: userId,
+        balance: 100000,
+        currency: 'INR'
+      });
+      await newBalance.save();
+      
+      return res.json({
+        success: true,
+        portfolio: {
+          cashBalance: 100000,
+          holdings: [],
+          summary: {
+            totalInvestment: 0,
+            totalCurrentValue: 0,
+            totalProfitLoss: 0,
+            totalProfitLossPercent: 0,
+            totalPortfolioValue: 100000
+          }
+        }
+      });
+    }
+    
+    // Get current prices for all holdings
+    const portfolioWithPrices = await Promise.all(
+      holdings.map(async (holding) => {
+        const quote = await getStockQuote(holding.symbol);
+        const currentValue = holding.quantity * quote.price;
+        const investment = holding.totalInvestment;
+        const profitLoss = currentValue - investment;
+        const profitLossPercent = investment > 0 ? (profitLoss / investment) * 100 : 0;
+        
+        return {
+          symbol: holding.symbol,
+          companyName: holding.companyName,
+          quantity: holding.quantity,
+          avgBuyPrice: holding.avgBuyPrice,
+          currentPrice: quote.price,
+          investment: investment,
+          currentValue: currentValue,
+          profitLoss: profitLoss,
+          profitLossPercent: profitLossPercent,
+          dayChange: quote.change,
+          dayChangePercent: quote.changePercent
+        };
+      })
+    );
+    
+    const totalInvestment = portfolioWithPrices.reduce((sum, h) => sum + h.investment, 0);
+    const totalCurrentValue = portfolioWithPrices.reduce((sum, h) => sum + h.currentValue, 0);
+    const totalProfitLoss = totalCurrentValue - totalInvestment;
+    const totalProfitLossPercent = totalInvestment > 0 ? (totalProfitLoss / totalInvestment) * 100 : 0;
+    
+    res.json({
+      success: true,
+      portfolio: {
+        cashBalance: balance.balance,
+        holdings: portfolioWithPrices,
+        summary: {
+          totalInvestment: totalInvestment,
+          totalCurrentValue: totalCurrentValue,
+          totalProfitLoss: totalProfitLoss,
+          totalProfitLossPercent: totalProfitLossPercent,
+          totalPortfolioValue: balance.balance + totalCurrentValue
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching portfolio:', error);
+    res.status(500).json({ error: 'Failed to fetch portfolio' });
+  }
+});
+
+// Buy stock - requires login
+app.post('/api/paper-trading/buy', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Please log in to trade' });
+    }
+    
+    const userId = req.session.userId;
+    
+    const { symbol, companyName, quantity } = req.body;
+    
+    if (!symbol || !quantity || quantity <= 0) {
+      return res.status(400).json({ error: 'Symbol and valid quantity are required' });
+    }
+    
+    // Get current stock price
+    const quote = await getStockQuote(symbol);
+    const totalCost = quote.price * quantity;
+    
+    // Check user balance
+    let balance = await PaperTradingBalance.findOne({ userId: userId });
+    if (!balance) {
+      balance = new PaperTradingBalance({
+        userId: userId,
+        balance: 100000,
+        currency: 'INR'
+      });
+      await balance.save();
+    }
+    
+    if (balance.balance < totalCost) {
+      return res.status(400).json({ 
+        error: 'Insufficient balance',
+        required: totalCost,
+        available: balance.balance
+      });
+    }
+    
+    // Deduct from balance
+    balance.balance -= totalCost;
+    balance.updatedAt = new Date();
+    await balance.save();
+    
+    // Update or create holding
+    let holding = await PaperTradingHolding.findOne({ userId: userId, symbol: symbol });
+    
+    if (holding) {
+      // Update existing holding with new average price
+      const totalQuantity = holding.quantity + quantity;
+      const totalInvestment = holding.totalInvestment + totalCost;
+      holding.quantity = totalQuantity;
+      holding.avgBuyPrice = totalInvestment / totalQuantity;
+      holding.totalInvestment = totalInvestment;
+      holding.updatedAt = new Date();
+      await holding.save();
+    } else {
+      // Create new holding
+      holding = new PaperTradingHolding({
+        userId: userId,
+        symbol: symbol,
+        companyName: companyName || symbol,
+        quantity: quantity,
+        avgBuyPrice: quote.price,
+        totalInvestment: totalCost
+      });
+      await holding.save();
+    }
+    
+    // Record transaction
+    const transaction = new PaperTradingTransaction({
+      userId: userId,
+      symbol: symbol,
+      companyName: companyName || symbol,
+      type: 'BUY',
+      quantity: quantity,
+      price: quote.price,
+      totalAmount: totalCost,
+      balanceAfter: balance.balance
+    });
+    await transaction.save();
+    
+    console.log(`BUY: User ${userId} bought ${quantity} shares of ${symbol} at ₹${quote.price}`);
+    
+    res.json({
+      success: true,
+      message: `Successfully bought ${quantity} shares of ${symbol}`,
+      transaction: {
+        symbol: symbol,
+        quantity: quantity,
+        price: quote.price,
+        totalCost: totalCost,
+        balance: balance.balance
+      }
+    });
+  } catch (error) {
+    console.error('Error buying stock:', error);
+    res.status(500).json({ error: 'Failed to execute buy order' });
+  }
+});
+
+// Sell stock - requires login
+app.post('/api/paper-trading/sell', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Please log in to trade' });
+    }
+    
+    const userId = req.session.userId;
+    
+    const { symbol, quantity } = req.body;
+    
+    if (!symbol || !quantity || quantity <= 0) {
+      return res.status(400).json({ error: 'Symbol and valid quantity are required' });
+    }
+    
+    // Check user holdings
+    const holding = await PaperTradingHolding.findOne({ userId: userId, symbol: symbol });
+    
+    if (!holding || holding.quantity < quantity) {
+      return res.status(400).json({ 
+        error: 'Insufficient shares',
+        available: holding ? holding.quantity : 0,
+        requested: quantity
+      });
+    }
+    
+    // Get current stock price
+    const quote = await getStockQuote(symbol);
+    const totalValue = quote.price * quantity;
+    
+    // Calculate profit/loss for this sale
+    const costBasis = holding.avgBuyPrice * quantity;
+    const profitLoss = totalValue - costBasis;
+    
+    // Add to balance
+    let balance = await PaperTradingBalance.findOne({ userId: userId });
+    balance.balance += totalValue;
+    balance.updatedAt = new Date();
+    await balance.save();
+    
+    // Update holding
+    holding.quantity -= quantity;
+    holding.totalInvestment = holding.avgBuyPrice * holding.quantity;
+    holding.updatedAt = new Date();
+    
+    if (holding.quantity === 0) {
+      await PaperTradingHolding.deleteOne({ _id: holding._id });
+    } else {
+      await holding.save();
+    }
+    
+    // Record transaction
+    const transaction = new PaperTradingTransaction({
+      userId: userId,
+      symbol: symbol,
+      companyName: holding.companyName,
+      type: 'SELL',
+      quantity: quantity,
+      price: quote.price,
+      totalAmount: totalValue,
+      balanceAfter: balance.balance
+    });
+    await transaction.save();
+    
+    console.log(`SELL: User ${userId} sold ${quantity} shares of ${symbol} at ₹${quote.price} (P&L: ₹${profitLoss.toFixed(2)})`);
+    
+    res.json({
+      success: true,
+      message: `Successfully sold ${quantity} shares of ${symbol}`,
+      transaction: {
+        symbol: symbol,
+        quantity: quantity,
+        price: quote.price,
+        totalValue: totalValue,
+        profitLoss: profitLoss,
+        balance: balance.balance
+      }
+    });
+  } catch (error) {
+    console.error('Error selling stock:', error);
+    res.status(500).json({ error: 'Failed to execute sell order' });
+  }
+});
+
+// Get transaction history - requires login
+app.get('/api/paper-trading/transactions', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Please log in to view transactions' });
+    }
+    
+    const userId = req.session.userId;
+    
+    const { limit = 50, page = 1 } = req.query;
+    
+    const transactions = await PaperTradingTransaction.find({ userId: userId })
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit));
+    
+    const total = await PaperTradingTransaction.countDocuments({ userId: userId });
+    
+    res.json({
+      success: true,
+      transactions: transactions,
+      pagination: {
+        total: total,
+        page: parseInt(page),
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  }
+});
+
+// Reset paper trading account - requires login
+app.post('/api/paper-trading/reset', async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Please log in to reset account' });
+    }
+    
+    const userId = req.session.userId;
+    
+    // Reset balance to ₹100,000
+    await PaperTradingBalance.findOneAndUpdate(
+      { userId: userId },
+      { balance: 100000, updatedAt: new Date() },
+      { upsert: true }
+    );
+    
+    // Delete all holdings
+    await PaperTradingHolding.deleteMany({ userId: userId });
+    
+    // Clear transactions history (optional - keeping for now)
+    // await PaperTradingTransaction.deleteMany({ userId: userId });
+    
+    console.log(`Reset paper trading account for user: ${userId}`);
+    
+    res.json({
+      success: true,
+      message: 'Paper trading account reset successfully. Starting balance: ₹100,000'
+    });
+  } catch (error) {
+    console.error('Error resetting account:', error);
+    res.status(500).json({ error: 'Failed to reset account' });
+  }
+});
+
+// Serve paper trading page
+app.get('/paper-trading', (req, res) => {
+  try {
+    const paperTradingPath = path.join(__dirname, 'mlearning', 'mlearning', 'paper-trading.html');
+    res.sendFile(paperTradingPath);
+  } catch (error) {
+    console.error('Error serving paper trading page:', error);
+    res.status(500).send('Error loading paper trading page');
+  }
+});
 
 // Only start server if running locally (not on Vercel)
 if (process.env.VERCEL !== '1') {
