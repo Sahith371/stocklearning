@@ -11,6 +11,8 @@ const fs = require('fs');
 const Razorpay = require('razorpay');
 const Groq = require('groq-sdk');
 const ffmpeg = require('fluent-ffmpeg');
+const axios = require('axios');
+const FormData = require('form-data');
 
 // Define Coupon Schema
 const couponSchema = new mongoose.Schema({
@@ -86,7 +88,7 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
-// Video Schema
+// Video Schema - Updated with AI Validation fields
 const videoSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -116,7 +118,21 @@ const videoSchema = new mongoose.Schema(
     uploadPaid: { type: Boolean, default: false },
     uploadPaidAt: { type: Date },
     uploadPaymentId: { type: String },
-    uploadOrderId: { type: String }
+    uploadOrderId: { type: String },
+    // AI Validation fields
+    aiSummary: { type: String },
+    relevanceScore: { type: Number },
+    topicMatchScore: { type: Number },
+    isApproved: { type: Boolean, default: false },
+    rejectionReason: { type: String },
+    transcript: { type: String },
+    validationStatus: { 
+      type: String, 
+      enum: ['pending', 'processing', 'approved', 'rejected'], 
+      default: 'pending' 
+    },
+    processingStage: { type: String }, // Current stage: upload, audio_extraction, transcription, ai_validation
+    validationCompletedAt: { type: Date }
   },
   { timestamps: true }
 );
@@ -214,6 +230,263 @@ async function generateThumbnail(videoPath, outputPath) {
           reject(err);
         });
     });
+  });
+}
+
+// ====== AI Video Validation Functions ======
+
+// Audio extraction function using FFmpeg
+async function extractAudioFromVideo(videoPath, outputAudioPath) {
+  return new Promise((resolve, reject) => {
+    const ffmpegPath = '"C:\\Users\\gutti\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.0.1-full_build\\bin\\ffmpeg.exe"';
+    const { exec } = require('child_process');
+    
+    exec(`${ffmpegPath} -version`, (error) => {
+      if (error) {
+        console.error('FFmpeg not available for audio extraction');
+        return reject(new Error('FFmpeg not available'));
+      }
+      
+      const ffmpeg = require('fluent-ffmpeg');
+      ffmpeg.setFfmpegPath(ffmpegPath.replace(/"/g, ''));
+      
+      ffmpeg(videoPath)
+        .noVideo()
+        .audioCodec('libmp3lame')
+        .audioBitrate('128k')
+        .toFormat('mp3')
+        .on('end', () => {
+          console.log('Audio extraction completed:', outputAudioPath);
+          resolve(outputAudioPath);
+        })
+        .on('error', (err) => {
+          console.error('Audio extraction error:', err);
+          reject(err);
+        })
+        .save(outputAudioPath);
+    });
+  });
+}
+
+// Speech-to-Text using Groq (Groq supports Whisper)
+async function transcribeAudio(audioPath) {
+  try {
+    if (!GROQ_API_KEY || !groq) {
+      throw new Error('Groq API key not configured');
+    }
+
+    console.log('Starting audio transcription...');
+    
+    // Check if file exists and has content
+    if (!fs.existsSync(audioPath)) {
+      throw new Error('Audio file not found');
+    }
+    
+    const stats = fs.statSync(audioPath);
+    if (stats.size === 0) {
+      throw new Error('Audio file is empty (no audio detected in video)');
+    }
+
+    // Read audio file
+    const audioBuffer = fs.readFileSync(audioPath);
+    
+    // Create a FormData-like object for the API call
+    const FormData = require('form-data');
+    const form = new FormData();
+    form.append('file', audioBuffer, {
+      filename: 'audio.mp3',
+      contentType: 'audio/mpeg'
+    });
+    form.append('model', 'whisper-large-v3');
+    
+    // Make API call to Groq
+    const axios = require('axios');
+    const response = await axios.post('https://api.groq.com/openai/v1/audio/transcriptions', form, {
+      headers: {
+        ...form.getHeaders(),
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      timeout: 120000 // 2 minute timeout for large files
+    });
+
+    const transcript = response.data.text;
+    
+    if (!transcript || transcript.trim().length === 0) {
+      throw new Error('Transcription result is empty');
+    }
+
+    console.log('Transcription completed. Length:', transcript.length);
+    return transcript;
+    
+  } catch (error) {
+    console.error('Transcription error:', error);
+    if (error.response?.status === 401) {
+      throw new Error('Invalid Groq API key');
+    }
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Transcription timed out - audio file may be too large');
+    }
+    throw new Error(`Transcription failed: ${error.message}`);
+  }
+}
+
+// AI Summarization using Groq
+async function summarizeTranscript(transcript, topic) {
+  try {
+    if (!GROQ_API_KEY || !groq) {
+      throw new Error('Groq API not configured');
+    }
+
+    console.log('Generating summary...');
+    
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful AI assistant. Summarize the following video transcript in 2-3 sentences. Keep it concise and informative.'
+        },
+        {
+          role: 'user',
+          content: `Topic: ${topic}\n\nTranscript:\n${transcript.substring(0, 3000)}\n\nPlease provide a brief summary of this content in 2-3 sentences. Focus on the key points discussed.`
+        }
+      ],
+      max_tokens: 300,
+      temperature: 0.7
+    });
+
+    const summary = completion.choices?.[0]?.message?.content;
+    
+    if (!summary) {
+      throw new Error('Empty summary response from AI');
+    }
+
+    console.log('Summary generated:', summary.substring(0, 100) + '...');
+    return summary.trim();
+    
+  } catch (error) {
+    console.error('Summarization error:', error);
+    throw new Error(`Failed to generate summary: ${error.message}`);
+  }
+}
+
+// Stock Market Relevance Check
+async function checkStockMarketRelevance(summary, transcript) {
+  try {
+    if (!GROQ_API_KEY || !groq) {
+      throw new Error('Groq API not configured');
+    }
+
+    console.log('Checking stock market relevance...');
+    
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a stock market content validator. Analyze if the content is related to stock market, investing, trading, mutual funds, ETFs, bonds, cryptocurrency, or personal finance.
+Return a JSON object with:
+- "relevant": boolean (true if related to stocks/finance)
+- "score": number 0-100 (higher = more relevant to stock market)
+Only return the JSON object, nothing else.`
+        },
+        {
+          role: 'user',
+          content: `Summary: ${summary}\n\nTranscript excerpt: ${transcript.substring(0, 1500)}\n\nIs this content related to stock market, investing, or finance? Return JSON only.`
+        }
+      ],
+      max_tokens: 100,
+      temperature: 0.1,
+      response_format: { type: 'json_object' }
+    });
+
+    const response = completion.choices?.[0]?.message?.content;
+    
+    if (!response) {
+      return { relevant: false, score: 0 };
+    }
+
+    try {
+      const result = JSON.parse(response);
+      return {
+        relevant: result.relevant === true,
+        score: Math.min(100, Math.max(0, parseInt(result.score) || 0))
+      };
+    } catch (parseError) {
+      console.error('Failed to parse relevance response:', response);
+      return { relevant: false, score: 0 };
+    }
+    
+  } catch (error) {
+    console.error('Relevance check error:', error);
+    return { relevant: false, score: 0 };
+  }
+}
+
+// Topic Matching Check
+async function checkTopicMatch(summary, transcript, providedTopic) {
+  try {
+    if (!GROQ_API_KEY || !groq) {
+      throw new Error('Groq API not configured');
+    }
+
+    console.log('Checking topic match...');
+    
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a topic matching validator. Compare the video content with the provided topic.
+Return a JSON object with:
+- "match": boolean (true if content matches the topic)
+- "score": number 0-100 (higher = better match)
+Only return the JSON object, nothing else.`
+        },
+        {
+          role: 'user',
+          content: `Provided Topic: ${providedTopic}\n\nSummary: ${summary}\n\nTranscript excerpt: ${transcript.substring(0, 1500)}\n\nDoes the content match the provided topic? Return JSON only.`
+        }
+      ],
+      max_tokens: 100,
+      temperature: 0.1,
+      response_format: { type: 'json_object' }
+    });
+
+    const response = completion.choices?.[0]?.message?.content;
+    
+    if (!response) {
+      return { match: false, score: 0 };
+    }
+
+    try {
+      const result = JSON.parse(response);
+      return {
+        match: result.match === true,
+        score: Math.min(100, Math.max(0, parseInt(result.score) || 0))
+      };
+    } catch (parseError) {
+      console.error('Failed to parse topic match response:', response);
+      return { match: false, score: 0 };
+    }
+    
+  } catch (error) {
+    console.error('Topic match check error:', error);
+    return { match: false, score: 0 };
+  }
+}
+
+// Clean up temporary files
+function cleanupTempFiles(files) {
+  files.forEach(filePath => {
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => {
+        if (err) console.error('Error cleaning up file:', filePath, err);
+        else console.log('Cleaned up:', filePath);
+      });
+    }
   });
 }
 
@@ -594,6 +867,592 @@ app.post('/api/videos', requireAuth, upload.fields([
 
     res.status(500).json({ 
       error: error.message || 'Failed to upload video' 
+    });
+  }
+});
+
+// ====== AI Video Validation Endpoint (Before Payment) ======
+// This endpoint validates video content without saving - called BEFORE payment
+app.post('/api/validate-video', requireAuth, upload.single('video'), async (req, res) => {
+  const tempFiles = [];
+  
+  try {
+    console.log('=== AI VALIDATION STARTED (Pre-Payment) ===');
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No video file uploaded' });
+    }
+
+    const videoFile = req.file;
+    const { topic } = req.body;
+    tempFiles.push(videoFile.path);
+
+    if (!topic) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({ error: 'Topic is required' });
+    }
+
+    // === STAGE 1: AUDIO EXTRACTION ===
+    console.log('[1/5] Extracting audio...');
+    const audioPath = videoFile.path.replace(path.extname(videoFile.path), '.mp3');
+    tempFiles.push(audioPath);
+    
+    try {
+      await extractAudioFromVideo(videoFile.path, audioPath);
+    } catch (error) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'audio_extraction',
+        error: `Audio extraction failed: ${error.message}`,
+        message: 'Failed to extract audio. The video may be silent or corrupted.'
+      });
+    }
+
+    // Check if audio file has content
+    const audioStats = fs.statSync(audioPath);
+    if (audioStats.size === 0) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'audio_extraction',
+        error: 'Audio file is empty',
+        message: 'No audio detected in the video. Please upload a video with audio/speech.'
+      });
+    }
+
+    // === STAGE 2: SPEECH-TO-TEXT TRANSCRIPTION ===
+    console.log('[2/5] Transcribing audio...');
+    let transcript;
+    try {
+      transcript = await transcribeAudio(audioPath);
+      if (!transcript || transcript.trim().length < 10) {
+        throw new Error('Transcription too short - no speech detected');
+      }
+    } catch (error) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'transcription',
+        error: error.message,
+        message: 'Failed to transcribe audio. ' + (error.message.includes('empty') 
+          ? 'The video appears to be silent.' 
+          : 'Please ensure clear audio in the video.')
+      });
+    }
+
+    console.log('Transcript length:', transcript.length, 'characters');
+
+    // === STAGE 3: AI SUMMARIZATION ===
+    console.log('[3/5] Generating summary...');
+    let summary;
+    try {
+      summary = await summarizeTranscript(transcript, topic);
+    } catch (error) {
+      console.error('Summarization failed, using excerpt:', error);
+      summary = transcript.substring(0, 500) + '...';
+    }
+
+    // === STAGE 4: AI VALIDATION - STOCK MARKET RELEVANCE ===
+    console.log('[4/5] Checking stock market relevance...');
+    const relevanceCheck = await checkStockMarketRelevance(summary, transcript);
+    console.log('Relevance result:', relevanceCheck);
+
+    // === STAGE 5: AI VALIDATION - TOPIC MATCH ===
+    console.log('[5/5] Checking topic match...');
+    const topicMatch = await checkTopicMatch(summary, transcript, topic);
+    console.log('Topic match result:', topicMatch);
+
+    // === DECISION LOGIC ===
+    const MIN_SCORE = 70;
+    const relevanceScore = relevanceCheck.score || 0;
+    const topicScore = topicMatch.score || 0;
+    const isRelevant = relevanceCheck.relevant && relevanceScore > MIN_SCORE;
+    const isTopicMatch = topicMatch.match && topicScore > MIN_SCORE;
+
+    let rejectionReason = '';
+    if (!isRelevant) {
+      rejectionReason = `Content is not stock market related (score: ${relevanceScore}/100, min required: ${MIN_SCORE}).`;
+    } else if (!isTopicMatch) {
+      rejectionReason = `Content does not match the provided topic "${topic}" (match score: ${topicScore}/100, min required: ${MIN_SCORE}).`;
+    }
+
+    const isApproved = isRelevant && isTopicMatch;
+
+    // Calculate file hash for later use
+    const crypto = require('crypto');
+    const fileBuffer = fs.readFileSync(videoFile.path);
+    const fileHash = crypto.createHash('md5').update(fileBuffer).digest('hex');
+
+    // Cleanup temp files
+    cleanupTempFiles(tempFiles);
+
+    // Return validation result
+    res.json({
+      success: true,
+      isApproved: isApproved,
+      message: isApproved ? 'Video passed AI validation!' : 'Video rejected by AI validation',
+      rejectionReason: isApproved ? null : rejectionReason,
+      summary: summary,
+      relevanceScore: relevanceScore,
+      topicScore: topicScore,
+      transcript: transcript.substring(0, 2000),
+      fileHash: fileHash,
+      fileName: videoFile.filename,
+      originalName: videoFile.originalname,
+      fileSize: videoFile.size,
+      mimeType: videoFile.mimetype
+    });
+
+  } catch (error) {
+    console.error('AI validation error:', error);
+    cleanupTempFiles(tempFiles);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'AI validation failed'
+    });
+  }
+});
+
+// ====== Final Video Save Endpoint (After Payment + Validation) ======
+// This endpoint saves the video after AI validation and payment are complete
+app.post('/api/videos/final-save', requireAuth, upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'paymentQrCode', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    console.log('=== FINAL VIDEO SAVE ===');
+
+    if (!req.files.video || !req.files.video[0]) {
+      return res.status(400).json({ error: 'No video file uploaded' });
+    }
+
+    const videoFile = req.files.video[0];
+    const qrCodeFile = req.files.paymentQrCode ? req.files.paymentQrCode[0] : null;
+
+    const { name, topic, isPaid, cost, currency, paymentEmail, paymentUpi, 
+        ownerUpiId, ownerAccountName, ownerAccountNumber, ownerIfsc,
+        uploadPaymentId, uploadOrderId, uploadSignature,
+        aiSummary, relevanceScore, topicMatchScore, transcript, fileHash } = req.body;
+
+    // Verify Razorpay payment
+    if (!uploadPaymentId || !uploadOrderId || !uploadSignature) {
+      return res.status(400).json({ error: 'Payment verification required' });
+    }
+
+    const crypto = require('crypto');
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${uploadOrderId}|${uploadPaymentId}`)
+      .digest('hex');
+    
+    if (generatedSignature !== uploadSignature) {
+      return res.status(400).json({ error: 'Payment verification failed' });
+    }
+
+    // Get user info
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Check for duplicate
+    const existingVideo = await Video.findOne({ fileHash });
+    if (existingVideo) {
+      fs.unlinkSync(videoFile.path);
+      if (qrCodeFile) fs.unlinkSync(qrCodeFile.path);
+      return res.status(400).json({ error: 'This video has already been uploaded' });
+    }
+
+    // Generate thumbnail
+    const thumbnailFileName = videoFile.filename.replace(path.extname(videoFile.filename), '.jpg');
+    const thumbnailPath = path.join(uploadsDir, thumbnailFileName);
+    let thumbnailUrl = null;
+    
+    try {
+      const generatedThumbnail = await generateThumbnail(videoFile.path, thumbnailPath);
+      if (generatedThumbnail) {
+        thumbnailUrl = `/uploads/${thumbnailFileName}`;
+      }
+    } catch (error) {
+      console.error('Thumbnail generation failed:', error);
+    }
+
+    // Get currency symbol
+    const currencySymbols = {
+      'USD': '$', 'INR': '₹', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'AUD': 'A$', 'CAD': 'C$'
+    };
+    const currencySymbol = currencySymbols[currency] || '$';
+    const formattedAmount = `${currencySymbol}${parseFloat(cost).toFixed(2)}`;
+
+    // Create and save video document
+    const video = new Video({
+      title: name,
+      topic: topic,
+      uploader: user.username,
+      uploaderEmail: user.email,
+      isPaid: isPaid === 'true',
+      price: parseFloat(cost) || 0,
+      currency: currency || 'USD',
+      formattedAmount: formattedAmount,
+      videoUrl: `/uploads/${videoFile.filename}`,
+      thumbnail: thumbnailUrl,
+      qrCodeUrl: qrCodeFile ? `/uploads/${qrCodeFile.filename}` : null,
+      fileName: videoFile.filename,
+      fileSize: videoFile.size,
+      mimeType: videoFile.mimetype,
+      fileHash: fileHash,
+      paymentEmail: paymentEmail || null,
+      paymentUpi: paymentUpi || null,
+      ownerUpiId: ownerUpiId || null,
+      ownerAccountName: ownerAccountName || null,
+      ownerAccountNumber: ownerAccountNumber || null,
+      ownerIfsc: ownerIfsc || null,
+      uploadPaymentId: uploadPaymentId,
+      uploadOrderId: uploadOrderId,
+      uploadPaid: true,
+      uploadPaidAt: new Date(),
+      // AI Validation fields
+      aiSummary: aiSummary,
+      relevanceScore: parseInt(relevanceScore),
+      topicMatchScore: parseInt(topicMatchScore),
+      isApproved: true,
+      transcript: transcript,
+      validationStatus: 'approved',
+      processingStage: 'completed',
+      validationCompletedAt: new Date()
+    });
+
+    await video.save();
+
+    console.log('Video saved successfully:', video._id);
+
+    res.status(201).json({
+      success: true,
+      message: 'Video uploaded successfully!',
+      video: {
+        id: video._id,
+        title: video.title,
+        topic: video.topic,
+        uploader: video.uploader,
+        isPaid: video.isPaid,
+        price: video.price,
+        videoUrl: video.videoUrl,
+        thumbnail: video.thumbnail,
+        createdAt: video.createdAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Final save error:', error);
+    // Cleanup files
+    if (req.files && req.files.video && req.files.video[0]) {
+      fs.unlink(req.files.video[0].path, () => {});
+    }
+    if (req.files && req.files.paymentQrCode && req.files.paymentQrCode[0]) {
+      fs.unlink(req.files.paymentQrCode[0].path, () => {});
+    }
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Failed to save video'
+    });
+  }
+});
+
+// ====== AI-Validated Video Upload Endpoint (Legacy - Deprecated) ======
+// This endpoint processes videos with AI validation before saving
+app.post('/api/videos/ai-validated', requireAuth, upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'paymentQrCode', maxCount: 1 }
+]), async (req, res) => {
+  const tempFiles = [];
+  let videoFile, qrCodeFile;
+  
+  try {
+    console.log('=== AI-VALIDATED UPLOAD STARTED ===');
+    
+    // Progress tracking helper
+    const sendProgress = (stage, message, data = {}) => {
+      console.log(`[PROGRESS] ${stage}: ${message}`);
+    };
+    
+    sendProgress('upload', 'Starting video upload process');
+
+    if (!req.files.video || !req.files.video[0]) {
+      return res.status(400).json({ error: 'No video file uploaded' });
+    }
+
+    videoFile = req.files.video[0];
+    qrCodeFile = req.files.paymentQrCode ? req.files.paymentQrCode[0] : null;
+    tempFiles.push(videoFile.path);
+    if (qrCodeFile) tempFiles.push(qrCodeFile.path);
+
+    const { name, topic, isPaid, cost, currency, paymentEmail, paymentUpi, 
+        ownerUpiId, ownerAccountName, ownerAccountNumber, ownerIfsc,
+        uploadPaymentId, uploadOrderId, uploadSignature } = req.body;
+
+    // Validate required fields
+    if (!name || !topic) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({ error: 'Name and topic are required' });
+    }
+
+    // Check for duplicate video
+    sendProgress('duplicate_check', 'Checking for duplicate video...');
+    const crypto = require('crypto');
+    const fileBuffer = fs.readFileSync(videoFile.path);
+    const fileHash = crypto.createHash('md5').update(fileBuffer).digest('hex');
+    
+    const existingVideo = await Video.findOne({ fileHash });
+    if (existingVideo) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({ 
+        error: 'This video has already been uploaded',
+        stage: 'duplicate_check',
+        duplicate: true
+      });
+    }
+
+    // Verify Razorpay payment
+    sendProgress('payment_verify', 'Verifying payment...');
+    if (!uploadPaymentId || !uploadOrderId || !uploadSignature) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({ 
+        error: 'Payment verification required',
+        stage: 'payment_verify'
+      });
+    }
+
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${uploadOrderId}|${uploadPaymentId}`)
+      .digest('hex');
+    
+    if (generatedSignature !== uploadSignature) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({ 
+        error: 'Payment verification failed',
+        stage: 'payment_verify'
+      });
+    }
+
+    // Get user info
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      cleanupTempFiles(tempFiles);
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // === STAGE 1: AUDIO EXTRACTION ===
+    sendProgress('audio_extraction', 'Extracting audio from video...');
+    const audioPath = videoFile.path.replace(path.extname(videoFile.path), '.mp3');
+    tempFiles.push(audioPath);
+    
+    try {
+      await extractAudioFromVideo(videoFile.path, audioPath);
+    } catch (error) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'audio_extraction',
+        error: `Audio extraction failed: ${error.message}`,
+        message: 'Failed to extract audio from video. The video may be silent or corrupted.'
+      });
+    }
+
+    // Check if audio file has content
+    const audioStats = fs.statSync(audioPath);
+    if (audioStats.size === 0) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'audio_extraction',
+        error: 'Audio file is empty',
+        message: 'No audio detected in the video. Please upload a video with audio/speech.'
+      });
+    }
+
+    // === STAGE 2: SPEECH-TO-TEXT TRANSCRIPTION ===
+    sendProgress('transcription', 'Converting speech to text using AI...');
+    let transcript;
+    try {
+      transcript = await transcribeAudio(audioPath);
+      
+      if (!transcript || transcript.trim().length < 10) {
+        throw new Error('Transcription too short - no speech detected');
+      }
+    } catch (error) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'transcription',
+        error: error.message,
+        message: 'Failed to transcribe audio. ' + (error.message.includes('empty') 
+          ? 'The video appears to be silent.' 
+          : 'Please ensure clear audio in the video.')
+      });
+    }
+
+    console.log('Transcript length:', transcript.length, 'characters');
+
+    // === STAGE 3: AI SUMMARIZATION ===
+    sendProgress('summarization', 'Generating AI summary...');
+    let summary;
+    try {
+      summary = await summarizeTranscript(transcript, topic);
+    } catch (error) {
+      console.error('Summarization failed, continuing without summary:', error);
+      summary = transcript.substring(0, 500) + '...';
+    }
+
+    // === STAGE 4: AI VALIDATION - STOCK MARKET RELEVANCE ===
+    sendProgress('ai_validation', 'Validating stock market relevance...');
+    const relevanceCheck = await checkStockMarketRelevance(summary, transcript);
+    
+    console.log('Relevance check result:', relevanceCheck);
+
+    // === STAGE 5: AI VALIDATION - TOPIC MATCH ===
+    sendProgress('ai_validation', 'Checking topic match...');
+    const topicMatch = await checkTopicMatch(summary, transcript, topic);
+    
+    console.log('Topic match result:', topicMatch);
+
+    // === STAGE 6: DECISION LOGIC ===
+    const MIN_SCORE = 70;
+    const relevanceScore = relevanceCheck.score || 0;
+    const topicScore = topicMatch.score || 0;
+    const isRelevant = relevanceCheck.relevant && relevanceScore > MIN_SCORE;
+    const isTopicMatch = topicMatch.match && topicScore > MIN_SCORE;
+
+    console.log('Validation scores:', { relevanceScore, topicScore, isRelevant, isTopicMatch });
+
+    let rejectionReason = '';
+    if (!isRelevant) {
+      rejectionReason = `Content is not stock market related (score: ${relevanceScore}/100, min required: ${MIN_SCORE}).`;
+    } else if (!isTopicMatch) {
+      rejectionReason = `Content does not match the provided topic "${topic}" (match score: ${topicScore}/100, min required: ${MIN_SCORE}).`;
+    }
+
+    // If validation fails, reject and cleanup
+    if (!isRelevant || !isTopicMatch) {
+      cleanupTempFiles(tempFiles);
+      return res.status(400).json({
+        success: false,
+        stage: 'ai_validation',
+        message: 'Video rejected by AI validation',
+        rejectionReason: rejectionReason,
+        summary: summary,
+        relevanceScore: relevanceScore,
+        topicScore: topicScore,
+        isApproved: false,
+        transcript: transcript.substring(0, 1000) // First 1000 chars for reference
+      });
+    }
+
+    // === STAGE 7: SAVE APPROVED VIDEO ===
+    sendProgress('saving', 'Saving validated video to database...');
+
+    // Generate thumbnail
+    const thumbnailFileName = videoFile.filename.replace(path.extname(videoFile.filename), '.jpg');
+    const thumbnailPath = path.join(uploadsDir, thumbnailFileName);
+    let thumbnailUrl = null;
+    
+    try {
+      const generatedThumbnail = await generateThumbnail(videoFile.path, thumbnailPath);
+      if (generatedThumbnail) {
+        thumbnailUrl = `/uploads/${thumbnailFileName}`;
+      }
+    } catch (error) {
+      console.error('Thumbnail generation failed:', error);
+    }
+
+    // Get currency symbol
+    const currencySymbols = {
+      'USD': '$', 'INR': '₹', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'AUD': 'A$', 'CAD': 'C$'
+    };
+    const currencySymbol = currencySymbols[currency] || '$';
+    const formattedAmount = `${currencySymbol}${parseFloat(cost).toFixed(2)}`;
+
+    // Create and save video document
+    const video = new Video({
+      title: name,
+      topic: topic,
+      uploader: user.username,
+      uploaderEmail: user.email,
+      isPaid: isPaid === 'true',
+      price: parseFloat(cost) || 0,
+      currency: currency || 'USD',
+      formattedAmount: formattedAmount,
+      videoUrl: `/uploads/${videoFile.filename}`,
+      thumbnail: thumbnailUrl,
+      qrCodeUrl: qrCodeFile ? `/uploads/${qrCodeFile.filename}` : null,
+      fileName: videoFile.filename,
+      fileSize: videoFile.size,
+      mimeType: videoFile.mimetype,
+      fileHash: fileHash,
+      paymentEmail: paymentEmail || null,
+      paymentUpi: paymentUpi || null,
+      ownerUpiId: ownerUpiId || null,
+      ownerAccountName: ownerAccountName || null,
+      ownerAccountNumber: ownerAccountNumber || null,
+      ownerIfsc: ownerIfsc || null,
+      uploadPaymentId: uploadPaymentId,
+      uploadOrderId: uploadOrderId,
+      uploadPaid: true,
+      uploadPaidAt: new Date(),
+      // AI Validation fields
+      aiSummary: summary,
+      relevanceScore: relevanceScore,
+      topicMatchScore: topicScore,
+      isApproved: true,
+      transcript: transcript.substring(0, 10000), // Store first 10k chars
+      validationStatus: 'approved',
+      processingStage: 'completed',
+      validationCompletedAt: new Date()
+    });
+
+    await video.save();
+
+    // Cleanup temp audio file (keep video and thumbnail)
+    cleanupTempFiles([audioPath]);
+
+    sendProgress('completed', 'Video upload completed successfully!');
+
+    // Return success response
+    res.status(201).json({
+      success: true,
+      message: 'Video approved and uploaded successfully!',
+      stage: 'completed',
+      video: {
+        id: video._id,
+        title: video.title,
+        topic: video.topic,
+        uploader: video.uploader,
+        isPaid: video.isPaid,
+        price: video.price,
+        videoUrl: video.videoUrl,
+        thumbnail: video.thumbnail,
+        createdAt: video.createdAt
+      },
+      aiValidation: {
+        summary: summary,
+        relevanceScore: relevanceScore,
+        topicScore: topicScore,
+        isApproved: true
+      }
+    });
+
+  } catch (error) {
+    console.error('AI-validated upload error:', error);
+    
+    // Cleanup all temp files on error
+    cleanupTempFiles(tempFiles);
+    
+    res.status(500).json({ 
+      success: false,
+      stage: 'error',
+      error: error.message || 'Failed to process video',
+      message: 'An error occurred during video processing. Please try again.'
     });
   }
 });
@@ -2133,10 +2992,13 @@ app.get('/api/paper-trading/portfolio', async (req, res) => {
     if (!req.session || !req.session.userId) {
       return res.status(401).json({ error: 'Please log in to access paper trading' });
     }
-    
+
     const userId = req.session.userId;
-    
+    console.log(`[PORTFOLIO] Fetching portfolio for user ${userId}`);
+
     const holdings = await PaperTradingHolding.find({ userId: userId });
+    console.log(`[PORTFOLIO] Found ${holdings.length} holdings:`, holdings.map(h => ({ symbol: h.symbol, quantity: h.quantity })));
+
     const balance = await PaperTradingBalance.findOne({ userId: userId });
     
     if (!balance) {
@@ -2221,19 +3083,21 @@ app.post('/api/paper-trading/buy', async (req, res) => {
     if (!req.session || !req.session.userId) {
       return res.status(401).json({ error: 'Please log in to trade' });
     }
-    
+
     const userId = req.session.userId;
-    
+    console.log(`[BUY] User ${userId} attempting to buy stock`);
+
     const { symbol, companyName, quantity } = req.body;
-    
+
     if (!symbol || !quantity || quantity <= 0) {
       return res.status(400).json({ error: 'Symbol and valid quantity are required' });
     }
-    
+
     // Get current stock price
     const quote = await getStockQuote(symbol);
     const totalCost = quote.price * quantity;
-    
+    console.log(`[BUY] Stock ${symbol} price: ₹${quote.price}, Total cost: ₹${totalCost}`);
+
     // Check user balance
     let balance = await PaperTradingBalance.findOne({ userId: userId });
     if (!balance) {
@@ -2243,24 +3107,26 @@ app.post('/api/paper-trading/buy', async (req, res) => {
         currency: 'INR'
       });
       await balance.save();
+      console.log(`[BUY] Created new balance for user ${userId}: ₹100,000`);
     }
-    
+
     if (balance.balance < totalCost) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Insufficient balance',
         required: totalCost,
         available: balance.balance
       });
     }
-    
+
     // Deduct from balance
     balance.balance -= totalCost;
     balance.updatedAt = new Date();
     await balance.save();
-    
+    console.log(`[BUY] Deducted ₹${totalCost} from user ${userId} balance. New balance: ₹${balance.balance}`);
+
     // Update or create holding
     let holding = await PaperTradingHolding.findOne({ userId: userId, symbol: symbol });
-    
+
     if (holding) {
       // Update existing holding with new average price
       const totalQuantity = holding.quantity + quantity;
@@ -2270,6 +3136,7 @@ app.post('/api/paper-trading/buy', async (req, res) => {
       holding.totalInvestment = totalInvestment;
       holding.updatedAt = new Date();
       await holding.save();
+      console.log(`[BUY] Updated existing holding for ${symbol}: ${totalQuantity} shares @ ₹${holding.avgBuyPrice}`);
     } else {
       // Create new holding
       holding = new PaperTradingHolding({
@@ -2281,8 +3148,13 @@ app.post('/api/paper-trading/buy', async (req, res) => {
         totalInvestment: totalCost
       });
       await holding.save();
+      console.log(`[BUY] Created new holding for ${symbol}: ${quantity} shares @ ₹${quote.price}`);
     }
-    
+
+    // Verify holding was saved
+    const verifyHolding = await PaperTradingHolding.findOne({ userId: userId, symbol: symbol });
+    console.log(`[BUY] Verified holding in DB:`, verifyHolding);
+
     // Record transaction
     const transaction = new PaperTradingTransaction({
       userId: userId,
@@ -2295,9 +3167,9 @@ app.post('/api/paper-trading/buy', async (req, res) => {
       balanceAfter: balance.balance
     });
     await transaction.save();
-    
-    console.log(`BUY: User ${userId} bought ${quantity} shares of ${symbol} at ₹${quote.price}`);
-    
+
+    console.log(`[BUY] SUCCESS: User ${userId} bought ${quantity} shares of ${symbol} at ₹${quote.price}`);
+
     res.json({
       success: true,
       message: `Successfully bought ${quantity} shares of ${symbol}`,
@@ -2310,7 +3182,7 @@ app.post('/api/paper-trading/buy', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error buying stock:', error);
+    console.error('[BUY] Error:', error);
     res.status(500).json({ error: 'Failed to execute buy order' });
   }
 });

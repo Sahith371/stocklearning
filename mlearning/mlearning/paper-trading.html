@@ -1582,17 +1582,19 @@
         // Execute trade
         async function executeTrade(type) {
             if (!selectedStock || !selectedStock.price) return;
-            
+
             const quantity = parseInt(document.getElementById('quantityInput').value);
-            
+
             if (!quantity || quantity <= 0) {
                 showError('Please enter a valid quantity');
                 return;
             }
-            
+
             const endpoint = type === 'BUY' ? '/api/paper-trading/buy' : '/api/paper-trading/sell';
-            
+
             try {
+                console.log(`Executing ${type} order:`, { symbol: selectedStock.symbol, companyName: selectedStock.name, quantity });
+
                 const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                     method: 'POST',
                     headers: {
@@ -1605,16 +1607,19 @@
                         quantity: quantity
                     })
                 });
-                
+
                 const data = await response.json();
-                
+                console.log(`${type} order response:`, data);
+
                 if (data.success) {
                     showSuccess(`${type} order executed successfully! ${quantity} shares of ${selectedStock.symbol} at ₹${data.transaction.price.toFixed(2)}`);
-                    
+
                     // Refresh data
+                    console.log('Refreshing portfolio after trade...');
                     await loadPortfolio();
                     await loadTransactions();
-                    
+                    console.log('Portfolio refreshed. Current portfolio:', portfolio);
+
                     // Reset quantity
                     document.getElementById('quantityInput').value = '1';
                 } else {
@@ -1711,14 +1716,18 @@
         // Update quick stats
         function updateQuickStats() {
             if (!portfolio) return;
-            
+
             const totalValue = portfolio.cashBalance + portfolio.summary.totalCurrentValue;
             const holdingsCount = portfolio.holdings.length;
-            
-            // Format numbers
-            document.getElementById('quickBalance').textContent = formatCompactNumber(portfolio.cashBalance);
-            document.getElementById('quickValue').textContent = formatCompactNumber(totalValue);
-            document.getElementById('quickHoldings').textContent = holdingsCount;
+
+            // Format numbers - check if elements exist before updating
+            const quickBalance = document.getElementById('quickBalance');
+            const quickValue = document.getElementById('quickValue');
+            const quickHoldings = document.getElementById('quickHoldings');
+
+            if (quickBalance) quickBalance.textContent = formatCompactNumber(portfolio.cashBalance);
+            if (quickValue) quickValue.textContent = formatCompactNumber(totalValue);
+            if (quickHoldings) quickHoldings.textContent = holdingsCount;
         }
 
         // Format compact numbers (e.g., 100000 -> 100K)
@@ -1737,7 +1746,8 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    document.getElementById('quickTrades').textContent = data.pagination.total;
+                    const quickTrades = document.getElementById('quickTrades');
+                    if (quickTrades) quickTrades.textContent = data.pagination.total;
                 }
             } catch (error) {
                 console.error('Error loading trade count:', error);
