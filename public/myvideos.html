@@ -476,6 +476,89 @@
                 border-radius: 16px;
             }
         }
+        
+        /* Rating Section Styles */
+        .rating-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rate-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .rate-prompt {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .star-rating .star {
+            color: #fbbf24;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+        
+        .star-rating .star:hover,
+        .star-rating .star.hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        
+        .star-rating .star.active {
+            opacity: 1;
+        }
+        
+        .user-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .user-rating .rating-label {
+            color: var(--text-muted);
+        }
+        
+        .user-rating .stars {
+            color: #fbbf24;
+            letter-spacing: 0.1rem;
+        }
+        
+        .user-rating .rating-value {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        
+        .rating-message {
+            text-align: center;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            min-height: 1rem;
+        }
+        
+        .rating-message.success {
+            color: #10b981;
+        }
+        
+        .rating-message.error {
+            color: #ef4444;
+        }
     </style>
 </head>
 <body>
@@ -568,12 +651,50 @@
         function createVideoCard(video) {
             const card = document.createElement('div');
             card.className = 'video-card';
+            card.id = `video-card-${video._id}`;
             
             const videoUrl = video.videoUrl || '#';
             const thumbnail = video.thumbnail || '';
             const title = video.title || 'Untitled Video';
             const topic = video.topic || 'General';
             const unlockedAt = new Date(video.unlockedAt).toLocaleDateString();
+            
+            // Determine rating section content
+            let ratingSection = '';
+            if (video.rated) {
+                // Already rated - show user's rating
+                ratingSection = `
+                    <div class="rating-section rated">
+                        <div class="user-rating">
+                            <span class="rating-label">Your Rating:</span>
+                            <span class="stars">${'★'.repeat(video.userRating)}${'☆'.repeat(5 - video.userRating)}</span>
+                            <span class="rating-value">${video.userRating}/5</span>
+                        </div>
+                    </div>
+                `;
+            } else if (video.watched) {
+                // Watched but not rated - show rating input
+                ratingSection = `
+                    <div class="rating-section can-rate">
+                        <div class="rate-prompt">Rate this video:</div>
+                        <div class="star-rating" data-video-id="${video._id}">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <div class="rating-message" id="rating-msg-${video._id}"></div>
+                    </div>
+                `;
+            } else {
+                // Not watched yet
+                ratingSection = `
+                    <div class="rating-section not-watched">
+                        <div class="rate-hint">Watch video to enable rating</div>
+                    </div>
+                `;
+            }
             
             card.innerHTML = `
                 <div class="video-thumbnail">
@@ -591,15 +712,90 @@
                     <button class="watch-btn" onclick="watchVideo('${video._id}', '${videoUrl}', '${title}')">
                         <i class="fas fa-play"></i> Watch Now
                     </button>
+                    ${ratingSection}
                 </div>
             `;
             
+            // Add star rating event listeners if rating is available
+            if (!video.rated && video.watched) {
+                const stars = card.querySelectorAll('.star');
+                stars.forEach(star => {
+                    star.addEventListener('click', () => submitRating(video._id, parseInt(star.dataset.rating)));
+                    star.addEventListener('mouseenter', () => highlightStars(stars, parseInt(star.dataset.rating)));
+                    star.addEventListener('mouseleave', () => resetStars(stars));
+                });
+            }
+            
             return card;
+        }
+        
+        // Star rating UI helpers
+        function highlightStars(stars, rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('hover');
+                } else {
+                    star.classList.remove('hover');
+                }
+            });
+        }
+        
+        function resetStars(stars) {
+            stars.forEach(star => star.classList.remove('hover'));
+        }
+        
+        // Submit rating
+        async function submitRating(videoId, rating) {
+            try {
+                const response = await fetch(`/api/videos/${videoId}/rate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ rating })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Refresh the video card to show rated state
+                    refreshVideos();
+                    alert(`Thank you! Your rating: ${rating}/5 stars`);
+                } else {
+                    alert(data.error || 'Failed to submit rating');
+                }
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+                alert('Failed to submit rating. Please try again.');
+            }
+        }
+        
+        // Mark video as watched
+        async function markVideoWatched(videoId) {
+            try {
+                const response = await fetch(`/api/videos/${videoId}/watch`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('Video marked as watched:', videoId);
+                    // Refresh to show rating UI
+                    refreshVideos();
+                }
+            } catch (error) {
+                console.error('Error marking video watched:', error);
+            }
         }
 
         // Watch video
-        function watchVideo(videoId, videoUrl, title) {
+        async function watchVideo(videoId, videoUrl, title) {
             if (videoUrl && videoUrl !== '#') {
+                // Mark video as watched
+                await markVideoWatched(videoId);
                 // Open video in new tab or modal
                 window.open(videoUrl, '_blank');
             } else {

@@ -13,6 +13,7 @@ const Groq = require('groq-sdk');
 const ffmpeg = require('fluent-ffmpeg');
 const axios = require('axios');
 const FormData = require('form-data');
+const nodemailer = require('nodemailer');
 
 // Define Coupon Schema
 const couponSchema = new mongoose.Schema({
@@ -34,6 +35,227 @@ const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// ====== Email configuration ======
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Function to send payment receipt email
+async function sendPaymentReceiptEmail(to, paymentDetails) {
+  try {
+    const { videoTopic, amount, orderId, paymentId, date, mentorName } = paymentDetails;
+    
+    console.log('📧 Preparing to send email...');
+    console.log('To:', to);
+    console.log('From:', process.env.EMAIL_USER);
+    console.log('SMTP Service: gmail');
+    
+    const mailOptions = {
+      from: `"StockMaster" <${process.env.EMAIL_USER}>`,
+      to: to,
+      subject: 'Payment Receipt - Video Upload Successful',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #16a34a; margin: 0;">Payment Successful!</h2>
+            <p style="color: #6b7280; margin: 5px 0;">Your video upload fee has been received</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #374151;">Receipt Details</h3>
+            <table style="width: 100%; font-size: 14px;">
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Video Topic:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${videoTopic}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Mentor:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${mentorName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Amount Paid:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #16a34a;">₹${amount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Order ID:</td>
+                <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${orderId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Payment ID:</td>
+                <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${paymentId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Date:</td>
+                <td style="padding: 8px 0; text-align: right;">${date}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">Thank you for using StockMaster!</p>
+            <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">For any queries, please contact support.</p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(`Payment receipt sent to ${to}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending payment receipt email:', error);
+    return false;
+  }
+}
+
+// Function to send sale receipt email to video owner
+async function sendSaleReceiptEmail(to, receiptDetails) {
+  try {
+    const { videoTopic, amount, ownerEarnings, orderId, paymentId, date, mentorName, buyerName } = receiptDetails;
+    
+    console.log('📧 Preparing to send sale receipt email...');
+    console.log('To:', to);
+    
+    const mailOptions = {
+      from: `"StockMaster" <${process.env.EMAIL_USER}>`,
+      to: to,
+      subject: 'New Video Sale - Payment Received',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #16a34a; margin: 0;">New Sale! 🎉</h2>
+            <p style="color: #6b7280; margin: 5px 0;">Someone purchased your video</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #374151;">Sale Details</h3>
+            <table style="width: 100%; font-size: 14px;">
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Video Topic:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${videoTopic}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Buyer:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${buyerName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Total Sale Amount:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">₹${amount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Platform Fee (16%):</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #dc2626;">-₹${(amount - ownerEarnings).toFixed(2)}</td>
+              </tr>
+              <tr style="background: #f0fdf4;">
+                <td style="padding: 12px 0; color: #166534; font-weight: 600;">You Receive (84%):</td>
+                <td style="padding: 12px 0; text-align: right; font-weight: 700; color: #16a34a;">₹${ownerEarnings}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Order ID:</td>
+                <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${orderId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Payment ID:</td>
+                <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${paymentId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Date:</td>
+                <td style="padding: 8px 0; text-align: right;">${date}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">Keep up the great work! 🚀</p>
+            <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">For any queries, please contact support.</p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(`Sale receipt sent to ${to}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending sale receipt email:', error);
+    return false;
+  }
+}
+
+// Function to send purchase receipt email to buyer
+async function sendBuyerReceiptEmail(to, receiptDetails) {
+  try {
+    const { videoTopic, amount, orderId, paymentId, date, mentorName, buyerName } = receiptDetails;
+    
+    console.log('📧 Preparing to send buyer receipt email...');
+    console.log('To:', to);
+    
+    const mailOptions = {
+      from: `"StockMaster" <${process.env.EMAIL_USER}>`,
+      to: to,
+      subject: 'Purchase Receipt - Video Access Confirmed',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #16a34a; margin: 0;">Purchase Successful!</h2>
+            <p style="color: #6b7280; margin: 5px 0;">You now have access to the video</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #374151;">Purchase Details</h3>
+            <table style="width: 100%; font-size: 14px;">
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Video Topic:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${videoTopic}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Mentor:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${mentorName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Buyer:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${buyerName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Amount Paid:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #16a34a;">₹${amount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Order ID:</td>
+                <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${orderId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Payment ID:</td>
+                <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${paymentId}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Date:</td>
+                <td style="padding: 8px 0; text-align: right;">${date}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">Thank you for your purchase!</p>
+            <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">You can now watch the video in your account.</p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(`Buyer receipt sent to ${to}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending buyer receipt email:', error);
+    return false;
+  }
+}
 
 // ====== Razorpay configuration ======
 const razorpay = new Razorpay({
@@ -82,6 +304,9 @@ const userSchema = new mongoose.Schema(
         message: 'User type must be either learner or mentor'
       }
     },
+    // Forgot password rate limiting
+    forgotPasswordAttempts: { type: Number, default: 0 },
+    forgotPasswordLastAttempt: { type: Date }
   },
   { timestamps: true }
 );
@@ -113,7 +338,7 @@ const videoSchema = new mongoose.Schema(
     ownerIfsc: { type: String },
     ownerAccountName: { type: String },
     ownerUpiId: { type: String },
-    platformFee: { type: Number, default: 5 }, // 5% platform fee
+    platformFee: { type: Number, default: 16 }, // 16% platform fee
     // Upload payment tracking
     uploadPaid: { type: Boolean, default: false },
     uploadPaidAt: { type: Date },
@@ -132,7 +357,10 @@ const videoSchema = new mongoose.Schema(
       default: 'pending' 
     },
     processingStage: { type: String }, // Current stage: upload, audio_extraction, transcription, ai_validation
-    validationCompletedAt: { type: Date }
+    validationCompletedAt: { type: Date },
+    // Rating summary fields
+    averageRating: { type: Number, default: 0, min: 0, max: 5 },
+    totalReviews: { type: Number, default: 0 }
   },
   { timestamps: true }
 );
@@ -145,10 +373,28 @@ const videoAccessSchema = new mongoose.Schema({
   videoId: { type: String, required: true },
   unlockedAt: { type: Date, default: Date.now },
   paymentId: { type: String },
-  amount: { type: Number }
+  amount: { type: Number },
+  // Rating and watch tracking
+  watched: { type: Boolean, default: false },
+  watchedAt: { type: Date },
+  rated: { type: Boolean, default: false },
+  rating: { type: Number, min: 1, max: 5 }
 });
 
 const VideoAccess = mongoose.models.VideoAccess || mongoose.model('VideoAccess', videoAccessSchema);
+
+// Rating Schema - Stores individual user ratings
+const ratingSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  videoId: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  createdAt: { type: Date, default: Date.now }
+}, { timestamps: true });
+
+// Ensure one rating per user per video
+ratingSchema.index({ userId: 1, videoId: 1 }, { unique: true });
+
+const Rating = mongoose.models.Rating || mongoose.model('Rating', ratingSchema);
 
 // ====== Paper Trading Schemas ======
 const paperTradingBalanceSchema = new mongoose.Schema({
@@ -545,6 +791,12 @@ mongoose
   })
   .then((result) => {
     console.log('Video uploadPaid migration completed:', result.modifiedCount, 'videos updated');
+    
+    // Update existing admin coupons with default score after migrations
+    return updateAdminCoupons();
+  })
+  .then(() => {
+    console.log('Admin coupons update completed');
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
@@ -696,7 +948,7 @@ app.post('/api/videos', requireAuth, upload.fields([
       return res.status(400).json({ error: 'This video has already been uploaded' });
     }
 
-    const { name, topic, isPaid, cost, currency, paymentEmail, paymentUpi, 
+    const { name, topic, isPaid, cost, currency, paymentUpi, 
         ownerUpiId, ownerAccountName, ownerAccountNumber, ownerIfsc,
         uploadPaymentId, uploadOrderId, uploadSignature } = req.body;
     
@@ -706,7 +958,6 @@ app.post('/api/videos', requireAuth, upload.fields([
     console.log('Is Paid:', isPaid);
     console.log('Cost:', cost);
     console.log('Currency:', currency);
-    console.log('Payment Email:', paymentEmail);
     console.log('Payment UPI:', paymentUpi);
     console.log('Upload Payment ID:', uploadPaymentId);
     console.log('Upload Order ID:', uploadOrderId);
@@ -826,6 +1077,33 @@ app.post('/api/videos', requireAuth, upload.fields([
     console.log('=== VERIFICATION DEBUG ===');
     console.log('Retrieved video currency:', savedVideo.currency);
     console.log('Retrieved video price:', savedVideo.price);
+
+    // Send payment receipt email if payment was made
+    console.log('=== EMAIL DEBUG ===');
+    console.log('paymentEmail:', paymentEmail);
+    console.log('uploadOrderId:', uploadOrderId);
+    console.log('uploadPaymentId:', uploadPaymentId);
+    console.log('user.username:', user.username);
+    
+    if (paymentEmail && uploadOrderId && uploadPaymentId) {
+      const receiptDetails = {
+        videoTopic: topic,
+        amount: 120, // Upload fee is ₹120
+        orderId: uploadOrderId,
+        paymentId: uploadPaymentId,
+        date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        mentorName: user.username
+      };
+      
+      console.log('Sending receipt to:', paymentEmail);
+      console.log('Receipt details:', receiptDetails);
+      
+      sendPaymentReceiptEmail(paymentEmail, receiptDetails)
+        .then(() => console.log('✅ Upload payment receipt email sent successfully'))
+        .catch(err => console.error('❌ Failed to send upload receipt email:', err));
+    } else {
+      console.log('⚠️ Skipping email - missing required fields');
+    }
 
     console.log('Video saved successfully:', {
       id: video._id,
@@ -1124,6 +1402,32 @@ app.post('/api/videos/final-save', requireAuth, upload.fields([
     });
 
     await video.save();
+
+    // Send payment receipt email to user's account email (not upload form email)
+    console.log('=== UPLOAD EMAIL DEBUG ===');
+    console.log('User account email:', user.email);
+    console.log('uploadOrderId:', uploadOrderId);
+    console.log('uploadPaymentId:', uploadPaymentId);
+    console.log('user.username:', user.username);
+    
+    if (user.email && uploadOrderId && uploadPaymentId) {
+      const receiptDetails = {
+        videoTopic: topic,
+        amount: 120, // Upload fee is ₹120
+        orderId: uploadOrderId,
+        paymentId: uploadPaymentId,
+        date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        mentorName: user.username
+      };
+      
+      console.log('Sending upload receipt to user account email:', user.email);
+      
+      sendPaymentReceiptEmail(user.email, receiptDetails)
+        .then(() => console.log('✅ Upload payment receipt email sent successfully'))
+        .catch(err => console.error('❌ Failed to send upload receipt email:', err));
+    } else {
+      console.log('⚠️ Skipping upload email - missing user account email or payment details');
+    }
 
     console.log('Video saved successfully:', video._id);
 
@@ -1462,7 +1766,7 @@ app.post('/api/create-upload-order', requireAuth, async (req, res) => {
   try {
     console.log('=== CREATE UPLOAD ORDER REQUEST ===');
     
-    const amount = 200; // ₹200 INR ($2.40)
+    const amount = 120; // ₹120 INR ($1.44)
     const currency = 'INR';
     
     // Generate short receipt (max 40 chars for Razorpay)
@@ -1646,6 +1950,70 @@ app.post('/api/verify-payment', async (req, res) => {
         console.log('ℹ️ User already has access to this video');
       }
       
+      // Get video details and send receipt to video owner
+      const video = await Video.findById(videoId);
+      console.log('=== VIDEO LOOKUP ===');
+      console.log('Video found:', !!video);
+      console.log('Video ID:', videoId);
+      
+      if (video) {
+        const videoOwner = await User.findOne({ username: video.uploader });
+        console.log('=== VIDEO OWNER LOOKUP ===');
+        console.log('Video uploader (username):', video.uploader);
+        console.log('Video owner found:', !!videoOwner);
+        
+        const buyer = await User.findById(userId);
+        console.log('=== BUYER LOOKUP ===');
+        console.log('userId:', userId);
+        console.log('Buyer found:', !!buyer);
+        if (buyer) {
+          console.log('Buyer email:', buyer.email);
+        }
+        
+        if (videoOwner && videoOwner.email) {
+          const ownerEarnings = (totalAmount * 0.84).toFixed(2); // 84% after 16% commission
+          const receiptDetails = {
+            videoTopic: video.topic,
+            amount: totalAmount,
+            ownerEarnings: ownerEarnings,
+            orderId: razorpay_order_id,
+            paymentId: razorpay_payment_id,
+            date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+            mentorName: videoOwner.username,
+            buyerName: buyer ? buyer.username : 'Anonymous'
+          };
+          
+          sendSaleReceiptEmail(videoOwner.email, receiptDetails)
+            .then(() => console.log('✅ Sale receipt email sent to video owner:', videoOwner.email))
+            .catch(err => console.error('❌ Failed to send sale receipt email:', err));
+        }
+        
+        // Send receipt to buyer as well
+        console.log('=== BUYER EMAIL DEBUG ===');
+        console.log('Buyer object:', buyer ? { id: buyer._id, username: buyer.username, email: buyer.email } : 'null');
+        
+        if (buyer && buyer.email) {
+          const buyerReceiptDetails = {
+            videoTopic: video.topic,
+            amount: totalAmount,
+            orderId: razorpay_order_id,
+            paymentId: razorpay_payment_id,
+            date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+            mentorName: videoOwner ? videoOwner.username : 'Unknown',
+            buyerName: buyer.username
+          };
+          
+          console.log('📧 Sending buyer receipt to:', buyer.email);
+          console.log('Buyer receipt details:', buyerReceiptDetails);
+          
+          sendBuyerReceiptEmail(buyer.email, buyerReceiptDetails)
+            .then(() => console.log('✅ Purchase receipt email sent to buyer:', buyer.email))
+            .catch(err => console.error('❌ Failed to send buyer receipt email:', err));
+        } else {
+          console.log('⚠️ Skipping buyer email - buyer or buyer.email is missing');
+        }
+      }
+
       // Initiate automatic transfer to video owner
       const transferSuccess = await transferToVideoOwner(videoId, totalAmount);
       
@@ -1691,8 +2059,8 @@ async function transferToVideoOwner(videoId, totalAmount) {
       return false;
     }
 
-    // Calculate amounts
-    const platformFeePercent = video.platformFee || 5;
+    // Calculate amounts - hardcoded 16% platform fee
+    const platformFeePercent = 16;
     const platformFee = (totalAmount * platformFeePercent) / 100;
     const ownerAmount = totalAmount - platformFee;
 
@@ -1810,7 +2178,7 @@ app.get('/api/videos', async (req, res) => {
     
     const videos = await Video.find()
       .sort({ createdAt: -1 }) // Most recent first
-      .select('title topic uploader uploaderEmail isPaid price currency formattedAmount videoUrl thumbnail createdAt paymentEmail paymentUpi qrCodeUrl uploadPaid');
+      .select('title topic uploader uploaderEmail isPaid price currency formattedAmount videoUrl thumbnail createdAt paymentEmail paymentUpi qrCodeUrl uploadPaid averageRating totalReviews');
 
     console.log(`Found ${videos.length} videos`);
     
@@ -1836,7 +2204,9 @@ app.get('/api/videos', async (req, res) => {
       qrCodeUrl: video.qrCodeUrl,
       paymentEmail: video.paymentEmail,
       paymentUpi: video.paymentUpi,
-      createdAt: video.createdAt
+      createdAt: video.createdAt,
+      averageRating: video.averageRating || 0,
+      totalReviews: video.totalReviews || 0
     })));
   } catch (err) {
     console.error('Error fetching videos:', err);
@@ -1950,7 +2320,10 @@ app.get('/api/user/unlocked-videos', async (req, res) => {
         ...video.toObject(),
         unlockedAt: record.unlockedAt,
         paymentId: record.paymentId,
-        amount: record.amount
+        amount: record.amount,
+        watched: record.watched || false,
+        rated: record.rated || false,
+        userRating: record.rating || null
       };
     });
     
@@ -1965,6 +2338,165 @@ app.get('/api/user/unlocked-videos', async (req, res) => {
   } catch (error) {
     console.error('Error getting unlocked videos:', error);
     res.status(500).json({ error: 'Failed to get unlocked videos' });
+  }
+});
+
+// ====== Video Rating Endpoints ======
+
+// Mark video as watched (enables rating)
+app.post('/api/videos/:videoId/watch', requireAuth, async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    const { videoId } = req.params;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not logged in' });
+    }
+    
+    const access = await VideoAccess.findOne({ userId, videoId });
+    if (!access) {
+      return res.status(404).json({ error: 'Video not found in user library' });
+    }
+    
+    access.watched = true;
+    access.watchedAt = new Date();
+    await access.save();
+    
+    res.json({ success: true, message: 'Video marked as watched' });
+  } catch (error) {
+    console.error('Error marking video as watched:', error);
+    res.status(500).json({ error: 'Failed to mark video as watched' });
+  }
+});
+
+// Submit rating for a video
+app.post('/api/videos/:videoId/rate', requireAuth, async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    const { videoId } = req.params;
+    const { rating } = req.body;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not logged in' });
+    }
+    
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+    }
+    
+    // Check if user has access and has watched the video
+    const access = await VideoAccess.findOne({ userId, videoId });
+    if (!access) {
+      return res.status(403).json({ error: 'You must purchase this video to rate it' });
+    }
+    
+    if (!access.watched) {
+      return res.status(403).json({ error: 'You must watch the video before rating' });
+    }
+    
+    if (access.rated) {
+      return res.status(403).json({ error: 'You have already rated this video' });
+    }
+    
+    // Create rating
+    const newRating = new Rating({
+      userId,
+      videoId,
+      rating
+    });
+    await newRating.save();
+    
+    // Update VideoAccess
+    access.rated = true;
+    access.rating = rating;
+    await access.save();
+    
+    // Recalculate video rating stats
+    const ratingStats = await Rating.aggregate([
+      { $match: { videoId: videoId } },
+      { 
+        $group: { 
+          _id: null, 
+          averageRating: { $avg: '$rating' },
+          totalReviews: { $sum: 1 }
+        } 
+      }
+    ]);
+    
+    if (ratingStats.length > 0) {
+      await Video.findByIdAndUpdate(videoId, {
+        averageRating: parseFloat(ratingStats[0].averageRating.toFixed(1)),
+        totalReviews: ratingStats[0].totalReviews
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Rating submitted successfully',
+      averageRating: ratingStats[0]?.averageRating.toFixed(1) || rating,
+      totalReviews: ratingStats[0]?.totalReviews || 1
+    });
+  } catch (error) {
+    console.error('Error submitting rating:', error);
+    if (error.code === 11000) {
+      return res.status(403).json({ error: 'You have already rated this video' });
+    }
+    res.status(500).json({ error: 'Failed to submit rating' });
+  }
+});
+
+// Check if user can rate a video
+app.get('/api/videos/:videoId/rating-status', requireAuth, async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    const { videoId } = req.params;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not logged in' });
+    }
+    
+    const access = await VideoAccess.findOne({ userId, videoId });
+    
+    if (!access) {
+      return res.json({ 
+        canRate: false, 
+        reason: 'not_purchased',
+        watched: false,
+        rated: false
+      });
+    }
+    
+    res.json({
+      canRate: access.watched && !access.rated,
+      watched: access.watched,
+      rated: access.rated,
+      userRating: access.rating || null,
+      reason: access.rated ? 'already_rated' : (access.watched ? 'can_rate' : 'not_watched')
+    });
+  } catch (error) {
+    console.error('Error checking rating status:', error);
+    res.status(500).json({ error: 'Failed to check rating status' });
+  }
+});
+
+// Get video rating stats
+app.get('/api/videos/:videoId/ratings', async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    
+    const video = await Video.findById(videoId).select('averageRating totalReviews');
+    
+    if (!video) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    
+    res.json({
+      averageRating: video.averageRating || 0,
+      totalReviews: video.totalReviews || 0
+    });
+  } catch (error) {
+    console.error('Error getting video ratings:', error);
+    res.status(500).json({ error: 'Failed to get video ratings' });
   }
 });
 
@@ -2144,6 +2676,110 @@ app.post('/api/logout', (req, res) => {
     }
     res.json({ success: true });
   });
+});
+
+// Check if email exists (for forgot password) - with rate limiting
+const MAX_FORGOT_PASSWORD_ATTEMPTS = 2;
+const FORGOT_PASSWORD_WINDOW_HOURS = 24;
+
+app.post('/api/check-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.json({ exists: false });
+    }
+    
+    // Check rate limiting
+    const now = new Date();
+    const lastAttempt = user.forgotPasswordLastAttempt;
+    let attempts = user.forgotPasswordAttempts || 0;
+    
+    // Reset attempts if 24 hours have passed since last attempt
+    if (lastAttempt) {
+      const hoursSinceLastAttempt = (now - lastAttempt) / (1000 * 60 * 60);
+      if (hoursSinceLastAttempt >= FORGOT_PASSWORD_WINDOW_HOURS) {
+        attempts = 0; // Reset counter after 24 hours
+      }
+    }
+    
+    // Check if limit exceeded
+    if (attempts >= MAX_FORGOT_PASSWORD_ATTEMPTS) {
+      const hoursRemaining = lastAttempt 
+        ? Math.ceil(FORGOT_PASSWORD_WINDOW_HOURS - (now - lastAttempt) / (1000 * 60 * 60))
+        : FORGOT_PASSWORD_WINDOW_HOURS;
+      
+      console.log(`Rate limit exceeded for ${email}. Attempts: ${attempts}, Hours remaining: ${hoursRemaining}`);
+      
+      return res.status(429).json({ 
+        error: `Too many attempts. You can try again in ${hoursRemaining} hour(s).`,
+        rateLimited: true,
+        hoursRemaining: hoursRemaining,
+        attemptsRemaining: 0
+      });
+    }
+    
+    // Increment attempt counter and update timestamp
+    await User.updateOne(
+      { email },
+      { 
+        $set: { 
+          forgotPasswordAttempts: attempts + 1,
+          forgotPasswordLastAttempt: now
+        }
+      }
+    );
+    
+    console.log(`Forgot password attempt ${attempts + 1}/${MAX_FORGOT_PASSWORD_ATTEMPTS} for ${email}`);
+    
+    res.json({ 
+      exists: true,
+      attemptsRemaining: MAX_FORGOT_PASSWORD_ATTEMPTS - (attempts + 1)
+    });
+  } catch (error) {
+    console.error('Check email error:', error);
+    res.status(500).json({ error: 'Failed to check email' });
+  }
+});
+
+// Reset password (for forgot password)
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: 'Email and new password are required' });
+    }
+    
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+    
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Update user password
+    const result = await User.updateOne(
+      { email },
+      { $set: { passwordHash: hashedPassword } }
+    );
+    
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log(`Password reset successful for: ${email}`);
+    res.json({ success: true, message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
 });
 
 // ====== Mentor Earnings API ======
@@ -2487,9 +3123,6 @@ async function updateAdminCoupons() {
     console.error('Error updating admin coupons:', error);
   }
 }
-
-// Call the update function
-updateAdminCoupons();
 
 // Get coupon statistics (admin only)
 app.get('/api/coupons/stats', async (req, res) => {

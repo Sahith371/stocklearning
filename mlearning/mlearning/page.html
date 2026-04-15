@@ -763,6 +763,10 @@
 
                         <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
 
+                        <div class="forgot-password-link" style="margin: 10px 0; text-align: center;">
+                            <a href="#" id="showForgotPassword" class="toggle-link">Forgot Password?</a>
+                        </div>
+
                         <div class="toggle-auth" style="margin: 20px 0 0 0; text-align: center;">
                             <p>Don't have an account? <a href="#" class="toggle-link" id="showSignup">Create Account</a></p>
                         </div>
@@ -771,6 +775,75 @@
                             Login successful! Welcome back! 🎉
                         </div>
                     </form>
+                </div>
+
+                <!-- Forgot Password Form -->
+                <div class="forgot-password-form" id="forgotPasswordForm" style="display: none;">
+                    <div class="header">
+                        <h1>Reset Password</h1>
+                    </div>
+
+                    <!-- Step 1: Enter Email -->
+                    <div id="forgotStep1">
+                        <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Enter your registered email address
+                        </p>
+                        <div class="input-group">
+                            <input type="email" class="input-field" placeholder="Enter your email" id="forgotEmail" required>
+                        </div>
+                        <div class="error-message" id="forgotEmailError"></div>
+                        <button type="button" class="login-btn" id="sendForgotOtpBtn">Send OTP</button>
+                    </div>
+
+                    <!-- Step 2: Enter OTP -->
+                    <div id="forgotStep2" style="display: none;">
+                        <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Enter the OTP sent to your email
+                        </p>
+                        <div class="input-group">
+                            <input type="text" class="input-field" placeholder="Enter OTP" id="forgotOtp" required maxlength="6">
+                        </div>
+                        <div class="error-message" id="forgotOtpError"></div>
+                        <button type="button" class="login-btn" id="verifyForgotOtpBtn">Verify OTP</button>
+                        <p style="text-align: center; margin-top: 1rem;">
+                            <a href="#" id="resendForgotOtp" class="toggle-link">Resend OTP</a>
+                        </p>
+                    </div>
+
+                    <!-- Step 3: New Password -->
+                    <div id="forgotStep3" style="display: none;">
+                        <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Enter your new password
+                        </p>
+                        <div class="input-group">
+                            <input type="password" class="input-field" placeholder="New Password" id="newPassword" required>
+                            <button type="button" class="password-toggle" id="toggleNewPassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" class="input-field" placeholder="Confirm New Password" id="confirmNewPassword" required>
+                            <button type="button" class="password-toggle" id="toggleConfirmNewPassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="error-message" id="forgotPasswordError"></div>
+                        <button type="button" class="login-btn" id="resetPasswordBtn">Reset Password</button>
+                    </div>
+
+                    <div class="toggle-auth" style="margin: 20px 0 0 0; text-align: center;">
+                        <p>Remember your password? <a href="#" class="toggle-link" id="backToLogin">Back to Login</a></p>
+                    </div>
+
+                    <div class="success-message" id="forgotSuccessMessage">
+                        Password reset successful! Redirecting to login... 🎉
+                    </div>
                 </div>
             </div>
         </div>
@@ -1158,6 +1231,256 @@
                 createProfileBtn.textContent = btnOriginal;
                 createProfileBtn.disabled = false;
             }
+        });
+
+        // Forgot Password Functionality
+        const showForgotPasswordLink = document.getElementById('showForgotPassword');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const loginFormDiv = document.getElementById('loginForm');
+        const backToLoginLink = document.getElementById('backToLogin');
+        
+        // Show forgot password form
+        showForgotPasswordLink?.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginFormDiv.style.display = 'none';
+            forgotPasswordForm.style.display = 'block';
+            // Reset form to step 1
+            document.getElementById('forgotStep1').style.display = 'block';
+            document.getElementById('forgotStep2').style.display = 'none';
+            document.getElementById('forgotStep3').style.display = 'none';
+            document.getElementById('forgotSuccessMessage').style.display = 'none';
+            // Clear previous values
+            document.getElementById('forgotEmail').value = '';
+            document.getElementById('forgotOtp').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+        });
+        
+        // Back to login
+        backToLoginLink?.addEventListener('click', function(e) {
+            e.preventDefault();
+            forgotPasswordForm.style.display = 'none';
+            loginFormDiv.style.display = 'block';
+        });
+        
+        // Send OTP for forgot password
+        let forgotOtpVerified = false;
+        let verifiedForgotEmail = '';
+        
+        document.getElementById('sendForgotOtpBtn')?.addEventListener('click', async function() {
+            const emailInput = document.getElementById('forgotEmail');
+            const email = emailInput.value.trim();
+            const emailError = document.getElementById('forgotEmailError');
+            
+            // Clear previous error
+            emailError.textContent = '';
+            emailError.style.display = 'none';
+            
+            // Validate email
+            if (!email) {
+                emailError.textContent = 'Please enter your email address';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            const btn = document.getElementById('sendForgotOtpBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+            
+            try {
+                // Check if email exists in database
+                const checkRes = await fetch(`${API_BASE_URL}/api/check-email`, {
+                    ...fetchOptions,
+                    body: JSON.stringify({ email })
+                });
+                
+                const checkData = await checkRes.json();
+                
+                if (!checkRes.ok) {
+                    // Check for rate limit error (429 status)
+                    if (checkRes.status === 429) {
+                        throw new Error(checkData.error || 'Too many attempts. Please try again later.');
+                    }
+                    throw new Error(checkData.error || 'Failed to verify email');
+                }
+                
+                if (!checkData.exists) {
+                    throw new Error('No account found with this email address');
+                }
+                
+                // Send OTP
+                const response = await fetch(`${OTP_API_URL}/send-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to send OTP');
+                }
+                
+                // Show step 2
+                document.getElementById('forgotStep1').style.display = 'none';
+                document.getElementById('forgotStep2').style.display = 'block';
+                verifiedForgotEmail = email;
+                
+                alert('OTP sent to your email!');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                emailError.textContent = error.message || 'Failed to send OTP. Please try again.';
+                emailError.style.display = 'block';
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+        
+        // Verify OTP for forgot password
+        document.getElementById('verifyForgotOtpBtn')?.addEventListener('click', async function() {
+            const otpInput = document.getElementById('forgotOtp');
+            const otp = otpInput.value.trim();
+            const otpError = document.getElementById('forgotOtpError');
+            
+            otpError.textContent = '';
+            otpError.style.display = 'none';
+            
+            if (!otp || otp.length !== 6) {
+                otpError.textContent = 'Please enter a valid 6-digit OTP';
+                otpError.style.display = 'block';
+                return;
+            }
+            
+            const btn = document.getElementById('verifyForgotOtpBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Verifying...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`${OTP_API_URL}/verify-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: verifiedForgotEmail, otp })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Invalid OTP');
+                }
+                
+                forgotOtpVerified = true;
+                
+                // Show step 3
+                document.getElementById('forgotStep2').style.display = 'none';
+                document.getElementById('forgotStep3').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                otpError.textContent = error.message || 'Invalid OTP. Please try again.';
+                otpError.style.display = 'block';
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+        
+        // Reset password
+        document.getElementById('resetPasswordBtn')?.addEventListener('click', async function() {
+            const newPasswordInput = document.getElementById('newPassword');
+            const confirmPasswordInput = document.getElementById('confirmNewPassword');
+            const passwordError = document.getElementById('forgotPasswordError');
+            
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            passwordError.textContent = '';
+            passwordError.style.display = 'none';
+            
+            // Validate passwords
+            if (!newPassword || newPassword.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                passwordError.textContent = 'Passwords do not match';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            const btn = document.getElementById('resetPasswordBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Resetting...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
+                    ...fetchOptions,
+                    body: JSON.stringify({
+                        email: verifiedForgotEmail,
+                        newPassword: newPassword
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to reset password');
+                }
+                
+                // Show success message
+                document.getElementById('forgotStep3').style.display = 'none';
+                document.getElementById('forgotSuccessMessage').style.display = 'block';
+                
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    forgotPasswordForm.style.display = 'none';
+                    loginFormDiv.style.display = 'block';
+                    document.getElementById('forgotSuccessMessage').style.display = 'none';
+                    // Reset form for next time
+                    document.getElementById('forgotStep1').style.display = 'block';
+                    document.getElementById('forgotStep2').style.display = 'none';
+                    document.getElementById('forgotStep3').style.display = 'none';
+                    forgotOtpVerified = false;
+                    verifiedForgotEmail = '';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                passwordError.textContent = error.message || 'Failed to reset password. Please try again.';
+                passwordError.style.display = 'block';
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+        
+        // Password toggle functionality for new password fields
+        document.getElementById('toggleNewPassword')?.addEventListener('click', function() {
+            const input = document.getElementById('newPassword');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+        });
+        
+        document.getElementById('toggleConfirmNewPassword')?.addEventListener('click', function() {
+            const input = document.getElementById('confirmNewPassword');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
         });
 
         // Handle login form submission (Sign In on this page)

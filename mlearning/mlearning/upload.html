@@ -1214,7 +1214,7 @@
         <p class="page-subtitle">Share your knowledge with the world and earn from your expertise</p>
         <div class="upload-fee-header">
             <i class="fas fa-exclamation"></i>
-            <span>Upload fee: ₹200 per video</span>
+            <span>Upload fee: ₹120 per video</span>
         </div>
     </header>
 
@@ -1255,7 +1255,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Pricing</label>
+                    <label>Pricing <span style="font-size: 0.75rem; color: #6b7280; font-weight: 500;">(Video cost in limits ₹299 - ₹999)</span></label>
                     <div class="cost-input" id="costInput" style="display: block;">
                         <div class="currency-amount-group">
                             <select id="currency" class="form-control currency-select">
@@ -1269,12 +1269,28 @@
                             </select>
                             <div class="input-with-icon">
                                 <i class="fas fa-dollar-sign" id="currencyIcon"></i>
-                                <input type="number" id="cost" class="form-control" placeholder="Enter amount" min="0" max="4000" step="0.01" required>
+                                <input type="number" id="cost" class="form-control" placeholder="Enter amount (299-999)" min="299" max="999" step="0.01" required>
                             </div>
                         </div>
-                        <div class="input-with-icon" style="margin-top: 0.75rem;">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="paymentEmail" class="form-control" placeholder="Your email for payment receipts" required>
+                        <div id="earningsPreview" style="margin-top: 0.75rem; padding: 0.75rem; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 8px; border: 1px solid #86efac; display: none;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-hand-holding-usd" style="color: #16a34a;"></i>
+                                <span style="font-weight: 600; color: #166534; font-size: 0.9rem;">Your Earnings Preview</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
+                                <div style="text-align: center;">
+                                    <div style="color: #6b7280;">Price</div>
+                                    <div id="previewPrice" style="font-weight: 600; color: #374151;">-</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #6b7280;">Platform Fee (16%)</div>
+                                    <div id="previewFee" style="font-weight: 600; color: #dc2626;">-</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #6b7280;">You Receive (84%)</div>
+                                    <div id="previewEarnings" style="font-weight: 700; color: #16a34a;">-</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1337,8 +1353,8 @@
                         <div class="info-box">
                             <i class="fas fa-percentage"></i>
                             <div>
-                                <h5>Platform Fee: 5%</h5>
-                                <p>You'll receive 95% of each video sale directly to your account when any user buy your video</p>
+                                <h5>Platform Fee: 16%</h5>
+                                <p>You'll receive 84% of each video sale directly to your account when any user buy your video</p>
                             </div>
                         </div>
                     </div>
@@ -1396,7 +1412,7 @@
 
                 <div class="upload-fee" style="margin-top: 1.5rem; display: none;">
                     <i class="fas fa-info-circle"></i>
-                    <span>Upload fee: ₹200 per video</span>
+                    <span>Upload fee: ₹120 per video</span>
                 </div>
             </section>
         </form>
@@ -1608,6 +1624,44 @@
                 const iconClass = currencyIcons[selectedCurrency] || 'fas fa-dollar-sign';
                 currencyIcon.className = iconClass;
             });
+
+            // Earnings preview calculation
+            const costField = document.getElementById('cost');
+            const earningsPreview = document.getElementById('earningsPreview');
+            const previewPrice = document.getElementById('previewPrice');
+            const previewFee = document.getElementById('previewFee');
+            const previewEarnings = document.getElementById('previewEarnings');
+
+            function updateEarningsPreview() {
+                const price = parseFloat(costField.value) || 0;
+                const currency = currencySelect.value;
+                
+                if (price > 0) {
+                    const platformFee = (price * 0.16).toFixed(2);
+                    const earnings = (price * 0.84).toFixed(2);
+                    
+                    const currencySymbols = {
+                        'USD': '$',
+                        'INR': '₹',
+                        'EUR': '€',
+                        'GBP': '£',
+                        'JPY': '¥',
+                        'AUD': '$',
+                        'CAD': '$'
+                    };
+                    const symbol = currencySymbols[currency] || '$';
+                    
+                    previewPrice.textContent = symbol + price.toFixed(2);
+                    previewFee.textContent = symbol + platformFee;
+                    previewEarnings.textContent = symbol + earnings;
+                    earningsPreview.style.display = 'block';
+                } else {
+                    earningsPreview.style.display = 'none';
+                }
+            }
+
+            costField.addEventListener('input', updateEarningsPreview);
+            currencySelect.addEventListener('change', updateEarningsPreview);
 
             // Set initial required attributes for payment fields
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
@@ -1876,14 +1930,11 @@
                         amount: orderData.amount,
                         currency: orderData.currency,
                         name: 'Market Master',
-                        description: 'Video Upload Fee (₹200)',
+                        description: 'Video Upload Fee (₹120)',
                         order_id: orderData.orderId,
                         handler: async function(response) {
                             // Payment successful - now save the video
                             await saveVideo(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
-                        },
-                        prefill: {
-                            email: document.getElementById('paymentEmail').value || ''
                         },
                         theme: {
                             color: '#6366f1'
@@ -1933,7 +1984,6 @@
                 const currency = document.getElementById('currency').value;
                 formData.append('cost', cost.toString());
                 formData.append('currency', currency);
-                formData.append('paymentEmail', document.getElementById('paymentEmail').value.trim());
                 
                 // Add Razorpay payment details
                 formData.append('uploadPaymentId', paymentId);

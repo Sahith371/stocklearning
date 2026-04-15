@@ -949,6 +949,23 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
+        .rating-display {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .rating-display i {
+            color: white;
+            font-size: 0.7rem;
+        }
 
         /* Video Modal Styles */
         .video-modal {
@@ -2542,6 +2559,11 @@
                                     <span class="uploader">
                                         <i class="fas fa-user"></i> ${video.uploader || 'Anonymous'}
                                     </span>
+                                    ${video.averageRating > 0 ? `
+                                    <span class="rating-display">
+                                        <i class="fas fa-star"></i> ${video.averageRating.toFixed(1)} (${video.totalReviews || 0})
+                                    </span>
+                                    ` : ''}
                                 </div>
                             </div>
                         </div>
