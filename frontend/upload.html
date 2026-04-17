@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Content - Market Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #14b8a6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+            min-height: 100vh;
+            color: #0f172a;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        /* Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.04) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header Section */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 1rem;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .upload-fee-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border: 2px solid #e53e3e;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-top: 16px;
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.15);
+        }
+
+        .upload-fee-header i {
+            color: #e53e3e;
+            font-size: 1.2rem;
+        }
+
+        .upload-fee-header span {
+            color: #c53030;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Progress Tracking Styles */
+        .progress-container {
+            display: none;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .progress-container.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            border-color: #6366f1;
+            background: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .progress-step.completed {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        }
+
+        .progress-step.error {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .progress-step.active .step-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .progress-step.completed .step-icon {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .progress-step.error .step-icon {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .step-description {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        /* AI Validation Result Styles */
+        .validation-result {
+            display: none;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .validation-result.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .validation-result.approved {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #22c55e;
+        }
+
+        .validation-result.rejected {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px solid #ef4444;
+        }
+
+        .validation-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .validation-result.approved .validation-icon {
+            color: #22c55e;
+        }
+
+        .validation-result.rejected .validation-icon {
+            color: #ef4444;
+        }
+
+        .validation-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .validation-result.approved .validation-title {
+            color: #166534;
+        }
+
+        .validation-result.rejected .validation-title {
+            color: #991b1b;
+        }
+
+        .validation-message {
+            color: #4b5563;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .validation-scores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .score-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .score-value.pass {
+            color: #22c55e;
+        }
+
+        .score-value.fail {
+            color: #ef4444;
+        }
+
+        .ai-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+        }
+
+        .ai-summary h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .ai-summary p {
+            color: #4b5563;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .upload-form-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Single Border Container for All 3 Columns */
+        #uploadForm {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            align-items: start;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+        }
+
+        /* Form Section - No Individual Borders */
+        .form-section {
+            padding: 1.5rem;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-control {
+            width: 100%;
+            max-width: 320px;
+            padding: 0.9rem 1rem 0.9rem 2.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-input {
+            width: 100%;
+            max-width: 320px;
+            padding: 0.9rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* Currency & Cost */
+        .cost-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .currency-amount-group {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 0.75rem;
+        }
+
+        .currency-select {
+            padding-left: 1rem;
+            cursor: pointer;
+        }
+
+        /* Payment Method Toggle */
+        .payment-method-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            border-color: #6366f1;
+            background: #f1f5f9;
+        }
+
+        .payment-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+
+        .payment-details {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .platform-fee-info {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .info-box i {
+            color: #22c55e;
+            font-size: 1.25rem;
+            margin-top: 2px;
+        }
+
+        .info-box h5 {
+            color: #22c55e;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-box p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload:hover {
+            border-color: #6366f1;
+            border-style: solid;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        }
+
+        .file-upload i {
+            font-size: 1.5rem;
+            color: #6366f1;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .file-upload h3 {
+            color: #0f172a;
+            margin-bottom: 0.15rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .file-upload p {
+            margin-bottom: 0.15rem;
+            color: #64748b;
+            font-size: 0.7rem;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #262626 100%);
+            color: #ffffff;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #333333 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #6366f1;
+            border: 1px solid #6366f1;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:disabled {
+            background: linear-gradient(135deg, #666 0%, #888 50%, #999 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Terms and Conditions */
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .terms-checkbox label {
+            font-size: 0.9rem;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .terms-link {
+            color: #3b82f6;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .terms-link:hover {
+            color: #2563eb;
+        }
+
+        /* Terms Modal */
+        .terms-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .terms-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .terms-modal-content {
+            background: #ffffff;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .terms-modal-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .terms-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .terms-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .terms-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .terms-modal-body {
+            padding: 2rem;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .terms-condition {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #ef4444;
+        }
+
+        .terms-condition-number {
+            background: #ef4444;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .terms-condition p {
+            margin: 0;
+            color: #334155;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .terms-modal-footer {
+            padding: 1.5rem 2rem;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-decline {
+            background: #fff;
+            color: #64748b;
+            border: 2px solid #cbd5e1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-decline:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .btn-accept {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-accept:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Upload Fee Notice */
+        .upload-fee {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #f59e0b;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 1.25rem;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-radius: 12px;
+            border: 2px solid #fcd34d;
+        }
+
+        .upload-fee i {
+            font-size: 1.25rem;
+        }
+
+        /* Form Footer - Centered */
+        .form-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .submit-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .amount-input {
+            flex: 1;
+        }
+
+        .amount-input .input-with-icon {
+            position: relative;
+        }
+
+        .amount-input .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .amount-input .form-control {
+            padding-left: 3rem;
+        }
+
+        @media (max-width: 576px) {
+            .currency-amount-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .currency-selector {
+                min-width: auto;
+            }
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f0f5ff;
+            border-radius: var(--border-radius);
+            color: var(--primary);
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInDown 0.5s ease-out;
+            box-shadow: 0 5px 20px rgba(0, 184, 148, 0.3);
+        }
+
+        .success-message i {
+            font-size: 1.25rem;
+        }
+
+        .success-message p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        @keyframes slideInDown {
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .qr-upload-section {
+            margin-top: 1rem;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        .file-upload-label i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .file-text {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .qr-preview {
+            position: relative;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .qr-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+        }
+
+        .remove-qr {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+        }
+
+        .remove-qr:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Payment Details Styles */
+        .payment-details-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 1rem;
+        }
+
+        .payment-method-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary-light);
+            background: linear-gradient(135deg, #f8f9ff 0%, #e9ecef 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.15);
+        }
+
+        .payment-option input[type="radio"] {
+            accent-color: var(--primary);
+            transform: scale(1.2);
+        }
+
+        .payment-option input[type="radio"]:checked + .radio-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .payment-option input[type="radio"]:checked ~ .payment-option {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        .radio-label {
+            font-size: 0.95rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .payment-details {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            margin-top: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .payment-details .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-details .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .platform-fee-info {
+            margin-top: 2rem;
+        }
+
+        .info-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border-radius: 12px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+        }
+
+        .info-box i {
+            font-size: 2rem;
+            color: #28a745;
+            flex-shrink: 0;
+        }
+
+        .info-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+            color: #155724;
+            font-weight: 600;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #155724;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 576px) {
+            .upload-container {
+                padding: 1.5rem;
+            }
+
+            .upload-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .qr-preview img {
+                max-width: 150px;
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="page-header">
+        <span class="page-badge">
+            <i class="fas fa-cloud-upload-alt"></i>
+            Content Upload
+        </span>
+        <h1 class="page-title">Upload Your Content</h1>
+        <p class="page-subtitle">Share your knowledge with the world and earn from your expertise</p>
+        <div class="upload-fee-header">
+            <i class="fas fa-exclamation"></i>
+            <span>Upload fee: ₹120 per video</span>
+        </div>
+    </header>
+
+    <!-- Main Form -->
+    <main class="upload-form-container">
+        <form id="uploadForm">
+            <!-- Column 1: Basic Info -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="section-title">Basic Information</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="topic">Topic</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-tag"></i>
+                        <input type="text" id="topic" class="form-control" placeholder="What's your content about?" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-with-icon" style="display: flex; gap: 0.5rem;">
+                        <i class="fas fa-phone" style="flex-shrink: 0;"></i>
+                        <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number (e.g., +919876543210)" required style="flex: 1; min-width: 200px;">
+                        <button type="button" id="sendPhoneOtpBtn" class="btn btn-secondary" style="padding: 0.1rem 0.45rem; white-space: nowrap; font-size: 0.7rem; flex-shrink: 0; min-width: auto; width: auto; background-color: #000000; color: #ffffff; border: 1px solid #000000;">Send OTP</button>
+                    </div>
+                    <small id="phoneStatus" style="color: #6b7280; display: block; margin-top: 0.25rem;"></small>
+                </div>
+
+                <div class="form-group" id="phoneOtpGroup" style="display: none;">
+                    <label for="phoneOtp">Verify OTP</label>
+                    <div class="input-with-icon" style="display: flex; gap: 0.5rem;">
+                        <i class="fas fa-lock" style="flex-shrink: 0;"></i>
+                        <input type="text" id="phoneOtp" class="form-control" placeholder="Enter 6-digit OTP" maxlength="6" style="flex: 1; min-width: 200px;">
+                        <button type="button" id="verifyPhoneOtpBtn" class="btn btn-secondary" style="padding: 0.1rem 0.45rem; white-space: nowrap; font-size: 0.7rem; flex-shrink: 0; min-width: auto; width: auto; background-color: #000000; color: #ffffff; border: 1px solid #000000;">Verify</button>
+                    </div>
+                    <small id="phoneOtpStatus" style="color: #6b7280; display: block; margin-top: 0.25rem;"></small>
+                </div>
+
+                <input type="hidden" id="phoneVerified" value="false">
+
+                <div class="form-group">
+                    <label>Pricing <span style="font-size: 0.75rem; color: #6b7280; font-weight: 500;">(Video cost in limits ₹299 - ₹999)</span></label>
+                    <div class="cost-input" id="costInput" style="display: block;">
+                        <div class="currency-amount-group">
+                            <select id="currency" class="form-control currency-select">
+                                <option value="USD" selected>$ USD</option>
+                                <option value="INR">₹ INR</option>
+                                <option value="EUR">€ EUR</option>
+                                <option value="GBP">£ GBP</option>
+                                <option value="JPY">¥ JPY</option>
+                                <option value="AUD">$ AUD</option>
+                                <option value="CAD">$ CAD</option>
+                            </select>
+                            <div class="input-with-icon">
+                                <i class="fas fa-dollar-sign" id="currencyIcon"></i>
+                                <input type="number" id="cost" class="form-control" placeholder="Enter amount (299-999)" min="299" max="999" step="0.01" required>
+                            </div>
+                        </div>
+                        <div id="earningsPreview" style="margin-top: 0.75rem; padding: 0.75rem; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 8px; border: 1px solid #86efac; display: none;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-hand-holding-usd" style="color: #16a34a;"></i>
+                                <span style="font-weight: 600; color: #166534; font-size: 0.9rem;">Your Earnings Preview</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
+                                <div style="text-align: center;">
+                                    <div style="color: #6b7280;">Price</div>
+                                    <div id="previewPrice" style="font-weight: 600; color: #374151;">-</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #6b7280;">Platform Fee (16%)</div>
+                                    <div id="previewFee" style="font-weight: 600; color: #dc2626;">-</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #6b7280;">You Receive (84%)</div>
+                                    <div id="previewEarnings" style="font-weight: 700; color: #16a34a;">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Column 2: Payment Details -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h2 class="section-title">Payment Details</h2>
+                </div>
+
+                <div class="form-group" id="paymentDetails" style="display: block;">
+                    <label>Payment Method (For Direct Money Transfer)</label>
+                    <div class="payment-method-toggle">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="upi" checked onchange="togglePaymentMethod('upi')">
+                            <span class="radio-label">UPI ID</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="bank" onchange="togglePaymentMethod('bank')">
+                            <span class="radio-label">Bank Account</span>
+                        </label>
+                    </div>
+
+                    <!-- UPI Details -->
+                    <div id="upiDetails" class="payment-details">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="ownerUpiId">Your UPI ID</label>
+                            <input type="text" id="ownerUpiId" name="ownerUpiId" 
+                                   placeholder="yourname@ybl" class="form-input" required>
+                            <p style="font-size: 0.8rem; color: var(--gray); margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> PhonePe, GPay, Paytm, etc.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bank Details -->
+                    <div id="bankDetails" class="payment-details" style="display: none;">
+                        <div class="form-group">
+                            <label for="ownerAccountName">Account Holder Name</label>
+                            <input type="text" id="ownerAccountName" name="ownerAccountName" 
+                                   placeholder="John Doe" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="ownerAccountNumber">Account Number</label>
+                            <input type="text" id="ownerAccountNumber" name="ownerAccountNumber" 
+                                   placeholder="1234567890123456" class="form-input">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="ownerIfsc">IFSC Code</label>
+                            <input type="text" id="ownerIfsc" name="ownerIfsc" 
+                                   placeholder="HDFC0001234" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="platform-fee-info">
+                        <div class="info-box">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <h5>Platform Fee: 16%</h5>
+                                <p>You'll receive 84% of each video sale directly to your account when any user buy your video</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="termsCheck" disabled>
+                        <label for="termsCheck">I agree to the <span class="terms-link" onclick="openTermsModal()">Terms and Conditions</span></label>
+                    </div>
+
+                    <button type="submit" form="uploadForm" class="btn btn-primary" id="uploadBtn" style="margin-top: 1.5rem; width: 100%;" disabled>
+                        <i class="fas fa-upload"></i> Upload Video
+                    </button>
+                </div>
+            </section>
+
+            <!-- Column 3: Video Upload -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h2 class="section-title">Upload Video</h2>
+                </div>
+
+                <div class="form-group">
+                    <label><b>Video File</b></label>
+                    <div class="file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Drag & drop your video here</h3>
+                        <p>or click to browse</p>
+                        <button type="button" class="btn btn-outline">
+                            <i class="fas fa-folder-open"></i> Select File
+                        </button>
+                        <p style="font-size: 0.8rem; margin-top: 1rem; color: var(--gray);">
+                            MP4, WebM or MOV. Max 1GB
+                        </p>
+                        <input type="file" id="videoFile" accept="video/*" required>
+                    </div>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+
+                <!-- SEBI Certificate Upload -->
+                <div class="form-group">
+                    <label style="font-size: 0.85rem; color: #64748b;"><b>SEBI Certificate</b> <span style="color: #94a3b8;">(optional, required only if buy/sell advice or promos included in video)</span></label>
+                    <div class="file-upload" style="padding: 1.25rem;">
+                        <i class="fas fa-certificate" style="font-size: 2rem;"></i>
+                        <p style="font-size: 0.8rem; color: #64748b;">PDF, JPG or PNG</p>
+                        <button type="button" class="btn btn-outline" style="max-width: 180px; margin: 0 auto; padding: 0.6rem 1rem; font-size: 0.85rem;">
+                            <i class="fas fa-upload"></i> Upload
+                        </button>
+                        <input type="file" id="sebiCertificate" accept=".pdf,image/*" style="display: none;">
+                    </div>
+                    <div class="file-info" id="sebiFileInfo"></div>
+                </div>
+
+                <div class="upload-fee" style="margin-top: 1.5rem; display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Upload fee: ₹120 per video</span>
+                </div>
+            </section>
+        </form>
+
+        <!-- AI Processing Progress -->
+        <div id="progressContainer" class="progress-container">
+            <div class="progress-title">
+                <i class="fas fa-brain"></i> AI Processing Your Video
+            </div>
+            <div class="progress-steps">
+                <div class="progress-step" id="step-upload">
+                    <div class="step-icon"><i class="fas fa-upload"></i></div>
+                    <div class="step-content">
+                        <div class="step-label">Uploading Video</div>
+                        <div class="step-description">Transferring video to server...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step-audio">
+                    <div class="step-icon"><i class="fas fa-music"></i></div>
+                    <div class="step-content">
+                        <div class="step-label">Extracting Audio</div>
+                        <div class="step-description">Converting video to audio format...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step-transcription">
+                    <div class="step-icon"><i class="fas fa-microphone"></i></div>
+                    <div class="step-content">
+                        <div class="step-label">Speech-to-Text</div>
+                        <div class="step-description">Transcribing audio using AI...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step-validation">
+                    <div class="step-icon"><i class="fas fa-robot"></i></div>
+                    <div class="step-content">
+                        <div class="step-label">AI Validation</div>
+                        <div class="step-description">Checking stock relevance & topic match...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step-save">
+                    <div class="step-icon"><i class="fas fa-save"></i></div>
+                    <div class="step-content">
+                        <div class="step-label">Saving Video</div>
+                        <div class="step-description">Storing approved video in database...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Validation Results -->
+        <div id="validationResult" class="validation-result">
+            <div class="validation-icon">
+                <i id="validationIcon" class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="validation-title" id="validationTitle">Video Approved!</h3>
+            <p class="validation-message" id="validationMessage">Your video has been approved by our AI validation system.</p>
+            
+            <div class="validation-scores" id="validationScores">
+                <div class="score-card">
+                    <div class="score-label">Stock Market Relevance</div>
+                    <div class="score-value pass" id="relevanceScore">85</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Topic Match</div>
+                    <div class="score-value pass" id="topicScore">90</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Terms and Conditions Modal -->
+    <div id="termsModal" class="terms-modal">
+        <div class="terms-modal-content">
+            <div class="terms-modal-header">
+                <h2><i class="fas fa-file-contract"></i> Terms and Conditions</h2>
+                <button class="terms-close" onclick="closeTermsModal()">&times;</button>
+            </div>
+            <div class="terms-modal-body">
+                <div class="terms-condition">
+                    <div class="terms-condition-number">1</div>
+                    <p><strong>SEBI Registration Required:</strong> Buy/sell advice and promotional content must only be provided by SEBI registered brokers or investment advisors. Unauthorized financial advice is strictly prohibited and may result in legal action.</p>
+                </div>
+                <div class="terms-condition">
+                    <div class="terms-condition-number">2</div>
+                    <p><strong>Content Quality:</strong> Uploading scrap videos that do not contain relevant stock market content will result in heavy penalties up to ₹50,000 and permanent account suspension. All content must provide genuine educational or analytical value.</p>
+                </div>
+                <div class="terms-condition">
+                    <div class="terms-condition-number">3</div>
+                    <p><strong>Accuracy of Information:</strong> You are solely responsible for the accuracy of all information provided. Misleading content, false claims, or manipulated data will result in immediate content removal and account penalties.</p>
+                </div>
+                <div class="terms-condition">
+                    <div class="terms-condition-number">4</div>
+                    <p><strong>Intellectual Property:</strong> All uploaded content must be your original work. Copyright infringement, plagiarism, or unauthorized use of third-party materials will result in content removal and potential legal consequences.</p>
+                </div>
+                <div class="terms-condition">
+                    <div class="terms-condition-number">5</div>
+                    <p><strong>Compliance with Regulations:</strong> All content must comply with SEBI guidelines, RBI regulations, and Indian financial laws. The platform reserves the right to remove any content violating regulatory requirements.</p>
+                </div>
+                <div class="terms-condition">
+                    <div class="terms-condition-number">6</div>
+                    <p><strong>Platform Rights:</strong> By uploading, you grant the platform non-exclusive rights to host, distribute, and promote your content. The platform may remove content at its discretion if found inappropriate or non-compliant with policies.</p>
+                </div>
+            </div>
+            <div class="terms-modal-footer">
+                <button class="btn-decline" onclick="declineTerms()">Decline</button>
+                <button class="btn-accept" onclick="acceptTerms()">Accept</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        // Terms and Conditions Modal Functions
+        function openTermsModal() {
+            document.getElementById('termsModal').classList.add('active');
+        }
+
+        function closeTermsModal() {
+            document.getElementById('termsModal').classList.remove('active');
+        }
+
+        function acceptTerms() {
+            const termsCheck = document.getElementById('termsCheck');
+            const uploadBtn = document.getElementById('uploadBtn');
+            termsCheck.checked = true;
+            termsCheck.disabled = false;
+            uploadBtn.disabled = false;
+            closeTermsModal();
+        }
+
+        function declineTerms() {
+            const termsCheck = document.getElementById('termsCheck');
+            const uploadBtn = document.getElementById('uploadBtn');
+            termsCheck.checked = false;
+            termsCheck.disabled = true;
+            uploadBtn.disabled = true;
+            closeTermsModal();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('termsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTermsModal();
+            }
+        });
+
+        // Toggle payment method function
+        function togglePaymentMethod(method) {
+            const upiDetails = document.getElementById('upiDetails');
+            const bankDetails = document.getElementById('bankDetails');
+            
+            if (method === 'upi') {
+                upiDetails.style.display = 'block';
+                bankDetails.style.display = 'none';
+                document.getElementById('ownerUpiId').setAttribute('required', 'required');
+                document.getElementById('ownerAccountName').removeAttribute('required');
+                document.getElementById('ownerAccountNumber').removeAttribute('required');
+                document.getElementById('ownerIfsc').removeAttribute('required');
+            } else {
+                upiDetails.style.display = 'none';
+                bankDetails.style.display = 'block';
+                document.getElementById('ownerUpiId').removeAttribute('required');
+                document.getElementById('ownerAccountName').setAttribute('required', 'required');
+                document.getElementById('ownerAccountNumber').setAttribute('required', 'required');
+                document.getElementById('ownerIfsc').setAttribute('required', 'required');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('uploadForm');
+            const costInput = document.getElementById('costInput');
+            const fileInput = document.getElementById('videoFile');
+            const fileInfo = document.getElementById('fileInfo');
+            const browseBtn = document.querySelector('.btn-outline');
+            const fileUploadLabel = document.querySelector('.file-upload-label');
+            const fileName = document.querySelector('.file-name');
+
+            // File upload functionality
+            browseBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileInfo.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success);">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        </div>
+                    `;
+                }
+            });
+
+            // Handle currency change
+            const currencySelect = document.getElementById('currency');
+            const currencyIcon = document.getElementById('currencyIcon');
+            
+            const currencyIcons = {
+                'USD': 'fas fa-dollar-sign',
+                'INR': 'fas fa-rupee-sign',
+                'EUR': 'fas fa-euro-sign',
+                'GBP': 'fas fa-pound-sign',
+                'JPY': 'fas fa-yen-sign',
+                'AUD': 'fas fa-dollar-sign',
+                'CAD': 'fas fa-dollar-sign'
+            };
+
+            currencySelect.addEventListener('change', function() {
+                const selectedCurrency = this.value;
+                const iconClass = currencyIcons[selectedCurrency] || 'fas fa-dollar-sign';
+                currencyIcon.className = iconClass;
+            });
+
+            // Earnings preview calculation
+            const costField = document.getElementById('cost');
+            const earningsPreview = document.getElementById('earningsPreview');
+            const previewPrice = document.getElementById('previewPrice');
+            const previewFee = document.getElementById('previewFee');
+            const previewEarnings = document.getElementById('previewEarnings');
+
+            function updateEarningsPreview() {
+                const price = parseFloat(costField.value) || 0;
+                const currency = currencySelect.value;
+                
+                if (price > 0) {
+                    const platformFee = (price * 0.16).toFixed(2);
+                    const earnings = (price * 0.84).toFixed(2);
+                    
+                    const currencySymbols = {
+                        'USD': '$',
+                        'INR': '₹',
+                        'EUR': '€',
+                        'GBP': '£',
+                        'JPY': '¥',
+                        'AUD': '$',
+                        'CAD': '$'
+                    };
+                    const symbol = currencySymbols[currency] || '$';
+                    
+                    previewPrice.textContent = symbol + price.toFixed(2);
+                    previewFee.textContent = symbol + platformFee;
+                    previewEarnings.textContent = symbol + earnings;
+                    earningsPreview.style.display = 'block';
+                } else {
+                    earningsPreview.style.display = 'none';
+                }
+            }
+
+            costField.addEventListener('input', updateEarningsPreview);
+            currencySelect.addEventListener('change', updateEarningsPreview);
+
+            // Set initial required attributes for payment fields
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            if (paymentMethod === 'upi') {
+                document.getElementById('ownerUpiId').setAttribute('required', '');
+            } else {
+                document.getElementById('ownerAccountName').setAttribute('required', '');
+                document.getElementById('ownerAccountNumber').setAttribute('required', '');
+                document.getElementById('ownerIfsc').setAttribute('required', '');
+            }
+
+            // File input click handler
+            browseBtn.addEventListener('click', () => fileInput.click());
+
+            // Phone OTP Functionality
+            const phoneInput = document.getElementById('phone');
+            const sendPhoneOtpBtn = document.getElementById('sendPhoneOtpBtn');
+            const phoneOtpGroup = document.getElementById('phoneOtpGroup');
+            const phoneOtpInput = document.getElementById('phoneOtp');
+            const verifyPhoneOtpBtn = document.getElementById('verifyPhoneOtpBtn');
+            const phoneStatus = document.getElementById('phoneStatus');
+            const phoneOtpStatus = document.getElementById('phoneOtpStatus');
+            const phoneVerified = document.getElementById('phoneVerified');
+            let phoneOtpGenerated = null;
+
+            // Send Phone OTP
+            sendPhoneOtpBtn?.addEventListener('click', async function() {
+                const phone = phoneInput.value.trim();
+                
+                if (!phone) {
+                    phoneStatus.textContent = 'Please enter phone number first';
+                    phoneStatus.style.color = 'var(--danger)';
+                    return;
+                }
+
+                // Validate phone format (E.164 format with country code)
+                if (!phone.match(/^\+[1-9]\d{1,14}$/)) {
+                    phoneStatus.textContent = 'Please enter valid phone with country code (e.g., +919876543210)';
+                    phoneStatus.style.color = 'var(--danger)';
+                    return;
+                }
+
+                sendPhoneOtpBtn.disabled = true;
+                sendPhoneOtpBtn.textContent = 'Sending...';
+                phoneStatus.textContent = '';
+
+                try {
+                    const response = await fetch('/api/send-phone-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone: phone })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        phoneStatus.textContent = 'OTP sent to your phone!';
+                        phoneStatus.style.color = 'var(--success)';
+                        phoneOtpGroup.style.display = 'block';
+                        phoneInput.disabled = true;
+                        sendPhoneOtpBtn.textContent = 'Sent';
+                        
+                        // For demo/testing: show OTP in console
+                        console.log('Phone OTP:', data.otp);
+                    } else {
+                        throw new Error(data.error || 'Failed to send OTP');
+                    }
+                } catch (error) {
+                    phoneStatus.textContent = error.message;
+                    phoneStatus.style.color = 'var(--danger)';
+                    sendPhoneOtpBtn.disabled = false;
+                    sendPhoneOtpBtn.textContent = 'Send OTP';
+                }
+            });
+
+            // Verify Phone OTP
+            verifyPhoneOtpBtn?.addEventListener('click', function() {
+                const enteredOtp = phoneOtpInput.value.trim();
+                
+                if (!enteredOtp) {
+                    phoneOtpStatus.textContent = 'Please enter OTP';
+                    phoneOtpStatus.style.color = 'var(--danger)';
+                    return;
+                }
+
+                if (enteredOtp.length !== 6) {
+                    phoneOtpStatus.textContent = 'OTP must be 6 digits';
+                    phoneOtpStatus.style.color = 'var(--danger)';
+                    return;
+                }
+
+                verifyPhoneOtpBtn.disabled = true;
+                verifyPhoneOtpBtn.textContent = 'Verifying...';
+
+                fetch('/api/verify-phone-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        phone: phoneInput.value.trim(),
+                        otp: enteredOtp 
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        phoneOtpStatus.textContent = 'Phone verified successfully!';
+                        phoneOtpStatus.style.color = 'var(--success)';
+                        phoneVerified.value = 'true';
+                        phoneOtpInput.disabled = true;
+                        verifyPhoneOtpBtn.textContent = 'Verified';
+                        verifyPhoneOtpBtn.style.background = 'var(--success)';
+                    } else {
+                        throw new Error(data.error || 'Invalid OTP');
+                    }
+                })
+                .catch(error => {
+                    phoneOtpStatus.textContent = error.message;
+                    phoneOtpStatus.style.color = 'var(--danger)';
+                    verifyPhoneOtpBtn.disabled = false;
+                    verifyPhoneOtpBtn.textContent = 'Verify';
+                });
+            });
+
+            // SEBI Certificate upload functionality
+            const sebiBtn = document.querySelectorAll('.btn-outline')[1];
+            const sebiInput = document.getElementById('sebiCertificate');
+            const sebiFileInfo = document.getElementById('sebiFileInfo');
+            
+            sebiBtn.addEventListener('click', () => sebiInput.click());
+            
+            sebiInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const fileSize = (file.size / 1024).toFixed(2);
+                    sebiFileInfo.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success);">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${file.name} (${fileSize} KB)</span>
+                        </div>
+                    `;
+                    sebiFileInfo.style.display = 'block';
+                }
+            });
+
+            // Store validation data after AI check
+            let validationData = null;
+            let checkedFileHash = null;
+
+            // Handle file selection with AI validation
+            fileInput.addEventListener('change', async function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                    
+                    // Check file type
+                    const validTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+                    if (!validTypes.includes(file.type)) {
+                        showFileError('Please upload a valid video file (MP4, WebM, or MOV)');
+                        return;
+                    }
+
+                    // Check file size (max 1GB)
+                    if (file.size > 1024 * 1024 * 1024) {
+                        showFileError('File is too large. Maximum size is 1GB.');
+                        return;
+                    }
+
+                    // Show AI validation progress
+                    const progressContainer = document.getElementById('progressContainer');
+                    const form = document.getElementById('uploadForm');
+                    const validationResult = document.getElementById('validationResult');
+                    
+                    // Helper to update progress steps
+                    const setStep = (stepId, status) => {
+                        const step = document.getElementById(stepId);
+                        step.classList.remove('active', 'completed', 'error');
+                        step.classList.add(status);
+                        const icon = step.querySelector('.step-icon i');
+                        if (status === 'completed') icon.className = 'fas fa-check';
+                        else if (status === 'error') icon.className = 'fas fa-times';
+                    };
+                    
+                    // Reset and show progress
+                    validationData = null;
+                    progressContainer.classList.add('active');
+                    validationResult.classList.remove('active', 'approved', 'rejected');
+                    
+                    // Reset all steps
+                    ['step-upload', 'step-audio', 'step-transcription', 'step-validation', 'step-save'].forEach(id => {
+                        const step = document.getElementById(id);
+                        step.classList.remove('active', 'completed', 'error');
+                        const icon = step.querySelector('.step-icon i');
+                        if (id === 'step-upload') icon.className = 'fas fa-upload';
+                        else if (id === 'step-audio') icon.className = 'fas fa-music';
+                        else if (id === 'step-transcription') icon.className = 'fas fa-microphone';
+                        else if (id === 'step-validation') icon.className = 'fas fa-robot';
+                        else if (id === 'step-save') icon.className = 'fas fa-save';
+                    });
+                    
+                    setStep('step-upload', 'active');
+                    fileInfo.textContent = `Selected: ${file.name} (${fileSize} MB) - AI Validation in progress...`;
+                    fileInfo.style.display = 'block';
+                    fileInfo.style.color = '#f39c12';
+                    fileInfo.style.backgroundColor = '#fff3cd';
+
+                    try {
+                        // Step 1: Check for duplicate first
+                        const checkForm = new FormData();
+                        checkForm.append('video', file);
+                        
+                        const dupResponse = await fetch('/api/check-duplicate-video', {
+                            method: 'POST',
+                            body: checkForm,
+                            credentials: 'include'
+                        });
+
+                        const dupResult = await dupResponse.json();
+
+                        if (!dupResponse.ok) {
+                            showFileError(dupResult.error || 'Failed to check for duplicates');
+                            progressContainer.classList.remove('active');
+                            return;
+                        }
+
+                        checkedFileHash = dupResult.fileHash;
+                        setStep('step-upload', 'completed');
+                        setStep('step-audio', 'active');
+
+                        // Step 2: AI Validation
+                        const validateForm = new FormData();
+                        validateForm.append('video', file);
+                        validateForm.append('topic', document.getElementById('topic').value.trim() || 'General');
+
+                        const response = await fetch('/api/validate-video', {
+                            method: 'POST',
+                            body: validateForm,
+                            credentials: 'include'
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            setStep('step-validation', 'error');
+                            progressContainer.classList.remove('active');
+                            showFileError(result.error || result.message || 'AI validation failed');
+                            
+                            // Show rejection details if available
+                            if (result.stage) {
+                                validationResult.classList.add('active', 'rejected');
+                                document.getElementById('validationIcon').className = 'fas fa-times-circle';
+                                document.getElementById('validationTitle').textContent = 'Validation Failed';
+                                document.getElementById('validationMessage').textContent = result.message || 'AI validation failed.';
+                                document.getElementById('relevanceScore').textContent = result.relevanceScore || 0;
+                                document.getElementById('relevanceScore').className = (result.relevanceScore > 70) ? 'score-value pass' : 'score-value fail';
+                                document.getElementById('topicScore').textContent = result.topicScore || 0;
+                                document.getElementById('topicScore').className = (result.topicScore > 70) ? 'score-value pass' : 'score-value fail';
+                            }
+                            return;
+                        }
+
+                        // Mark progress steps as completed
+                        setStep('step-audio', 'completed');
+                        setStep('step-transcription', 'completed');
+                        setStep('step-validation', 'completed');
+                        
+                        // Hide progress and show result
+                        progressContainer.classList.remove('active');
+                        
+                        // Check if approved
+                        if (!result.isApproved) {
+                            // Show rejection
+                            validationResult.classList.add('active', 'rejected');
+                            validationResult.classList.remove('approved');
+                            document.getElementById('validationIcon').className = 'fas fa-times-circle';
+                            document.getElementById('validationTitle').textContent = 'Video Rejected';
+                            document.getElementById('validationMessage').textContent = result.rejectionReason || 'Video did not pass AI validation.';
+                            document.getElementById('relevanceScore').textContent = result.relevanceScore || 0;
+                            document.getElementById('relevanceScore').className = (result.relevanceScore > 70) ? 'score-value pass' : 'score-value fail';
+                            document.getElementById('topicScore').textContent = result.topicScore || 0;
+                            document.getElementById('topicScore').className = (result.topicScore > 70) ? 'score-value pass' : 'score-value fail';
+                            
+                            showFileError('Video rejected. Please upload a video that matches your topic and is stock market related.');
+                            return;
+                        }
+
+                        // APPROVED! Show approval and enable payment
+                        validationResult.classList.add('active', 'approved');
+                        validationResult.classList.remove('rejected');
+                        document.getElementById('validationIcon').className = 'fas fa-check-circle';
+                        document.getElementById('validationTitle').textContent = 'Video Approved!';
+                        document.getElementById('validationMessage').textContent = 'Your video passed AI validation. Please complete payment to upload.';
+                        document.getElementById('relevanceScore').textContent = result.relevanceScore;
+                        document.getElementById('relevanceScore').className = 'score-value pass';
+                        document.getElementById('topicScore').textContent = result.topicScore;
+                        document.getElementById('topicScore').className = 'score-value pass';
+                        
+                        // Store validation data for later use
+                        validationData = {
+                            summary: result.summary,
+                            relevanceScore: result.relevanceScore,
+                            topicScore: result.topicScore,
+                            transcript: result.transcript,
+                            fileHash: result.fileHash,
+                            fileName: result.fileName,
+                            originalName: result.originalName
+                        };
+                        
+                        // Show success message
+                        fileInfo.textContent = `Selected: ${file.name} (${fileSize} MB) - AI Approved! Ready for payment.`;
+                        fileInfo.style.color = '#22c55e';
+                        fileInfo.style.backgroundColor = '#dcfce7';
+                        
+                    } catch (error) {
+                        console.error('AI validation error:', error);
+                        progressContainer.classList.remove('active');
+                        showFileError('AI validation failed. Please try again.');
+                    }
+                }
+            });
+
+            function showFileError(message) {
+                fileInfo.textContent = message;
+                fileInfo.style.display = 'block';
+                fileInfo.style.color = '#dc3545';
+                fileInfo.style.backgroundColor = '#ffebee';
+                fileInput.value = '';
+            }
+
+            // Form submission - Check validation first, then payment, then save
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Validate form fields
+                if (fileInput.files.length === 0) {
+                    showFileError('Please select a video file');
+                    return;
+                }
+                
+                // Check if AI validation was completed
+                if (!validationData) {
+                    showFileError('Please wait for AI validation to complete');
+                    return;
+                }
+                
+                // Check if video was approved
+                const validationResult = document.getElementById('validationResult');
+                if (!validationResult.classList.contains('approved')) {
+                    showFileError('Video must pass AI validation before payment');
+                    return;
+                }
+                
+                // Check if phone is verified
+                const phoneVerified = document.getElementById('phoneVerified');
+                if (phoneVerified.value !== 'true') {
+                    showFileError('Please verify your phone number with OTP before proceeding');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                try {
+                    // Step 1: Create Razorpay order
+                    const orderResponse = await fetch('/api/create-upload-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+                    
+                    const orderData = await orderResponse.json();
+                    
+                    if (!orderResponse.ok) {
+                        throw new Error(orderData.error || 'Failed to create payment order');
+                    }
+                    
+                    // Step 2: Open Razorpay checkout
+                    const options = {
+                        key: orderData.key,
+                        amount: orderData.amount,
+                        currency: orderData.currency,
+                        name: 'Market Master',
+                        description: 'Video Upload Fee (₹120)',
+                        order_id: orderData.orderId,
+                        handler: async function(response) {
+                            // Payment successful - now save the video
+                            await saveVideo(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+                        },
+                        theme: {
+                            color: '#6366f1'
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                                showFileError('Payment cancelled. Please complete payment to upload video.');
+                            }
+                        }
+                    };
+                    
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                    
+                } catch (error) {
+                    console.error('Payment initialization error:', error);
+                    showFileError(error.message || 'Failed to initialize payment');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+            
+            // Function to save video after successful payment and validation
+            async function saveVideo(paymentId, orderId, signature) {
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const progressContainer = document.getElementById('progressContainer');
+                const setStep = (stepId, status) => {
+                    const step = document.getElementById(stepId);
+                    step.classList.remove('active', 'completed', 'error');
+                    step.classList.add(status);
+                    const icon = step.querySelector('.step-icon i');
+                    if (status === 'completed') icon.className = 'fas fa-check';
+                };
+                
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                progressContainer.classList.add('active');
+                setStep('step-save', 'active');
+                
+                const formData = new FormData();
+                formData.append('name', document.getElementById('name').value.trim());
+                formData.append('topic', document.getElementById('topic').value.trim());
+                formData.append('isPaid', 'true');
+                
+                const cost = parseFloat(document.getElementById('cost').value) || 0;
+                const currency = document.getElementById('currency').value;
+                formData.append('cost', cost.toString());
+                formData.append('currency', currency);
+                
+                // Add Razorpay payment details
+                formData.append('uploadPaymentId', paymentId);
+                formData.append('uploadOrderId', orderId);
+                formData.append('uploadSignature', signature);
+                
+                // Add AI validation data
+                formData.append('aiSummary', validationData.summary);
+                formData.append('relevanceScore', validationData.relevanceScore);
+                formData.append('topicMatchScore', validationData.topicScore);
+                formData.append('transcript', validationData.transcript);
+                formData.append('fileHash', validationData.fileHash);
+                
+                // Add payment method details
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+                if (paymentMethod === 'upi') {
+                    const upiId = document.getElementById('ownerUpiId').value.trim();
+                    if (!upiId) {
+                        showFileError('Please enter your UPI ID for paid videos');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                        return;
+                    }
+                    formData.append('ownerUpiId', upiId);
+                } else {
+                    const accountName = document.getElementById('ownerAccountName').value.trim();
+                    const accountNumber = document.getElementById('ownerAccountNumber').value.trim();
+                    const ifsc = document.getElementById('ownerIfsc').value.trim();
+                    
+                    if (!accountName || !accountNumber || !ifsc) {
+                        showFileError('Please fill in all bank account details for paid videos');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                        return;
+                    }
+                    
+                    formData.append('ownerAccountName', accountName);
+                    formData.append('ownerAccountNumber', accountNumber);
+                    formData.append('ownerIfsc', ifsc);
+                }
+                
+                // Add video file
+                if (fileInput.files.length > 0) {
+                    formData.append('video', fileInput.files[0]);
+                } else {
+                    showFileError('Please select a video file');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                    return;
+                }
+
+                try {
+                    // Call final save endpoint
+                    const response = await fetch('/api/videos/final-save', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to save video');
+                    }
+
+                    setStep('step-save', 'completed');
+                    progressContainer.classList.remove('active');
+
+                    // Show success and redirect
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'success-message';
+                    successMessage.style.cssText = 'background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 1.5rem; text-align: center; margin: 1rem 0;';
+                    successMessage.innerHTML = `
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #22c55e; margin-bottom: 1rem;"></i>
+                        <h3 style="color: #166534; margin-bottom: 0.5rem;">Video Uploaded Successfully!</h3>
+                        <p style="color: #4b5563;">Redirecting to videos page...</p>
+                    `;
+                    form.prepend(successMessage);
+                    
+                    // Reset form
+                    setTimeout(() => {
+                        form.reset();
+                        fileInfo.style.display = 'none';
+                        document.getElementById('validationResult').classList.remove('active', 'approved', 'rejected');
+                        progressContainer.classList.remove('active');
+                        validationData = null;
+                        checkedFileHash = null;
+                        window.location.href = 'mentors.html';
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Save error:', error);
+                    progressContainer.classList.remove('active');
+                    showFileError(error.message || 'Failed to save video. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+                }
+            }
+
+            // Add animation on load
+            document.querySelector('.upload-container').style.animation = 'fadeIn 0.5s ease-out';
+        });
+    </script>
+</body>
+</html>
