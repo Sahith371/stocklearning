@@ -2010,13 +2010,13 @@
 
     <!-- Header Auth Script -->
     <script>
-        const API_BASE_URL = 'https://stockmaster-api.onrender.com';
+        const API_BASE_URL = 'https://stock-learning-api.onrender.com';
         const navButtons = document.getElementById('navButtons');
         
         async function renderHeaderFromSession() {
             if (!navButtons) return;
             try {
-                const res = await fetch('https://stockmaster-api.onrender.com/api/me', { credentials: 'include' });
+                const res = await fetch('https://stock-learning-api.onrender.com/api/me', { credentials: 'include' });
                 if (!res.ok) throw new Error('No session');
                 const me = await res.json();
                 const first = String(me.username || '').charAt(0).toUpperCase() || 'U';

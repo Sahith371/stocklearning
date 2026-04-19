@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://stockmaster-api.onrender.com/api/$1"
+      "destination": "https://stock-learning-api.onrender.com/api/$1"
     },
     {
       "source": "/uploads/(.*)",
-      "destination": "https://stockmaster-api.onrender.com/uploads/$1"
+      "destination": "https://stock-learning-api.onrender.com/uploads/$1"
     }
   ],
   "headers": [
