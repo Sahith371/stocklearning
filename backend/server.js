@@ -916,8 +916,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production', // Secure in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-domain
+      secure: process.env.NODE_ENV === 'production', // Must be true for sameSite: 'none'
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
   })
