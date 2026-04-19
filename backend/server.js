@@ -438,15 +438,18 @@ const paperTradingTransactionSchema = new mongoose.Schema({
 const PaperTradingTransaction = mongoose.models.PaperTradingTransaction || mongoose.model('PaperTradingTransaction', paperTradingTransactionSchema);
 
 // ====== File Upload Configuration ======
-// Ensure uploads directory exists (skip in serverless)
-// Use Render disk path if available, otherwise use local path
-const uploadsDir = process.env.RENDER_DISK_PATH 
-  ? path.join(process.env.RENDER_DISK_PATH, 'uploads')
+// Ensure uploads directory exists
+// For Render free tier without disk, use /tmp folder (temporary but works)
+const uploadsDir = process.env.RENDER 
+  ? (process.env.RENDER_DISK_PATH ? path.join(process.env.RENDER_DISK_PATH, 'uploads') : '/tmp/uploads')
   : path.join(__dirname, '..', 'uploads');
   
-if (!fs.existsSync(uploadsDir) && process.env.VERCEL !== '1') {
+if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
+
+// Note: On Render free tier without disk, uploaded files will be lost when server restarts
+// For production, use Cloudflare R2, AWS S3, or upgrade to paid tier
 
 // Thumbnail generation function
 async function generateThumbnail(videoPath, outputPath) {
