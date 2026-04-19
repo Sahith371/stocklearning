@@ -3067,7 +3067,7 @@
                     }
                     
                     try {
-                        const response = await fetch('http://localhost:4000/api/verify-payment', {
+                        const response = await fetch('https://stockmaster-api.onrender.com/api/verify-payment', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -3401,7 +3401,7 @@
             videoTitle: videoTitle
         };
         
-        fetch('http://localhost:4000/api/create-order', {
+        fetch('https://stockmaster-api.onrender.com/api/create-order', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -3443,7 +3443,7 @@
                     console.log('Available methods:', response.methods);
                     
                     // Verify payment on server
-                    fetch('http://localhost:4000/api/verify-payment', {
+                    fetch('https://stockmaster-api.onrender.com/api/verify-payment', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

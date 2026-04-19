@@ -957,7 +957,7 @@
         /* ── EXIT MODAL ── */
         function showExitModal() { document.getElementById('exitModal').classList.add('active'); }
         function closeExitModal() { document.getElementById('exitModal').classList.remove('active'); requestFS(); }
-        function confirmExit() { stopWebcam(); window.location.href = 'http://localhost:4000/index.html'; }
+        function confirmExit() { stopWebcam(); window.location.href = 'https://stockmaster-api.onrender.com/index.html'; }
 
         /* ══════════════════════════════════════════
            SUBMIT EXAM
@@ -1210,7 +1210,7 @@
             });
         }
 
-        function finishExam() { window.location.href = 'http://localhost:4000/index.html'; }
+        function finishExam() { window.location.href = 'https://stockmaster-api.onrender.com/index.html'; }
 
         document.addEventListener('keydown', e => {
             if (e.key === 'F11') { e.preventDefault(); requestFS(); }

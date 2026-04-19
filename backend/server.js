@@ -439,7 +439,11 @@ const PaperTradingTransaction = mongoose.models.PaperTradingTransaction || mongo
 
 // ====== File Upload Configuration ======
 // Ensure uploads directory exists (skip in serverless)
-const uploadsDir = path.join(__dirname, '..', 'uploads');
+// Use Render disk path if available, otherwise use local path
+const uploadsDir = process.env.RENDER_DISK_PATH 
+  ? path.join(process.env.RENDER_DISK_PATH, 'uploads')
+  : path.join(__dirname, '..', 'uploads');
+  
 if (!fs.existsSync(uploadsDir) && process.env.VERCEL !== '1') {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -922,7 +926,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // Serve uploaded videos
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 // Serve index.html for root path
 app.get('/', (req, res) => {
